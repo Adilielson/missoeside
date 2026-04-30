@@ -97,7 +97,15 @@ export function CustomDonation() {
                 <span>Total Arrecadado</span>
                 <span>85%</span>
               </div>
-              <Progress value={85} className="h-4 bg-white/20" indicatorClassName="bg-white" />
+              <div className="h-4 w-full bg-white/20 rounded-full overflow-hidden">
+                <motion.div 
+                  initial={{ width: 0 }}
+                  whileInView={{ width: "85%" }}
+                  viewport={{ once: true }}
+                  transition={{ duration: 1.5, ease: "easeOut" }}
+                  className="h-full bg-white"
+                />
+              </div>
               <div className="flex justify-between font-bold opacity-80">
                 <span>R$ 425.000,00</span>
                 <span>Meta: R$ 500.000,00</span>
