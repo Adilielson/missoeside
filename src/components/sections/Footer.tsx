@@ -1,5 +1,5 @@
 import { Logo } from "../Logo";
-import { Globe, Share2, Instagram, Mail, Send, ChevronRight } from "lucide-react";
+import { Globe, Share2, Phone, Mail, Send, ChevronRight } from "lucide-react";
 import { Button } from "@/components/ui/button";
 
 export function Footer() {
@@ -15,7 +15,7 @@ export function Footer() {
               através de ações práticas e suporte missionário integral.
             </p>
             <div className="flex gap-4">
-              {[Globe, Share2, Instagram, Mail].map((Icon, i) => (
+              {[Globe, Share2, Phone, Mail].map((Icon, i) => (
                 <a 
                   key={i} 
                   href="#" 
