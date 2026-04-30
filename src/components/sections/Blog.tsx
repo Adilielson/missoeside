@@ -54,7 +54,7 @@ export function Blog() {
 
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
           {posts.map((post, index) => (
-            <fm.div
+            <motion.div
               key={index}
               initial={{ opacity: 0, y: 30 }}
               whileInView={{ opacity: 1, y: 0 }}
@@ -88,7 +88,7 @@ export function Blog() {
                 <span>Leia Mais</span>
                 <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
               </div>
-            </fm.div>
+            </motion.div>
           ))}
         </div>
       </div>
