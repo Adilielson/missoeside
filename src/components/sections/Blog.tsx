@@ -1,5 +1,4 @@
-import { motion } from "ate-presence"; // Wrong import, fixing below
-import { motion as fm } from "framer-motion";
+import { motion } from "framer-motion";
 import { ArrowRight, ArrowLeft, Calendar } from "lucide-react";
 import { SectionTag } from "../SectionTag";
 import { Button } from "@/components/ui/button";
