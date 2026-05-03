@@ -53,7 +53,7 @@ export function Volunteers() {
           </p>
 
           <Accordion type="single" defaultValue="item-1" className="space-y-4">
-            <AccordionItem value="item-1" className="border-none bg-white rounded-3xl px-8 shadow-sm">
+            <AccordionItem value="item-1" className="border-none bg-white rounded-3xl px-5 sm:px-8 shadow-sm">
               <AccordionTrigger className="hover:no-underline py-6">
                 <span className="text-lg font-black text-brand-dark text-left">Reconhecimento e Realização</span>
               </AccordionTrigger>
@@ -64,7 +64,7 @@ export function Volunteers() {
               </AccordionContent>
             </AccordionItem>
 
-            <AccordionItem value="item-2" className="border-none bg-white rounded-3xl px-8 shadow-sm">
+            <AccordionItem value="item-2" className="border-none bg-white rounded-3xl px-5 sm:px-8 shadow-sm">
               <AccordionTrigger className="hover:no-underline py-6">
                 <span className="text-lg font-black text-brand-dark text-left">Por Que Se Tornar Voluntário?</span>
               </AccordionTrigger>
@@ -75,7 +75,7 @@ export function Volunteers() {
               </AccordionContent>
             </AccordionItem>
 
-            <AccordionItem value="item-3" className="border-none bg-white rounded-3xl px-8 shadow-sm">
+            <AccordionItem value="item-3" className="border-none bg-white rounded-3xl px-5 sm:px-8 shadow-sm">
               <AccordionTrigger className="hover:no-underline py-6">
                 <span className="text-lg font-black text-brand-dark text-left">Faça Parte de uma Comunidade</span>
               </AccordionTrigger>
