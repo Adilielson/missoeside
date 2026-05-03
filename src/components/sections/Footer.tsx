@@ -102,7 +102,7 @@ export function Footer() {
       </div>
 
       <div className="bg-brand-orange py-6">
-        <div className="max-w-7xl mx-auto px-6 flex flex-col md:flex-row justify-between items-center gap-4">
+        <div className="max-w-7xl mx-auto px-5 sm:px-6 flex flex-col md:flex-row justify-between items-center gap-4 text-center md:text-left">
           <p className="text-white text-sm font-bold opacity-80">
             © 2026 IDE — Missões para o Mundo. Todos os direitos reservados.
           </p>
