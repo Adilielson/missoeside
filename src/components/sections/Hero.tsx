@@ -1,6 +1,13 @@
-import { motion } from "framer-motion";
+import { motion, AnimatePresence } from "framer-motion";
+import { useEffect, useState } from "react";
 import { Heart, ChevronRight } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import hero2 from "@/assets/hero-2.png";
+
+const heroImages = [
+  "https://images.unsplash.com/photo-1594708767771-a7502209ff51?q=80&w=1920&auto=format&fit=crop",
+  hero2,
+];
 
 const avatars = [
   "https://i.pravatar.cc/150?u=11",
