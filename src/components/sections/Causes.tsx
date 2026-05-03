@@ -52,18 +52,18 @@ export function Causes() {
   };
 
   return (
-    <section id="missoes" className="py-24 bg-brand-light relative overflow-hidden">
-      <div className="max-w-7xl mx-auto px-6 mb-16 flex flex-col md:flex-row md:items-end justify-between gap-6">
+    <section id="missoes" className="py-16 md:py-24 bg-brand-light relative overflow-hidden">
+      <div className="max-w-7xl mx-auto px-5 sm:px-6 mb-12 md:mb-16 flex flex-col md:flex-row md:items-end justify-between gap-6">
         <div className="max-w-2xl">
           <SectionTag icon={Heart} text="Ajude e Done" light />
-          <h2 className="text-4xl md:text-5xl font-black text-brand-dark leading-tight">
-            Inspirando e Ajudando por um <br />
+          <h2 className="text-3xl sm:text-4xl md:text-5xl font-black text-brand-dark leading-tight">
+            Inspirando e Ajudando por um <br className="hidden sm:block" />
             <span className="text-brand-orange">Mundo Melhor</span>
           </h2>
         </div>
       </div>
 
-      <div className="flex flex-col lg:flex-row gap-8 pl-6 lg:pl-0">
+      <div className="flex flex-col lg:flex-row gap-8 pl-5 sm:pl-6 lg:pl-0">
         {/* Causes Carousel */}
         <div 
           ref={scrollRef}
