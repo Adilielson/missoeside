@@ -40,12 +40,12 @@ const events = [
 
 export function Events() {
   return (
-    <section id="eventos" className="py-24 bg-brand-dark overflow-hidden">
-      <div className="max-w-7xl mx-auto px-6">
-        <div className="flex flex-col md:flex-row md:items-end justify-between gap-8 mb-16">
+    <section id="eventos" className="py-16 md:py-24 bg-brand-dark overflow-hidden">
+      <div className="max-w-7xl mx-auto px-5 sm:px-6">
+        <div className="flex flex-col md:flex-row md:items-end justify-between gap-6 md:gap-8 mb-12 md:mb-16">
           <div className="max-w-2xl">
             <SectionTag icon={Calendar} text="Próximos Eventos" />
-            <h2 className="text-4xl md:text-5xl font-black text-white leading-tight">
+            <h2 className="text-3xl sm:text-4xl md:text-5xl font-black text-white leading-tight">
               Esteja Conosco em <br />
               <span className="text-brand-orange">Nossos Momentos</span>
             </h2>
