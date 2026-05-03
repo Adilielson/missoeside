@@ -1,4 +1,4 @@
-import { motion, AnimatePresence } from "framer-motion";
+import { motion } from "framer-motion";
 import { useEffect, useState } from "react";
 import { Heart, ChevronRight } from "lucide-react";
 import { Button } from "@/components/ui/button";
