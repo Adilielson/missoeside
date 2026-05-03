@@ -62,12 +62,19 @@ export function Hero() {
 
       {/* Mobile background image */}
       <div className="lg:hidden absolute inset-0 pointer-events-none">
-        <img
-          src="https://images.unsplash.com/photo-1594708767771-a7502209ff51?q=80&w=1200&auto=format&fit=crop"
-          alt=""
-          aria-hidden="true"
-          className="w-full h-full object-cover opacity-25"
-        />
+        <AnimatePresence mode="sync">
+          <motion.img
+            key={imgIndex}
+            src={heroImages[imgIndex]}
+            alt=""
+            aria-hidden="true"
+            className="absolute inset-0 w-full h-full object-cover opacity-25"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 0.25 }}
+            exit={{ opacity: 0 }}
+            transition={{ duration: 1.5, ease: "easeInOut" }}
+          />
+        </AnimatePresence>
         <div className="absolute inset-0 bg-gradient-to-b from-brand-dark via-brand-dark/85 to-brand-dark" />
       </div>
 
