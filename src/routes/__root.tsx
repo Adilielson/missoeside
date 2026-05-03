@@ -29,14 +29,18 @@ export const Route = createRootRoute({
     meta: [
       { charSet: "utf-8" },
       { name: "viewport", content: "width=device-width, initial-scale=1" },
-      { title: "Lovable App" },
-      { name: "description", content: "Lovable Generated Project" },
+      { title: "IDE - MIssões para o Mundo" },
+      { name: "description", content: "Alcançando vidas, através do evangelho e da ação social. Seja um missionário fazendo sua doação." },
       { name: "author", content: "Lovable" },
-      { property: "og:title", content: "Lovable App" },
-      { property: "og:description", content: "Lovable Generated Project" },
+      { property: "og:title", content: "IDE - MIssões para o Mundo" },
+      { property: "og:description", content: "Alcançando vidas, através do evangelho e da ação social. Seja um missionário fazendo sua doação." },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary" },
       { name: "twitter:site", content: "@Lovable" },
+      { name: "twitter:title", content: "IDE - MIssões para o Mundo" },
+      { name: "twitter:description", content: "Alcançando vidas, através do evangelho e da ação social. Seja um missionário fazendo sua doação." },
+      { property: "og:image", content: "https://storage.googleapis.com/gpt-engineer-file-uploads/attachments/og-images/d06c498e-0475-474c-a454-31b3cdc8b72f" },
+      { name: "twitter:image", content: "https://storage.googleapis.com/gpt-engineer-file-uploads/attachments/og-images/d06c498e-0475-474c-a454-31b3cdc8b72f" },
     ],
     links: [
       {
