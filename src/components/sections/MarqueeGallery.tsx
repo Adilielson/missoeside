@@ -13,7 +13,7 @@ const images = [
 
 export function MarqueeGallery() {
   return (
-    <section className="py-24 bg-white overflow-hidden">
+    <section className="py-16 md:py-24 bg-white overflow-hidden">
       <div className="relative flex overflow-x-hidden">
         <motion.div
           animate={{ x: ["0%", "-50%"] }}
