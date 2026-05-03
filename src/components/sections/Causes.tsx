@@ -3,41 +3,36 @@ import { motion, useScroll, useTransform } from "framer-motion";
 import { Heart, ArrowRight, ArrowLeft, Users } from "lucide-react";
 import { SectionTag } from "../SectionTag";
 import { Button } from "@/components/ui/button";
-import { Progress } from "@/components/ui/progress";
 import africaXaiXai from "@/assets/africa-xai-xai.png";
 
 const causes = [
   {
-    title: "África – Xai Xai/Gaza",
+    title: "África",
+    subtitle: "Xai Xai / Gaza",
     desc: "Construção de poços artesianos em comunidades carentes para erradicar doenças.",
     image: africaXaiXai,
     category: "Saúde",
-    raised: 12500,
-    goal: 20000,
   },
   {
-    title: "África – Xai Xai/Gaza",
+    title: "África",
+    subtitle: "Xai Xai / Gaza",
     desc: "Fornecimento de materiais escolares e treinamento para professores locais.",
     image: "https://images.unsplash.com/photo-1497633762265-9d179a990aa6?q=80&w=2073&auto=format&fit=crop",
     category: "Educação",
-    raised: 8400,
-    goal: 15000,
   },
   {
-    title: "Alívio à Fome na América Latina",
+    title: "Alívio à Fome",
+    subtitle: "América Latina",
     desc: "Distribuição de cestas básicas e apoio a hortas comunitárias autossustentáveis.",
     image: "https://images.unsplash.com/photo-1488521787991-ed7bbaae773c?q=80&w=2070&auto=format&fit=crop",
     category: "Alimentação",
-    raised: 45000,
-    goal: 50000,
   },
   {
-    title: "Apoio a Refugiados de Guerra",
+    title: "Apoio a Refugiados",
+    subtitle: "Vítimas de Guerra",
     desc: "Assistência médica e psicológica imediata para famílias deslocadas por conflitos.",
     image: "https://images.unsplash.com/photo-1469571486292-0ba58a3f068b?q=80&w=2070&auto=format&fit=crop",
     category: "Emergência",
-    raised: 95000,
-    goal: 100000,
   },
 ];
 
