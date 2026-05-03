@@ -13,7 +13,7 @@ export function CustomDonation() {
   const [customAmount, setCustomAmount] = useState("");
 
   return (
-    <section id="doacoes" className="py-24 relative overflow-hidden">
+    <section id="doacoes" className="py-16 md:py-24 relative overflow-hidden">
       {/* Background with overlay */}
       <div className="absolute inset-0 z-0">
         <img 
