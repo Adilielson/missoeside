@@ -62,7 +62,7 @@ export function Blog() {
               transition={{ delay: index * 0.1 }}
               className="group cursor-pointer"
             >
-              <div className="relative aspect-[4/3] rounded-[40px] overflow-hidden mb-6">
+              <div className="relative aspect-[4/3] rounded-[28px] sm:rounded-[40px] overflow-hidden mb-6">
                 <img 
                   src={post.image} 
                   alt={post.title} 
