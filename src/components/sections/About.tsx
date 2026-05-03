@@ -60,10 +60,10 @@ export function About() {
             <motion.div
               animate={{ y: [0, -10, 0] }}
               transition={{ duration: 3, repeat: Infinity }}
-              className="absolute top-1/2 -right-10 bg-brand-orange text-white p-6 rounded-3xl shadow-2xl z-20"
+              className="absolute top-1/2 -right-2 sm:-right-6 lg:-right-10 bg-brand-orange text-white p-4 sm:p-6 rounded-2xl sm:rounded-3xl shadow-2xl z-20"
             >
-              <p className="text-4xl font-black">15+</p>
-              <p className="text-xs font-bold uppercase tracking-widest opacity-80">Anos de <br />Experiência</p>
+              <p className="text-2xl sm:text-4xl font-black">15+</p>
+              <p className="text-[10px] sm:text-xs font-bold uppercase tracking-widest opacity-80">Anos de <br />Experiência</p>
             </motion.div>
           </div>
         </motion.div>
