@@ -10,8 +10,8 @@ import {
 
 export function Volunteers() {
   return (
-    <section className="py-24 bg-brand-light overflow-hidden">
-      <div className="max-w-7xl mx-auto px-6 grid grid-cols-1 lg:grid-cols-2 gap-20 items-center">
+    <section className="py-16 md:py-24 bg-brand-light overflow-hidden">
+      <div className="max-w-7xl mx-auto px-5 sm:px-6 grid grid-cols-1 lg:grid-cols-2 gap-12 lg:gap-20 items-center">
         {/* Left Image */}
         <motion.div
           initial={{ opacity: 0, scale: 0.9 }}
