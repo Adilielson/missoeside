@@ -77,7 +77,7 @@ export function Causes() {
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true }}
               transition={{ delay: index * 0.1 }}
-              className="min-w-[320px] md:min-w-[400px] bg-white rounded-[40px] overflow-hidden shadow-xl border border-brand-orange/5 group snap-start"
+              className="min-w-[280px] sm:min-w-[320px] md:min-w-[400px] max-w-[90vw] bg-white rounded-[32px] sm:rounded-[40px] overflow-hidden shadow-xl border border-brand-orange/5 group snap-start"
             >
               <div className="relative h-64 overflow-hidden">
                 <img 
