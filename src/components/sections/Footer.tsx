@@ -4,9 +4,9 @@ import { Button } from "@/components/ui/button";
 
 export function Footer() {
   return (
-    <footer id="contato" className="bg-brand-dark pt-24">
-      <div className="max-w-7xl mx-auto px-6 pb-20">
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-16">
+    <footer id="contato" className="bg-brand-dark pt-16 sm:pt-24">
+      <div className="max-w-7xl mx-auto px-5 sm:px-6 pb-16 sm:pb-20">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-12 lg:gap-16">
           {/* Brand Col */}
           <div className="space-y-8">
             <Logo />
