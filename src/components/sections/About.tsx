@@ -5,8 +5,8 @@ import { Button } from "@/components/ui/button";
 
 export function About() {
   return (
-    <section id="sobre" className="py-24 bg-brand-light overflow-hidden">
-      <div className="max-w-7xl mx-auto px-6 grid grid-cols-1 lg:grid-cols-2 gap-20 items-center">
+    <section id="sobre" className="py-16 md:py-24 bg-brand-light overflow-hidden">
+      <div className="max-w-7xl mx-auto px-5 sm:px-6 grid grid-cols-1 lg:grid-cols-2 gap-12 lg:gap-20 items-center">
         {/* Left Side: Heart Collage */}
         <motion.div
           initial={{ opacity: 0, x: -100 }}
