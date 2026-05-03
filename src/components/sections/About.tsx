@@ -77,7 +77,7 @@ export function About() {
         >
           <SectionTag icon={Heart} text="Sobre Nós" light />
           
-          <h2 className="text-4xl md:text-5xl font-black text-brand-dark mb-6 leading-tight">
+          <h2 className="text-3xl sm:text-4xl md:text-5xl font-black text-brand-dark mb-6 leading-tight">
             Nossa Jornada de Fé e <br />
             <span className="text-brand-orange">Impacto Global</span>
           </h2>
