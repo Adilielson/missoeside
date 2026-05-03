@@ -1,6 +1,13 @@
-import { motion } from "framer-motion";
+import { motion, AnimatePresence } from "framer-motion";
+import { useEffect, useState } from "react";
 import { Heart, ChevronRight } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import hero2 from "@/assets/hero-2.png";
+
+const heroImages = [
+  "https://images.unsplash.com/photo-1594708767771-a7502209ff51?q=80&w=1920&auto=format&fit=crop",
+  hero2,
+];
 
 const avatars = [
   "https://i.pravatar.cc/150?u=11",
@@ -9,6 +16,15 @@ const avatars = [
 ];
 
 export function Hero() {
+  const [imgIndex, setImgIndex] = useState(0);
+
+  useEffect(() => {
+    const interval = setInterval(() => {
+      setImgIndex((i) => (i + 1) % heroImages.length);
+    }, 5000);
+    return () => clearInterval(interval);
+  }, []);
+
   return (
     <section
       id="hero"
@@ -27,24 +43,38 @@ export function Hero() {
           className="absolute inset-0"
           style={{ clipPath: "url(#heroCurve)", WebkitClipPath: "url(#heroCurve)" }}
         >
-          <img
-            src="https://images.unsplash.com/photo-1594708767771-a7502209ff51?q=80&w=1920&auto=format&fit=crop"
-            alt="Pessoas impactadas pela missão"
-            className="w-full h-full object-cover"
-            loading="eager"
-          />
+          <AnimatePresence mode="sync">
+            <motion.img
+              key={imgIndex}
+              src={heroImages[imgIndex]}
+              alt="Pessoas impactadas pela missão"
+              className="absolute inset-0 w-full h-full object-cover"
+              loading="eager"
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              transition={{ duration: 1.5, ease: "easeInOut" }}
+            />
+          </AnimatePresence>
           <div className="absolute inset-0 bg-gradient-to-r from-brand-dark/70 via-transparent to-transparent" />
         </div>
       </div>
 
       {/* Mobile background image */}
       <div className="lg:hidden absolute inset-0 pointer-events-none">
-        <img
-          src="https://images.unsplash.com/photo-1594708767771-a7502209ff51?q=80&w=1200&auto=format&fit=crop"
-          alt=""
-          aria-hidden="true"
-          className="w-full h-full object-cover opacity-25"
-        />
+        <AnimatePresence mode="sync">
+          <motion.img
+            key={imgIndex}
+            src={heroImages[imgIndex]}
+            alt=""
+            aria-hidden="true"
+            className="absolute inset-0 w-full h-full object-cover opacity-25"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 0.25 }}
+            exit={{ opacity: 0 }}
+            transition={{ duration: 1.5, ease: "easeInOut" }}
+          />
+        </AnimatePresence>
         <div className="absolute inset-0 bg-gradient-to-b from-brand-dark via-brand-dark/85 to-brand-dark" />
       </div>
 
