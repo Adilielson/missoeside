@@ -61,19 +61,18 @@ export function Hero() {
 
       {/* Mobile background image */}
       <div className="lg:hidden absolute inset-0 pointer-events-none">
-        <AnimatePresence mode="sync">
+        {heroImages.map((src, i) => (
           <motion.img
-            key={imgIndex}
-            src={heroImages[imgIndex]}
+            key={i}
+            src={src}
             alt=""
             aria-hidden="true"
-            className="absolute inset-0 w-full h-full object-cover opacity-25"
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 0.25 }}
-            exit={{ opacity: 0 }}
+            className="absolute inset-0 w-full h-full object-cover"
+            initial={false}
+            animate={{ opacity: i === imgIndex ? 0.25 : 0 }}
             transition={{ duration: 1.5, ease: "easeInOut" }}
           />
-        </AnimatePresence>
+        ))}
         <div className="absolute inset-0 bg-gradient-to-b from-brand-dark via-brand-dark/85 to-brand-dark" />
       </div>
 
