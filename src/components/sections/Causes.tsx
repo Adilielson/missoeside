@@ -7,7 +7,7 @@ import { Progress } from "@/components/ui/progress";
 
 const causes = [
   {
-    title: "Água Potável na África",
+    title: "África – Xai Xai/Gaza",
     desc: "Construção de poços artesianos em comunidades carentes para erradicar doenças.",
     image: "https://images.unsplash.com/photo-1547592166-23ac45744acd?q=80&w=2071&auto=format&fit=crop",
     category: "Saúde",
