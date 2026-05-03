@@ -71,8 +71,8 @@ export function CustomDonation() {
               />
             </div>
 
-            <Button className="w-full bg-brand-gradient hover:opacity-90 text-white text-xl py-8 rounded-full shadow-lg shadow-brand-orange/20 transition-all active:scale-95">
-              Fazer Doação <Heart className="ml-2 w-6 h-6 fill-white" />
+            <Button className="w-full bg-brand-gradient hover:opacity-90 text-white text-lg sm:text-xl py-6 sm:py-8 rounded-full shadow-lg shadow-brand-orange/20 transition-all active:scale-95">
+              Fazer Doação <Heart className="ml-2 w-5 h-5 sm:w-6 sm:h-6 fill-white" />
             </Button>
           </motion.div>
 
@@ -81,13 +81,13 @@ export function CustomDonation() {
             initial={{ opacity: 0, x: 50 }}
             whileInView={{ opacity: 1, x: 0 }}
             viewport={{ once: true }}
-            className="bg-brand-orange p-12 lg:p-20 text-white flex flex-col justify-center"
+            className="bg-brand-orange p-8 sm:p-12 lg:p-20 text-white flex flex-col justify-center"
           >
             <SectionTag text="Faça uma Doação" className="bg-white/20 border-white/30" />
-            <h3 className="text-4xl font-black mb-6 leading-tight">
-              Sua Generosidade Alimenta <br />a Esperança do Mundo
+            <h3 className="text-2xl sm:text-3xl md:text-4xl font-black mb-6 leading-tight">
+              Sua Generosidade Alimenta a Esperança do Mundo
             </h3>
-            <p className="text-white/80 mb-12 text-lg leading-relaxed">
+            <p className="text-white/80 mb-10 sm:mb-12 text-base sm:text-lg leading-relaxed">
               Cada centavo doado é direcionado integralmente para as nossas frentes missionárias. 
               Juntos, podemos alcançar lugares onde ninguém mais vai.
             </p>
