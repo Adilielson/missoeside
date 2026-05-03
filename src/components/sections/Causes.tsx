@@ -86,29 +86,25 @@ export function Causes() {
                 </div>
               </div>
               <div className="p-6 sm:p-8">
-                <h3 className="text-xl sm:text-2xl font-black text-brand-dark mb-4 group-hover:text-brand-orange transition-colors">
+                <h3 className="text-xl sm:text-2xl font-black text-brand-dark mb-1 group-hover:text-brand-orange transition-colors">
                   {cause.title}
                 </h3>
+                <p className="text-sm font-bold text-brand-orange uppercase tracking-wider mb-4">
+                  {cause.subtitle}
+                </p>
                 <p className="text-brand-dark/50 text-sm mb-8 line-clamp-2">
                   {cause.desc}
                 </p>
-                
-                <div className="space-y-2 mb-8">
-                  <div className="flex justify-between text-xs font-bold uppercase tracking-widest">
-                    <span className="text-brand-orange">Progresso</span>
-                    <span className="text-brand-dark">{Math.round((cause.raised / cause.goal) * 100)}%</span>
-                  </div>
-                  <Progress value={(cause.raised / cause.goal) * 100} className="h-2 bg-brand-orange/10" />
-                  <div className="flex justify-between text-sm font-black mt-2">
-                    <span className="text-brand-dark">R$ {cause.raised.toLocaleString()}</span>
-                    <span className="text-brand-dark/30">Meta: R$ {cause.goal.toLocaleString()}</span>
-                  </div>
-                </div>
 
-                <Button className="w-full bg-brand-orange/10 hover:bg-brand-orange text-brand-orange hover:text-white border-none py-6 rounded-2xl font-bold group/btn">
-                  Apoiar Agora
-                  <ArrowRight className="w-4 h-4 ml-2 group-hover/btn:translate-x-1 transition-transform" />
-                </Button>
+                <div className="flex flex-col sm:flex-row gap-3">
+                  <Button className="flex-1 bg-brand-orange hover:bg-brand-orange/90 text-white border-none py-6 rounded-2xl font-bold group/btn">
+                    Apoiar Agora
+                    <ArrowRight className="w-4 h-4 ml-2 group-hover/btn:translate-x-1 transition-transform" />
+                  </Button>
+                  <Button variant="outline" className="flex-1 border-2 border-brand-orange/20 bg-transparent hover:bg-brand-orange/10 text-brand-orange py-6 rounded-2xl font-bold">
+                    Conhecer mais
+                  </Button>
+                </div>
               </div>
             </motion.div>
           ))}
