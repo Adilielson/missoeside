@@ -16,28 +16,25 @@ export function Hero() {
     >
       {/* Right curved image area - desktop only */}
       <div className="hidden lg:block absolute inset-y-0 right-0 w-[58%] pointer-events-none">
-        <svg
-          viewBox="0 0 100 100"
-          preserveAspectRatio="none"
-          className="absolute inset-0 w-full h-full"
-        >
+        <svg width="0" height="0" className="absolute">
           <defs>
             <clipPath id="heroCurve" clipPathUnits="objectBoundingBox">
               <path d="M 0.15,0 C 0.05,0.16 0.18,0.34 0.10,0.52 C 0.03,0.70 0.18,0.82 0.13,1 L 1,1 L 1,0 Z" />
             </clipPath>
           </defs>
-          <foreignObject x="0" y="0" width="100" height="100" clipPath="url(#heroCurve)">
-            <div className="w-full h-full relative">
-              <img
-                src="https://images.unsplash.com/photo-1594708767771-a7502209ff51?q=80&w=1920&auto=format&fit=crop"
-                alt="Pessoas impactadas pela missão"
-                className="w-full h-full object-cover"
-                loading="eager"
-              />
-              <div className="absolute inset-0 bg-gradient-to-r from-brand-dark/70 via-transparent to-transparent" />
-            </div>
-          </foreignObject>
         </svg>
+        <div
+          className="absolute inset-0"
+          style={{ clipPath: "url(#heroCurve)", WebkitClipPath: "url(#heroCurve)" }}
+        >
+          <img
+            src="https://images.unsplash.com/photo-1594708767771-a7502209ff51?q=80&w=1920&auto=format&fit=crop"
+            alt="Pessoas impactadas pela missão"
+            className="w-full h-full object-cover"
+            loading="eager"
+          />
+          <div className="absolute inset-0 bg-gradient-to-r from-brand-dark/70 via-transparent to-transparent" />
+        </div>
       </div>
 
       {/* Mobile background image */}
