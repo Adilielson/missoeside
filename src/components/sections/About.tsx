@@ -82,7 +82,7 @@ export function About() {
             <span className="text-brand-orange">Impacto Global</span>
           </h2>
 
-          <p className="text-lg text-brand-dark/60 mb-8 leading-relaxed">
+          <p className="text-base sm:text-lg text-brand-dark/60 mb-8 leading-relaxed">
             Há mais de uma década, a IDE — Missões para o Mundo tem sido um farol de esperança. 
             Nascemos com o propósito de conectar corações generosos às necessidades mais urgentes 
             do planeta, levando não apenas assistência material, mas a mensagem transformadora do Evangelho.
