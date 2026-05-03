@@ -43,19 +43,18 @@ export function Hero() {
           className="absolute inset-0"
           style={{ clipPath: "url(#heroCurve)", WebkitClipPath: "url(#heroCurve)" }}
         >
-          <AnimatePresence mode="sync">
+          {heroImages.map((src, i) => (
             <motion.img
-              key={imgIndex}
-              src={heroImages[imgIndex]}
+              key={i}
+              src={src}
               alt="Pessoas impactadas pela missão"
               className="absolute inset-0 w-full h-full object-cover"
               loading="eager"
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              exit={{ opacity: 0 }}
+              initial={false}
+              animate={{ opacity: i === imgIndex ? 1 : 0 }}
               transition={{ duration: 1.5, ease: "easeInOut" }}
             />
-          </AnimatePresence>
+          ))}
           <div className="absolute inset-0 bg-gradient-to-r from-brand-dark/70 via-transparent to-transparent" />
         </div>
       </div>
