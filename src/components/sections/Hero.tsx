@@ -43,12 +43,19 @@ export function Hero() {
           className="absolute inset-0"
           style={{ clipPath: "url(#heroCurve)", WebkitClipPath: "url(#heroCurve)" }}
         >
-          <img
-            src="https://images.unsplash.com/photo-1594708767771-a7502209ff51?q=80&w=1920&auto=format&fit=crop"
-            alt="Pessoas impactadas pela missão"
-            className="w-full h-full object-cover"
-            loading="eager"
-          />
+          <AnimatePresence mode="sync">
+            <motion.img
+              key={imgIndex}
+              src={heroImages[imgIndex]}
+              alt="Pessoas impactadas pela missão"
+              className="absolute inset-0 w-full h-full object-cover"
+              loading="eager"
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              transition={{ duration: 1.5, ease: "easeInOut" }}
+            />
+          </AnimatePresence>
           <div className="absolute inset-0 bg-gradient-to-r from-brand-dark/70 via-transparent to-transparent" />
         </div>
       </div>
