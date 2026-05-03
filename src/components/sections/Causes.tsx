@@ -3,41 +3,36 @@ import { motion, useScroll, useTransform } from "framer-motion";
 import { Heart, ArrowRight, ArrowLeft, Users } from "lucide-react";
 import { SectionTag } from "../SectionTag";
 import { Button } from "@/components/ui/button";
-import { Progress } from "@/components/ui/progress";
 import africaXaiXai from "@/assets/africa-xai-xai.png";
 
 const causes = [
   {
-    title: "África – Xai Xai/Gaza",
+    title: "África",
+    subtitle: "Xai Xai / Gaza",
     desc: "Construção de poços artesianos em comunidades carentes para erradicar doenças.",
     image: africaXaiXai,
     category: "Saúde",
-    raised: 12500,
-    goal: 20000,
   },
   {
-    title: "África – Xai Xai/Gaza",
+    title: "África",
+    subtitle: "Xai Xai / Gaza",
     desc: "Fornecimento de materiais escolares e treinamento para professores locais.",
     image: "https://images.unsplash.com/photo-1497633762265-9d179a990aa6?q=80&w=2073&auto=format&fit=crop",
     category: "Educação",
-    raised: 8400,
-    goal: 15000,
   },
   {
-    title: "Alívio à Fome na América Latina",
+    title: "Alívio à Fome",
+    subtitle: "América Latina",
     desc: "Distribuição de cestas básicas e apoio a hortas comunitárias autossustentáveis.",
     image: "https://images.unsplash.com/photo-1488521787991-ed7bbaae773c?q=80&w=2070&auto=format&fit=crop",
     category: "Alimentação",
-    raised: 45000,
-    goal: 50000,
   },
   {
-    title: "Apoio a Refugiados de Guerra",
+    title: "Apoio a Refugiados",
+    subtitle: "Vítimas de Guerra",
     desc: "Assistência médica e psicológica imediata para famílias deslocadas por conflitos.",
     image: "https://images.unsplash.com/photo-1469571486292-0ba58a3f068b?q=80&w=2070&auto=format&fit=crop",
     category: "Emergência",
-    raised: 95000,
-    goal: 100000,
   },
 ];
 
@@ -91,29 +86,25 @@ export function Causes() {
                 </div>
               </div>
               <div className="p-6 sm:p-8">
-                <h3 className="text-xl sm:text-2xl font-black text-brand-dark mb-4 group-hover:text-brand-orange transition-colors">
+                <h3 className="text-xl sm:text-2xl font-black text-brand-dark mb-1 group-hover:text-brand-orange transition-colors">
                   {cause.title}
                 </h3>
+                <p className="text-sm font-bold text-brand-orange uppercase tracking-wider mb-4">
+                  {cause.subtitle}
+                </p>
                 <p className="text-brand-dark/50 text-sm mb-8 line-clamp-2">
                   {cause.desc}
                 </p>
-                
-                <div className="space-y-2 mb-8">
-                  <div className="flex justify-between text-xs font-bold uppercase tracking-widest">
-                    <span className="text-brand-orange">Progresso</span>
-                    <span className="text-brand-dark">{Math.round((cause.raised / cause.goal) * 100)}%</span>
-                  </div>
-                  <Progress value={(cause.raised / cause.goal) * 100} className="h-2 bg-brand-orange/10" />
-                  <div className="flex justify-between text-sm font-black mt-2">
-                    <span className="text-brand-dark">R$ {cause.raised.toLocaleString()}</span>
-                    <span className="text-brand-dark/30">Meta: R$ {cause.goal.toLocaleString()}</span>
-                  </div>
-                </div>
 
-                <Button className="w-full bg-brand-orange/10 hover:bg-brand-orange text-brand-orange hover:text-white border-none py-6 rounded-2xl font-bold group/btn">
-                  Apoiar Agora
-                  <ArrowRight className="w-4 h-4 ml-2 group-hover/btn:translate-x-1 transition-transform" />
-                </Button>
+                <div className="flex flex-col sm:flex-row gap-3">
+                  <Button className="flex-1 bg-brand-orange hover:bg-brand-orange/90 text-white border-none py-6 rounded-2xl font-bold group/btn">
+                    Apoiar Agora
+                    <ArrowRight className="w-4 h-4 ml-2 group-hover/btn:translate-x-1 transition-transform" />
+                  </Button>
+                  <Button variant="outline" className="flex-1 border-2 border-brand-orange/20 bg-transparent hover:bg-brand-orange/10 text-brand-orange py-6 rounded-2xl font-bold">
+                    Conhecer mais
+                  </Button>
+                </div>
               </div>
             </motion.div>
           ))}
