@@ -31,9 +31,9 @@ const stats = [
 
 export function Stats() {
   return (
-    <section className="py-24 bg-brand-dark overflow-hidden">
-      <div className="max-w-7xl mx-auto px-6">
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-12">
+    <section className="py-16 md:py-24 bg-brand-dark overflow-hidden">
+      <div className="max-w-7xl mx-auto px-5 sm:px-6">
+        <div className="grid grid-cols-2 lg:grid-cols-4 gap-8 sm:gap-12">
           {stats.map((stat, index) => (
             <motion.div
               key={index}
