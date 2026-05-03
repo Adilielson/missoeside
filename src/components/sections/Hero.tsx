@@ -15,18 +15,20 @@ export function Hero() {
       className="relative min-h-screen bg-brand-dark overflow-hidden flex items-center pt-28 pb-16 lg:pt-24 lg:pb-0"
     >
       {/* Right curved image area - desktop only */}
-      <div className="hidden lg:block absolute inset-y-0 right-0 w-[55%] pointer-events-none">
+      <div className="hidden lg:block absolute inset-y-0 right-0 w-[58%] pointer-events-none">
+        <svg width="0" height="0" className="absolute">
+          <defs>
+            <clipPath id="heroCurve" clipPathUnits="objectBoundingBox">
+              <path d="M 0.15,0 C 0.05,0.16 0.18,0.34 0.10,0.52 C 0.03,0.70 0.18,0.82 0.13,1 L 1,1 L 1,0 Z" />
+            </clipPath>
+          </defs>
+        </svg>
         <div
           className="absolute inset-0"
-          style={{
-            clipPath:
-              "path('M 180 0 C 60 180, 220 360, 120 560 C 40 740, 220 880, 160 1080 L 1200 1080 L 1200 0 Z')",
-            WebkitClipPath:
-              "path('M 180 0 C 60 180, 220 360, 120 560 C 40 740, 220 880, 160 1080 L 1200 1080 L 1200 0 Z')",
-          }}
+          style={{ clipPath: "url(#heroCurve)", WebkitClipPath: "url(#heroCurve)" }}
         >
           <img
-            src="https://images.unsplash.com/photo-1594708767771-a7502209ff51?q=80&w=1600&auto=format&fit=crop"
+            src="https://images.unsplash.com/photo-1594708767771-a7502209ff51?q=80&w=1920&auto=format&fit=crop"
             alt="Pessoas impactadas pela missão"
             className="w-full h-full object-cover"
             loading="eager"
