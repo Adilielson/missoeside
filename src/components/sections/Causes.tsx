@@ -89,8 +89,8 @@ export function Causes() {
                   {cause.category}
                 </div>
               </div>
-              <div className="p-8">
-                <h3 className="text-2xl font-black text-brand-dark mb-4 group-hover:text-brand-orange transition-colors">
+              <div className="p-6 sm:p-8">
+                <h3 className="text-xl sm:text-2xl font-black text-brand-dark mb-4 group-hover:text-brand-orange transition-colors">
                   {cause.title}
                 </h3>
                 <p className="text-brand-dark/50 text-sm mb-8 line-clamp-2">
