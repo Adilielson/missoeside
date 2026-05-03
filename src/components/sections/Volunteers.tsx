@@ -19,7 +19,7 @@ export function Volunteers() {
           viewport={{ once: true }}
           className="relative"
         >
-          <div className="aspect-[4/5] rounded-[60px] overflow-hidden border-[16px] border-white shadow-2xl relative">
+          <div className="aspect-[4/5] rounded-[32px] sm:rounded-[60px] overflow-hidden border-[8px] sm:border-[16px] border-white shadow-2xl relative">
             <img 
               src="https://images.unsplash.com/photo-1559027615-cd7d00d16348?q=80&w=2068&auto=format&fit=crop" 
               alt="Voluntários" 
