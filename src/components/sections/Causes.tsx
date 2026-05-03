@@ -4,12 +4,13 @@ import { Heart, ArrowRight, ArrowLeft, Users } from "lucide-react";
 import { SectionTag } from "../SectionTag";
 import { Button } from "@/components/ui/button";
 import { Progress } from "@/components/ui/progress";
+import africaXaiXai from "@/assets/africa-xai-xai.png";
 
 const causes = [
   {
     title: "África – Xai Xai/Gaza",
     desc: "Construção de poços artesianos em comunidades carentes para erradicar doenças.",
-    image: "https://images.unsplash.com/photo-1547592166-23ac45744acd?q=80&w=2071&auto=format&fit=crop",
+    image: africaXaiXai,
     category: "Saúde",
     raised: 12500,
     goal: 20000,
