@@ -123,7 +123,7 @@ export function Causes() {
           initial={{ opacity: 0, x: 50 }}
           whileInView={{ opacity: 1, x: 0 }}
           viewport={{ once: true }}
-          className="lg:w-80 bg-brand-dark rounded-[40px] p-8 text-white flex flex-col justify-between mx-6 lg:mx-0 shrink-0"
+          className="lg:w-80 bg-brand-dark rounded-[32px] sm:rounded-[40px] p-8 text-white flex flex-col justify-between mr-5 sm:mr-6 lg:mr-0 shrink-0"
         >
           <div>
             <div className="w-16 h-16 rounded-2xl bg-brand-orange/20 flex items-center justify-center text-brand-orange mb-8">
