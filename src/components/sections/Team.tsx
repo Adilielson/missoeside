@@ -30,12 +30,12 @@ const team = [
 
 export function Team() {
   return (
-    <section className="py-24 bg-brand-light/50 overflow-hidden">
-      <div className="max-w-7xl mx-auto px-6">
-        <div className="flex flex-col md:flex-row md:items-end justify-between gap-8 mb-16">
+    <section className="py-16 md:py-24 bg-brand-light/50 overflow-hidden">
+      <div className="max-w-7xl mx-auto px-5 sm:px-6">
+        <div className="flex flex-col md:flex-row md:items-end justify-between gap-6 md:gap-8 mb-12 md:mb-16">
           <div className="max-w-2xl">
             <SectionTag icon={Users} text="Nossa Equipe" light />
-            <h2 className="text-4xl md:text-5xl font-black text-brand-dark leading-tight">
+            <h2 className="text-3xl sm:text-4xl md:text-5xl font-black text-brand-dark leading-tight">
               Pessoas Comprometidas <br />
               <span className="text-brand-orange">com a Chamada</span>
             </h2>
@@ -45,7 +45,7 @@ export function Team() {
           </Button>
         </div>
 
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 sm:gap-8">
           {team.map((member, index) => (
             <motion.div
               key={index}

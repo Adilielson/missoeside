@@ -39,17 +39,17 @@ export function Testimonials() {
   const [active, setActive] = useState(0);
 
   return (
-    <section className="py-24 bg-brand-light/30 overflow-hidden">
-      <div className="max-w-7xl mx-auto px-6">
-        <div className="text-center mb-16">
+    <section className="py-16 md:py-24 bg-brand-light/30 overflow-hidden">
+      <div className="max-w-7xl mx-auto px-5 sm:px-6">
+        <div className="text-center mb-12 md:mb-16">
           <SectionTag icon={MessageSquare} text="Depoimentos" light />
-          <h2 className="text-4xl md:text-5xl font-black text-brand-dark leading-tight">
+          <h2 className="text-3xl sm:text-4xl md:text-5xl font-black text-brand-dark leading-tight">
             Vozes de Quem Faz <br />
             <span className="text-brand-orange">Parte da Nossa História</span>
           </h2>
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 sm:gap-8">
           {testimonials.map((test, index) => (
             <motion.div
               key={index}
@@ -57,7 +57,7 @@ export function Testimonials() {
               whileInView={{ opacity: 1, scale: 1 }}
               viewport={{ once: true }}
               transition={{ delay: index * 0.1 }}
-              className="bg-white rounded-[40px] p-10 relative shadow-lg border border-brand-orange/5"
+              className="bg-white rounded-[32px] sm:rounded-[40px] p-6 sm:p-10 relative shadow-lg border border-brand-orange/5"
             >
               <div className="flex gap-1 mb-6">
                 {[...Array(test.stars)].map((_, i) => (

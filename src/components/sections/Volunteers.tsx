@@ -10,8 +10,8 @@ import {
 
 export function Volunteers() {
   return (
-    <section className="py-24 bg-brand-light overflow-hidden">
-      <div className="max-w-7xl mx-auto px-6 grid grid-cols-1 lg:grid-cols-2 gap-20 items-center">
+    <section className="py-16 md:py-24 bg-brand-light overflow-hidden">
+      <div className="max-w-7xl mx-auto px-5 sm:px-6 grid grid-cols-1 lg:grid-cols-2 gap-12 lg:gap-20 items-center">
         {/* Left Image */}
         <motion.div
           initial={{ opacity: 0, scale: 0.9 }}
@@ -19,7 +19,7 @@ export function Volunteers() {
           viewport={{ once: true }}
           className="relative"
         >
-          <div className="aspect-[4/5] rounded-[60px] overflow-hidden border-[16px] border-white shadow-2xl relative">
+          <div className="aspect-[4/5] rounded-[32px] sm:rounded-[60px] overflow-hidden border-[8px] sm:border-[16px] border-white shadow-2xl relative">
             <img 
               src="https://images.unsplash.com/photo-1559027615-cd7d00d16348?q=80&w=2068&auto=format&fit=crop" 
               alt="Voluntários" 
@@ -41,19 +41,19 @@ export function Volunteers() {
         >
           <SectionTag icon={Heart} text="Junte-se a Nós" light />
           
-          <h2 className="text-4xl md:text-5xl font-black text-brand-dark mb-8 leading-tight">
-            Torne-se as Mãos e Pés <br />
+          <h2 className="text-3xl sm:text-4xl md:text-5xl font-black text-brand-dark mb-6 sm:mb-8 leading-tight">
+            Torne-se as Mãos e Pés <br className="hidden sm:block" />
             <span className="text-brand-orange">da Nossa Missão</span>
           </h2>
 
-          <p className="text-lg text-brand-dark/60 mb-10 leading-relaxed">
+          <p className="text-base sm:text-lg text-brand-dark/60 mb-8 sm:mb-10 leading-relaxed">
             Não importa sua profissão ou habilidade, há um lugar para você na IDE. 
             Seja no campo missionário, no suporte administrativo ou na intercessão, 
             sua vida pode ser o canal para a mudança que o mundo precisa.
           </p>
 
           <Accordion type="single" defaultValue="item-1" className="space-y-4">
-            <AccordionItem value="item-1" className="border-none bg-white rounded-3xl px-8 shadow-sm">
+            <AccordionItem value="item-1" className="border-none bg-white rounded-3xl px-5 sm:px-8 shadow-sm">
               <AccordionTrigger className="hover:no-underline py-6">
                 <span className="text-lg font-black text-brand-dark text-left">Reconhecimento e Realização</span>
               </AccordionTrigger>
@@ -64,7 +64,7 @@ export function Volunteers() {
               </AccordionContent>
             </AccordionItem>
 
-            <AccordionItem value="item-2" className="border-none bg-white rounded-3xl px-8 shadow-sm">
+            <AccordionItem value="item-2" className="border-none bg-white rounded-3xl px-5 sm:px-8 shadow-sm">
               <AccordionTrigger className="hover:no-underline py-6">
                 <span className="text-lg font-black text-brand-dark text-left">Por Que Se Tornar Voluntário?</span>
               </AccordionTrigger>
@@ -75,7 +75,7 @@ export function Volunteers() {
               </AccordionContent>
             </AccordionItem>
 
-            <AccordionItem value="item-3" className="border-none bg-white rounded-3xl px-8 shadow-sm">
+            <AccordionItem value="item-3" className="border-none bg-white rounded-3xl px-5 sm:px-8 shadow-sm">
               <AccordionTrigger className="hover:no-underline py-6">
                 <span className="text-lg font-black text-brand-dark text-left">Faça Parte de uma Comunidade</span>
               </AccordionTrigger>

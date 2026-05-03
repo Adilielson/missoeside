@@ -5,8 +5,8 @@ import { Button } from "@/components/ui/button";
 
 export function About() {
   return (
-    <section id="sobre" className="py-24 bg-brand-light overflow-hidden">
-      <div className="max-w-7xl mx-auto px-6 grid grid-cols-1 lg:grid-cols-2 gap-20 items-center">
+    <section id="sobre" className="py-16 md:py-24 bg-brand-light overflow-hidden">
+      <div className="max-w-7xl mx-auto px-5 sm:px-6 grid grid-cols-1 lg:grid-cols-2 gap-12 lg:gap-20 items-center">
         {/* Left Side: Heart Collage */}
         <motion.div
           initial={{ opacity: 0, x: -100 }}
@@ -60,10 +60,10 @@ export function About() {
             <motion.div
               animate={{ y: [0, -10, 0] }}
               transition={{ duration: 3, repeat: Infinity }}
-              className="absolute top-1/2 -right-10 bg-brand-orange text-white p-6 rounded-3xl shadow-2xl z-20"
+              className="absolute top-1/2 -right-2 sm:-right-6 lg:-right-10 bg-brand-orange text-white p-4 sm:p-6 rounded-2xl sm:rounded-3xl shadow-2xl z-20"
             >
-              <p className="text-4xl font-black">15+</p>
-              <p className="text-xs font-bold uppercase tracking-widest opacity-80">Anos de <br />Experiência</p>
+              <p className="text-2xl sm:text-4xl font-black">15+</p>
+              <p className="text-[10px] sm:text-xs font-bold uppercase tracking-widest opacity-80">Anos de <br />Experiência</p>
             </motion.div>
           </div>
         </motion.div>
@@ -77,12 +77,12 @@ export function About() {
         >
           <SectionTag icon={Heart} text="Sobre Nós" light />
           
-          <h2 className="text-4xl md:text-5xl font-black text-brand-dark mb-6 leading-tight">
+          <h2 className="text-3xl sm:text-4xl md:text-5xl font-black text-brand-dark mb-6 leading-tight">
             Nossa Jornada de Fé e <br />
             <span className="text-brand-orange">Impacto Global</span>
           </h2>
 
-          <p className="text-lg text-brand-dark/60 mb-8 leading-relaxed">
+          <p className="text-base sm:text-lg text-brand-dark/60 mb-8 leading-relaxed">
             Há mais de uma década, a IDE — Missões para o Mundo tem sido um farol de esperança. 
             Nascemos com o propósito de conectar corações generosos às necessidades mais urgentes 
             do planeta, levando não apenas assistência material, mas a mensagem transformadora do Evangelho.

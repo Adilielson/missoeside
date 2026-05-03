@@ -13,7 +13,7 @@ const images = [
 
 export function MarqueeGallery() {
   return (
-    <section className="py-24 bg-white overflow-hidden">
+    <section className="py-16 md:py-24 bg-white overflow-hidden">
       <div className="relative flex overflow-x-hidden">
         <motion.div
           animate={{ x: ["0%", "-50%"] }}
@@ -23,7 +23,7 @@ export function MarqueeGallery() {
           {[...images, ...images].map((src, index) => (
             <div 
               key={index} 
-              className="w-64 h-64 md:w-80 md:h-80 rounded-full overflow-hidden shrink-0 border-8 border-brand-light shadow-xl hover:scale-105 transition-transform duration-500 cursor-pointer"
+              className="w-48 h-48 sm:w-64 sm:h-64 md:w-80 md:h-80 rounded-full overflow-hidden shrink-0 border-4 sm:border-8 border-brand-light shadow-xl hover:scale-105 transition-transform duration-500 cursor-pointer"
             >
               <img src={src} alt={`Mission ${index}`} className="w-full h-full object-cover" />
             </div>

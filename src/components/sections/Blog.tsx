@@ -32,12 +32,12 @@ const posts = [
 
 export function Blog() {
   return (
-    <section id="blog" className="py-24 bg-white overflow-hidden">
-      <div className="max-w-7xl mx-auto px-6">
-        <div className="flex flex-col md:flex-row md:items-end justify-between gap-8 mb-16">
+    <section id="blog" className="py-16 md:py-24 bg-white overflow-hidden">
+      <div className="max-w-7xl mx-auto px-5 sm:px-6">
+        <div className="flex flex-col md:flex-row md:items-end justify-between gap-6 md:gap-8 mb-12 md:mb-16">
           <div className="max-w-2xl">
             <SectionTag icon={Calendar} text="Últimas Notícias" light />
-            <h2 className="text-4xl md:text-5xl font-black text-brand-dark leading-tight">
+            <h2 className="text-3xl sm:text-4xl md:text-5xl font-black text-brand-dark leading-tight">
               Fique por Dentro do <br />
               <span className="text-brand-orange">Nosso Blog</span>
             </h2>
@@ -52,7 +52,7 @@ export function Blog() {
           </div>
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 sm:gap-8">
           {posts.map((post, index) => (
             <motion.div
               key={index}
@@ -62,7 +62,7 @@ export function Blog() {
               transition={{ delay: index * 0.1 }}
               className="group cursor-pointer"
             >
-              <div className="relative aspect-[4/3] rounded-[40px] overflow-hidden mb-6">
+              <div className="relative aspect-[4/3] rounded-[28px] sm:rounded-[40px] overflow-hidden mb-6">
                 <img 
                   src={post.image} 
                   alt={post.title} 

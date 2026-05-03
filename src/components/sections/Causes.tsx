@@ -52,18 +52,18 @@ export function Causes() {
   };
 
   return (
-    <section id="missoes" className="py-24 bg-brand-light relative overflow-hidden">
-      <div className="max-w-7xl mx-auto px-6 mb-16 flex flex-col md:flex-row md:items-end justify-between gap-6">
+    <section id="missoes" className="py-16 md:py-24 bg-brand-light relative overflow-hidden">
+      <div className="max-w-7xl mx-auto px-5 sm:px-6 mb-12 md:mb-16 flex flex-col md:flex-row md:items-end justify-between gap-6">
         <div className="max-w-2xl">
           <SectionTag icon={Heart} text="Ajude e Done" light />
-          <h2 className="text-4xl md:text-5xl font-black text-brand-dark leading-tight">
-            Inspirando e Ajudando por um <br />
+          <h2 className="text-3xl sm:text-4xl md:text-5xl font-black text-brand-dark leading-tight">
+            Inspirando e Ajudando por um <br className="hidden sm:block" />
             <span className="text-brand-orange">Mundo Melhor</span>
           </h2>
         </div>
       </div>
 
-      <div className="flex flex-col lg:flex-row gap-8 pl-6 lg:pl-0">
+      <div className="flex flex-col lg:flex-row gap-8 pl-5 sm:pl-6 lg:pl-0">
         {/* Causes Carousel */}
         <div 
           ref={scrollRef}
@@ -77,7 +77,7 @@ export function Causes() {
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true }}
               transition={{ delay: index * 0.1 }}
-              className="min-w-[320px] md:min-w-[400px] bg-white rounded-[40px] overflow-hidden shadow-xl border border-brand-orange/5 group snap-start"
+              className="min-w-[280px] sm:min-w-[320px] md:min-w-[400px] max-w-[90vw] bg-white rounded-[32px] sm:rounded-[40px] overflow-hidden shadow-xl border border-brand-orange/5 group snap-start"
             >
               <div className="relative h-64 overflow-hidden">
                 <img 
@@ -89,8 +89,8 @@ export function Causes() {
                   {cause.category}
                 </div>
               </div>
-              <div className="p-8">
-                <h3 className="text-2xl font-black text-brand-dark mb-4 group-hover:text-brand-orange transition-colors">
+              <div className="p-6 sm:p-8">
+                <h3 className="text-xl sm:text-2xl font-black text-brand-dark mb-4 group-hover:text-brand-orange transition-colors">
                   {cause.title}
                 </h3>
                 <p className="text-brand-dark/50 text-sm mb-8 line-clamp-2">
@@ -123,7 +123,7 @@ export function Causes() {
           initial={{ opacity: 0, x: 50 }}
           whileInView={{ opacity: 1, x: 0 }}
           viewport={{ once: true }}
-          className="lg:w-80 bg-brand-dark rounded-[40px] p-8 text-white flex flex-col justify-between mx-6 lg:mx-0 shrink-0"
+          className="lg:w-80 bg-brand-dark rounded-[32px] sm:rounded-[40px] p-8 text-white flex flex-col justify-between mr-5 sm:mr-6 lg:mr-0 shrink-0"
         >
           <div>
             <div className="w-16 h-16 rounded-2xl bg-brand-orange/20 flex items-center justify-center text-brand-orange mb-8">

@@ -13,7 +13,7 @@ export function CustomDonation() {
   const [customAmount, setCustomAmount] = useState("");
 
   return (
-    <section id="doacoes" className="py-24 relative overflow-hidden">
+    <section id="doacoes" className="py-16 md:py-24 relative overflow-hidden">
       {/* Background with overlay */}
       <div className="absolute inset-0 z-0">
         <img 
@@ -24,20 +24,20 @@ export function CustomDonation() {
         <div className="absolute inset-0 bg-brand-dark/90" />
       </div>
 
-      <div className="max-w-7xl mx-auto px-6 relative z-10">
-        <div className="grid grid-cols-1 lg:grid-cols-2 rounded-[60px] overflow-hidden shadow-2xl">
+      <div className="max-w-7xl mx-auto px-5 sm:px-6 relative z-10">
+        <div className="grid grid-cols-1 lg:grid-cols-2 rounded-[32px] sm:rounded-[48px] lg:rounded-[60px] overflow-hidden shadow-2xl">
           {/* Left: Donation Form */}
           <motion.div
             initial={{ opacity: 0, x: -50 }}
             whileInView={{ opacity: 1, x: 0 }}
             viewport={{ once: true }}
-            className="bg-brand-dark/40 backdrop-blur-md p-12 lg:p-20 text-white"
+            className="bg-brand-dark/40 backdrop-blur-md p-8 sm:p-12 lg:p-20 text-white"
           >
-            <h2 className="text-4xl md:text-5xl font-black mb-10">Doe Agora</h2>
+            <h2 className="text-3xl sm:text-4xl md:text-5xl font-black mb-8 sm:mb-10">Doe Agora</h2>
             
             <p className="text-white/60 mb-8 font-medium">Escolha um valor para transformar uma vida:</p>
             
-            <div className="flex flex-wrap gap-4 mb-8">
+            <div className="grid grid-cols-3 sm:flex sm:flex-wrap gap-3 sm:gap-4 mb-8">
               {quickAmounts.map((amount) => (
                 <button
                   key={amount}
@@ -46,7 +46,7 @@ export function CustomDonation() {
                     setCustomAmount("");
                   }}
                   className={cn(
-                    "px-8 py-4 rounded-full font-black transition-all border-2",
+                    "px-4 sm:px-8 py-3 sm:py-4 rounded-full font-black transition-all border-2 text-sm sm:text-base",
                     selectedAmount === amount 
                       ? "bg-brand-orange border-brand-orange text-white" 
                       : "bg-white/5 border-white/10 text-white hover:border-brand-orange/50"
@@ -71,8 +71,8 @@ export function CustomDonation() {
               />
             </div>
 
-            <Button className="w-full bg-brand-gradient hover:opacity-90 text-white text-xl py-8 rounded-full shadow-lg shadow-brand-orange/20 transition-all active:scale-95">
-              Fazer Doação <Heart className="ml-2 w-6 h-6 fill-white" />
+            <Button className="w-full bg-brand-gradient hover:opacity-90 text-white text-lg sm:text-xl py-6 sm:py-8 rounded-full shadow-lg shadow-brand-orange/20 transition-all active:scale-95">
+              Fazer Doação <Heart className="ml-2 w-5 h-5 sm:w-6 sm:h-6 fill-white" />
             </Button>
           </motion.div>
 
@@ -81,13 +81,13 @@ export function CustomDonation() {
             initial={{ opacity: 0, x: 50 }}
             whileInView={{ opacity: 1, x: 0 }}
             viewport={{ once: true }}
-            className="bg-brand-orange p-12 lg:p-20 text-white flex flex-col justify-center"
+            className="bg-brand-orange p-8 sm:p-12 lg:p-20 text-white flex flex-col justify-center"
           >
             <SectionTag text="Faça uma Doação" className="bg-white/20 border-white/30" />
-            <h3 className="text-4xl font-black mb-6 leading-tight">
-              Sua Generosidade Alimenta <br />a Esperança do Mundo
+            <h3 className="text-2xl sm:text-3xl md:text-4xl font-black mb-6 leading-tight">
+              Sua Generosidade Alimenta a Esperança do Mundo
             </h3>
-            <p className="text-white/80 mb-12 text-lg leading-relaxed">
+            <p className="text-white/80 mb-10 sm:mb-12 text-base sm:text-lg leading-relaxed">
               Cada centavo doado é direcionado integralmente para as nossas frentes missionárias. 
               Juntos, podemos alcançar lugares onde ninguém mais vai.
             </p>
