@@ -10,7 +10,7 @@ const events = [
     month: "SET",
     title: "Culto de Missões",
     desc: "Um encontro focado em estratégias para o evangelismo em grandes centros.",
-    location: "Templo Cede, São Mateus ES",
+    location: "Templo Sede, São Mateus ES",
     image: cultoMissoes,
   },
   {
