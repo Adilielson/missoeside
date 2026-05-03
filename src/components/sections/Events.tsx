@@ -2,15 +2,16 @@ import { motion } from "framer-motion";
 import { MapPin, Calendar, ArrowRight } from "lucide-react";
 import { SectionTag } from "../SectionTag";
 import { Button } from "@/components/ui/button";
+import cultoMissoes from "@/assets/culto-missoes.png";
 
 const events = [
   {
-    day: "12",
-    month: "MAI",
-    title: "Congresso de Missões Urbanas",
+    day: "21",
+    month: "SET",
+    title: "Culto de Missões",
     desc: "Um encontro focado em estratégias para o evangelismo em grandes centros.",
-    location: "Auditório Central, São Paulo",
-    image: "https://images.unsplash.com/photo-1511632765486-a01980e01a18?q=80&w=2070&auto=format&fit=crop",
+    location: "Templo Cede, São Mateus ES",
+    image: cultoMissoes,
   },
   {
     day: "05",
