@@ -41,12 +41,12 @@ export function Volunteers() {
         >
           <SectionTag icon={Heart} text="Junte-se a Nós" light />
           
-          <h2 className="text-4xl md:text-5xl font-black text-brand-dark mb-8 leading-tight">
-            Torne-se as Mãos e Pés <br />
+          <h2 className="text-3xl sm:text-4xl md:text-5xl font-black text-brand-dark mb-6 sm:mb-8 leading-tight">
+            Torne-se as Mãos e Pés <br className="hidden sm:block" />
             <span className="text-brand-orange">da Nossa Missão</span>
           </h2>
 
-          <p className="text-lg text-brand-dark/60 mb-10 leading-relaxed">
+          <p className="text-base sm:text-lg text-brand-dark/60 mb-8 sm:mb-10 leading-relaxed">
             Não importa sua profissão ou habilidade, há um lugar para você na IDE. 
             Seja no campo missionário, no suporte administrativo ou na intercessão, 
             sua vida pode ser o canal para a mudança que o mundo precisa.
