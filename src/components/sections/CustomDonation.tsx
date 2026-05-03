@@ -37,7 +37,7 @@ export function CustomDonation() {
             
             <p className="text-white/60 mb-8 font-medium">Escolha um valor para transformar uma vida:</p>
             
-            <div className="flex flex-wrap gap-4 mb-8">
+            <div className="grid grid-cols-3 sm:flex sm:flex-wrap gap-3 sm:gap-4 mb-8">
               {quickAmounts.map((amount) => (
                 <button
                   key={amount}
@@ -46,7 +46,7 @@ export function CustomDonation() {
                     setCustomAmount("");
                   }}
                   className={cn(
-                    "px-8 py-4 rounded-full font-black transition-all border-2",
+                    "px-4 sm:px-8 py-3 sm:py-4 rounded-full font-black transition-all border-2 text-sm sm:text-base",
                     selectedAmount === amount 
                       ? "bg-brand-orange border-brand-orange text-white" 
                       : "bg-white/5 border-white/10 text-white hover:border-brand-orange/50"
