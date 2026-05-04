@@ -41,9 +41,9 @@ function ProjectPage() {
       <section className="relative pt-32 pb-16 lg:pt-40 lg:pb-24 overflow-hidden bg-brand-dark">
         <div className="absolute inset-0 z-0">
           <img 
-            src={galleryImages[currentImg]} 
+            src={hero2} 
             alt="Background" 
-            className="w-full h-full object-cover blur-sm opacity-30 transition-all duration-1000"
+            className="w-full h-full object-cover blur-sm opacity-30"
           />
           <div className="absolute inset-0 bg-gradient-to-b from-brand-dark/95 via-brand-dark/90 to-brand-dark" />
         </div>
@@ -55,48 +55,19 @@ function ProjectPage() {
             transition={{ duration: 0.6 }}
             className="max-w-5xl mx-auto text-center"
           >
-            {/* Automatic Carousel Image */}
-            <div className="relative group mb-12">
-              <motion.div 
-                key={currentImg}
-                initial={{ opacity: 0, scale: 0.95 }}
-                animate={{ opacity: 1, scale: 1 }}
-                exit={{ opacity: 0, scale: 1.05 }}
-                transition={{ duration: 0.8 }}
-                className="aspect-video w-full rounded-3xl overflow-hidden shadow-2xl border-4 border-white/5"
-              >
-                <img 
-                  src={galleryImages[currentImg]} 
-                  alt="Destaque do Projeto" 
-                  className="w-full h-full object-cover"
-                />
-              </motion.div>
-
-              {/* Navigation Arrows */}
-              <button 
-                onClick={prevImg}
-                className="absolute left-4 top-1/2 -translate-y-1/2 w-12 h-12 rounded-full bg-black/20 backdrop-blur-md text-white flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity hover:bg-brand-orange"
-              >
-                <ChevronLeft className="w-6 h-6" />
-              </button>
-              <button 
-                onClick={nextImg}
-                className="absolute right-4 top-1/2 -translate-y-1/2 w-12 h-12 rounded-full bg-black/20 backdrop-blur-md text-white flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity hover:bg-brand-orange"
-              >
-                <ChevronRight className="w-6 h-6" />
-              </button>
-
-              {/* Dots */}
-              <div className="absolute bottom-6 left-1/2 -translate-x-1/2 flex gap-2">
-                {galleryImages.map((_, i) => (
-                  <button
-                    key={i}
-                    onClick={() => setCurrentImg(i)}
-                    className={`w-2 h-2 rounded-full transition-all ${i === currentImg ? "w-8 bg-brand-orange" : "bg-white/50"}`}
-                  />
-                ))}
-              </div>
-            </div>
+            {/* Static Image as it was before */}
+            <motion.div 
+              initial={{ opacity: 0, scale: 0.95 }}
+              animate={{ opacity: 1, scale: 1 }}
+              transition={{ duration: 0.8, delay: 0.2 }}
+              className="aspect-video w-full rounded-3xl overflow-hidden mb-12 shadow-2xl border-4 border-white/5"
+            >
+              <img 
+                src={hero2} 
+                alt="Destaque do Projeto" 
+                className="w-full h-full object-cover"
+              />
+            </motion.div>
 
             <SectionTag icon={Heart} text="Saúde / Missões" />
             <h1 className="text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-black text-white leading-[1.05] mb-8">
