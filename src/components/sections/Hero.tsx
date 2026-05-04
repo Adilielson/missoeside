@@ -156,20 +156,6 @@ export function Hero() {
         <div className="hidden lg:block" />
       </div>
 
-      {/* Hands silhouette at bottom - desktop only */}
-      <div className="hidden md:block absolute bottom-0 left-0 w-1/2 h-40 opacity-30 pointer-events-none select-none">
-        <svg viewBox="0 0 600 200" className="w-full h-full" preserveAspectRatio="xMidYEnd meet">
-          <g fill="none" stroke="currentColor" strokeWidth="6" strokeLinecap="round" className="text-brand-orange/60">
-            {[40, 110, 180, 250, 320, 390, 460, 530].map((x, i) => (
-              <g key={i}>
-                <line x1={x} y1={200} x2={x} y2={120 - (i % 3) * 20} />
-                <line x1={x - 14} y1={140 - (i % 3) * 20} x2={x - 14} y2={170} />
-                <line x1={x + 14} y1={140 - (i % 3) * 20} x2={x + 14} y2={170} />
-              </g>
-            ))}
-          </g>
-        </svg>
-      </div>
     </section>
   );
 }
