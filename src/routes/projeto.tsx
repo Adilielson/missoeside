@@ -6,7 +6,8 @@ import { motion } from "framer-motion";
 import { Heart, Calendar, MapPin, Share2, ArrowRight } from "lucide-react";
 import { SectionTag } from "@/components/SectionTag";
 import { Button } from "@/components/ui/button";
-import africaXaiXai from "@/assets/africa-xai-xai.png";
+import hero2 from "@/assets/hero-2.png";
+
 
 export const Route = createFileRoute("/projeto")({
   component: ProjectPage,
