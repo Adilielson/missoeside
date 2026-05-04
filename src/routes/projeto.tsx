@@ -254,6 +254,43 @@ function ProjectPage() {
         </div>
       </section>
 
+      {/* Full Width Automatic Bottom Gallery */}
+      <section className="py-24 bg-brand-dark overflow-hidden">
+        <div className="max-w-7xl mx-auto px-5 sm:px-6 mb-12">
+          <SectionTag icon={Heart} text="Galeria do Projeto" />
+          <h2 className="text-3xl md:text-5xl font-black text-white uppercase tracking-tighter">
+            Nossa Jornada em <span className="text-brand-orange">Imagens</span>
+          </h2>
+        </div>
+
+        <div className="relative group">
+          <div className="flex gap-6 overflow-hidden py-10">
+            <motion.div 
+              animate={{ x: ["0%", "-50%"] }}
+              transition={{ 
+                duration: 30, 
+                ease: "linear", 
+                repeat: Infinity 
+              }}
+              className="flex gap-6 shrink-0"
+            >
+              {[...galleryImages, ...galleryImages].map((img, i) => (
+                <div 
+                  key={i} 
+                  className="w-[300px] md:w-[450px] aspect-[4/3] rounded-[40px] overflow-hidden shadow-2xl border-4 border-white/5"
+                >
+                  <img 
+                    src={img} 
+                    alt={`Galeria ${i}`} 
+                    className="w-full h-full object-cover"
+                  />
+                </div>
+              ))}
+            </motion.div>
+          </div>
+        </div>
+      </section>
+
       <ContactBar />
       <Footer />
     </main>
