@@ -123,7 +123,7 @@ function ProjectPage() {
           <div className="grid grid-cols-1 lg:grid-cols-12 gap-12">
             
             {/* Main Content */}
-            <div className="lg:col-span-8">
+            <div className="lg:col-span-8 space-y-12">
               <motion.div 
                 initial={{ opacity: 0, y: 30 }}
                 animate={{ opacity: 1, y: 0 }}
@@ -171,6 +171,44 @@ function ProjectPage() {
                   </div>
                 </div>
               </motion.div>
+
+              {/* Horizontal Image Cards with White Text Box */}
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+                {[
+                  {
+                    img: "https://images.unsplash.com/photo-1594708767771-a7502209ff51?q=80&w=800&auto=format&fit=crop",
+                    title: "Impacto Local",
+                    desc: "Vidas sendo transformadas diariamente em Xai Xai."
+                  },
+                  {
+                    img: "https://images.unsplash.com/photo-1488521787991-ed7bbaae773c?q=80&w=800&auto=format&fit=crop",
+                    title: "Esperança",
+                    desc: "Levando o amor de Deus através de ações práticas."
+                  }
+                ].map((card, i) => (
+                  <motion.div 
+                    key={i}
+                    initial={{ opacity: 0, y: 20 }}
+                    whileInView={{ opacity: 1, y: 0 }}
+                    viewport={{ once: true }}
+                    transition={{ delay: i * 0.1 }}
+                    className="relative h-80 rounded-[40px] overflow-hidden group shadow-xl"
+                  >
+                    <img 
+                      src={card.img} 
+                      alt={card.title} 
+                      className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110"
+                    />
+                    <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent" />
+                    
+                    {/* White Text Box on Card */}
+                    <div className="absolute bottom-6 left-6 right-6 bg-white rounded-3xl p-6 shadow-2xl translate-y-2 group-hover:translate-y-0 transition-transform">
+                      <h4 className="font-black text-brand-dark text-lg mb-1">{card.title}</h4>
+                      <p className="text-brand-dark/60 text-sm leading-tight font-medium">{card.desc}</p>
+                    </div>
+                  </motion.div>
+                ))}
+              </div>
             </div>
 
             {/* Sidebar */}
