@@ -2,17 +2,37 @@ import { createFileRoute } from "@tanstack/react-router";
 import { Navbar } from "@/components/sections/Navbar";
 import { Footer } from "@/components/sections/Footer";
 import { ContactBar } from "@/components/sections/ContactBar";
-import { motion } from "framer-motion";
-import { Heart, Calendar, MapPin, Share2, ArrowRight } from "lucide-react";
+import { motion, AnimatePresence } from "framer-motion";
+import { Heart, Calendar, MapPin, Share2, ArrowRight, ChevronLeft, ChevronRight } from "lucide-react";
 import { SectionTag } from "@/components/SectionTag";
 import { Button } from "@/components/ui/button";
+import { useState, useEffect } from "react";
 import hero2 from "@/assets/hero-2.png";
 
 export const Route = createFileRoute("/projeto")({
   component: ProjectPage,
 });
 
+const galleryImages = [
+  hero2,
+  "https://images.unsplash.com/photo-1488521787991-ed7bbaae773c?q=80&w=2070&auto=format&fit=crop",
+  "https://images.unsplash.com/photo-1497633762265-9d179a990aa6?q=80&w=2073&auto=format&fit=crop",
+  "https://images.unsplash.com/photo-1469571486292-0ba58a3f068b?q=80&w=2070&auto=format&fit=crop",
+];
+
 function ProjectPage() {
+  const [currentImg, setCurrentImg] = useState(0);
+
+  useEffect(() => {
+    const timer = setInterval(() => {
+      setCurrentImg((prev) => (prev + 1) % galleryImages.length);
+    }, 5000);
+    return () => clearInterval(timer);
+  }, []);
+
+  const nextImg = () => setCurrentImg((prev) => (prev + 1) % galleryImages.length);
+  const prevImg = () => setCurrentImg((prev) => (prev - 1 + galleryImages.length) % galleryImages.length);
+
   return (
     <main className="min-h-screen selection:bg-brand-orange selection:text-white bg-brand-light">
       <Navbar />
@@ -21,9 +41,9 @@ function ProjectPage() {
       <section className="relative pt-32 pb-16 lg:pt-40 lg:pb-24 overflow-hidden bg-brand-dark">
         <div className="absolute inset-0 z-0">
           <img 
-            src={hero2} 
-            alt="Projeto África Xai Xai" 
-            className="w-full h-full object-cover blur-sm opacity-30"
+            src={galleryImages[currentImg]} 
+            alt="Background" 
+            className="w-full h-full object-cover blur-sm opacity-30 transition-all duration-1000"
           />
           <div className="absolute inset-0 bg-gradient-to-b from-brand-dark/95 via-brand-dark/90 to-brand-dark" />
         </div>
@@ -35,19 +55,48 @@ function ProjectPage() {
             transition={{ duration: 0.6 }}
             className="max-w-5xl mx-auto text-center"
           >
-            {/* Main Post Image Moved Up */}
-            <motion.div 
-              initial={{ opacity: 0, scale: 0.95 }}
-              animate={{ opacity: 1, scale: 1 }}
-              transition={{ duration: 0.8, delay: 0.2 }}
-              className="aspect-video w-full rounded-3xl overflow-hidden mb-12 shadow-2xl border-4 border-white/5"
-            >
-              <img 
-                src={hero2} 
-                alt="Destaque do Projeto" 
-                className="w-full h-full object-cover"
-              />
-            </motion.div>
+            {/* Automatic Carousel Image */}
+            <div className="relative group mb-12">
+              <motion.div 
+                key={currentImg}
+                initial={{ opacity: 0, scale: 0.95 }}
+                animate={{ opacity: 1, scale: 1 }}
+                exit={{ opacity: 0, scale: 1.05 }}
+                transition={{ duration: 0.8 }}
+                className="aspect-video w-full rounded-3xl overflow-hidden shadow-2xl border-4 border-white/5"
+              >
+                <img 
+                  src={galleryImages[currentImg]} 
+                  alt="Destaque do Projeto" 
+                  className="w-full h-full object-cover"
+                />
+              </motion.div>
+
+              {/* Navigation Arrows */}
+              <button 
+                onClick={prevImg}
+                className="absolute left-4 top-1/2 -translate-y-1/2 w-12 h-12 rounded-full bg-black/20 backdrop-blur-md text-white flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity hover:bg-brand-orange"
+              >
+                <ChevronLeft className="w-6 h-6" />
+              </button>
+              <button 
+                onClick={nextImg}
+                className="absolute right-4 top-1/2 -translate-y-1/2 w-12 h-12 rounded-full bg-black/20 backdrop-blur-md text-white flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity hover:bg-brand-orange"
+              >
+                <ChevronRight className="w-6 h-6" />
+              </button>
+
+              {/* Dots */}
+              <div className="absolute bottom-6 left-1/2 -translate-x-1/2 flex gap-2">
+                {galleryImages.map((_, i) => (
+                  <button
+                    key={i}
+                    onClick={() => setCurrentImg(i)}
+                    className={`w-2 h-2 rounded-full transition-all ${i === currentImg ? "w-8 bg-brand-orange" : "bg-white/50"}`}
+                  />
+                ))}
+              </div>
+            </div>
 
             <SectionTag icon={Heart} text="Saúde / Missões" />
             <h1 className="text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-black text-white leading-[1.05] mb-8">
@@ -74,7 +123,7 @@ function ProjectPage() {
           <div className="grid grid-cols-1 lg:grid-cols-12 gap-12">
             
             {/* Main Content */}
-            <div className="lg:col-span-8">
+            <div className="lg:col-span-8 space-y-12">
               <motion.div 
                 initial={{ opacity: 0, y: 30 }}
                 animate={{ opacity: 1, y: 0 }}
@@ -122,6 +171,44 @@ function ProjectPage() {
                   </div>
                 </div>
               </motion.div>
+
+              {/* Horizontal Image Cards with White Text Box */}
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+                {[
+                  {
+                    img: "https://images.unsplash.com/photo-1594708767771-a7502209ff51?q=80&w=800&auto=format&fit=crop",
+                    title: "Impacto Local",
+                    desc: "Vidas sendo transformadas diariamente em Xai Xai."
+                  },
+                  {
+                    img: "https://images.unsplash.com/photo-1488521787991-ed7bbaae773c?q=80&w=800&auto=format&fit=crop",
+                    title: "Esperança",
+                    desc: "Levando o amor de Deus através de ações práticas."
+                  }
+                ].map((card, i) => (
+                  <motion.div 
+                    key={i}
+                    initial={{ opacity: 0, y: 20 }}
+                    whileInView={{ opacity: 1, y: 0 }}
+                    viewport={{ once: true }}
+                    transition={{ delay: i * 0.1 }}
+                    className="relative h-80 rounded-[40px] overflow-hidden group shadow-xl"
+                  >
+                    <img 
+                      src={card.img} 
+                      alt={card.title} 
+                      className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110"
+                    />
+                    <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent" />
+                    
+                    {/* White Text Box on Card */}
+                    <div className="absolute bottom-6 left-6 right-6 bg-white rounded-3xl p-6 shadow-2xl translate-y-2 group-hover:translate-y-0 transition-transform">
+                      <h4 className="font-black text-brand-dark text-lg mb-1">{card.title}</h4>
+                      <p className="text-brand-dark/60 text-sm leading-tight font-medium">{card.desc}</p>
+                    </div>
+                  </motion.div>
+                ))}
+              </div>
             </div>
 
             {/* Sidebar */}
