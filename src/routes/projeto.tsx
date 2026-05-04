@@ -18,14 +18,14 @@ function ProjectPage() {
       <Navbar />
       
       {/* Hero Section of the Post */}
-      <section className="relative pt-32 pb-16 lg:pt-40 lg:pb-24 overflow-hidden">
+      <section className="relative pt-32 pb-16 lg:pt-40 lg:pb-24 overflow-hidden bg-brand-dark">
         <div className="absolute inset-0 z-0">
           <img 
             src={hero2} 
             alt="Projeto África Xai Xai" 
-            className="w-full h-full object-cover blur-[2px] opacity-20"
+            className="w-full h-full object-cover blur-sm opacity-30"
           />
-          <div className="absolute inset-0 bg-gradient-to-b from-brand-light via-brand-light/95 to-brand-light" />
+          <div className="absolute inset-0 bg-gradient-to-b from-brand-dark/95 via-brand-dark/90 to-brand-dark" />
         </div>
 
         <div className="max-w-7xl mx-auto px-5 sm:px-6 relative z-10">
@@ -33,14 +33,28 @@ function ProjectPage() {
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.6 }}
-            className="max-w-4xl mx-auto text-center"
+            className="max-w-5xl mx-auto text-center"
           >
-            <SectionTag icon={Heart} text="Saúde / Missões" light />
-            <h1 className="text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-black text-brand-dark leading-[1.05] mb-8">
+            {/* Main Post Image Moved Up */}
+            <motion.div 
+              initial={{ opacity: 0, scale: 0.95 }}
+              animate={{ opacity: 1, scale: 1 }}
+              transition={{ duration: 0.8, delay: 0.2 }}
+              className="aspect-video w-full rounded-3xl overflow-hidden mb-12 shadow-2xl border-4 border-white/5"
+            >
+              <img 
+                src={hero2} 
+                alt="Destaque do Projeto" 
+                className="w-full h-full object-cover"
+              />
+            </motion.div>
+
+            <SectionTag icon={Heart} text="Saúde / Missões" />
+            <h1 className="text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-black text-white leading-[1.05] mb-8">
               África: <span className="text-brand-orange">Xai Xai / Gaza</span>
             </h1>
             
-            <div className="flex flex-wrap items-center justify-center gap-6 text-brand-dark/60 font-bold text-sm uppercase tracking-widest">
+            <div className="flex flex-wrap items-center justify-center gap-6 text-white/60 font-bold text-sm uppercase tracking-widest">
               <div className="flex items-center gap-2">
                 <Calendar className="w-5 h-5 text-brand-orange" />
                 <span>04 de Maio, 2026</span>
@@ -55,7 +69,7 @@ function ProjectPage() {
       </section>
 
       {/* Content Section */}
-      <section className="pb-24 relative">
+      <section className="pb-24 relative -mt-10 lg:-mt-16 z-20">
         <div className="max-w-7xl mx-auto px-5 sm:px-6">
           <div className="grid grid-cols-1 lg:grid-cols-12 gap-12">
             
@@ -67,14 +81,6 @@ function ProjectPage() {
                 transition={{ duration: 0.8, delay: 0.2 }}
                 className="bg-white rounded-[40px] p-8 md:p-12 shadow-xl border border-brand-orange/5"
               >
-                <div className="aspect-video w-full rounded-3xl overflow-hidden mb-10 shadow-2xl">
-                  <img 
-                    src={hero2} 
-                    alt="Destaque do Projeto" 
-                    className="w-full h-full object-cover"
-                  />
-                </div>
-
                 <div className="prose prose-lg max-w-none text-brand-dark/70 leading-relaxed">
                   <p className="text-xl font-bold text-brand-dark mb-6">
                     A Agência Cristã Missionária IDE está mobilizando esforços para transformar a realidade da comunidade de Xai Xai, na província de Gaza, Moçambique.
