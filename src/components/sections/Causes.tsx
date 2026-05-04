@@ -1,9 +1,12 @@
 import { useRef } from "react";
-import { motion, useScroll, useTransform } from "framer-motion";
+import { motion } from "framer-motion";
 import { Heart, ArrowRight, ArrowLeft, Users } from "lucide-react";
 import { SectionTag } from "../SectionTag";
 import { Button } from "@/components/ui/button";
-import africaXaiXai from "@/assets/africa-xai-xai.png";
+import { Link } from "@tanstack/react-router";
+import africaXaiXai from "@/assets/hero-2.png"; // Changed to use the existing image asset correctly
+import cause1 from "@/assets/hero-2.png"; // fallback or same for now
+
 
 const causes = [
   {
@@ -101,8 +104,10 @@ export function Causes() {
                     Apoiar Agora
                     <ArrowRight className="w-4 h-4 ml-2 group-hover/btn:translate-x-1 transition-transform" />
                   </Button>
-                  <Button variant="outline" className="flex-1 border-2 border-brand-orange/20 bg-transparent hover:bg-brand-orange/10 text-brand-orange py-6 rounded-2xl font-bold">
-                    Conhecer mais
+                  <Button asChild variant="outline" className="flex-1 border-2 border-brand-orange/20 bg-transparent hover:bg-brand-orange/10 text-brand-orange py-6 rounded-2xl font-bold">
+                    <Link to="/projeto">
+                      Conhecer mais
+                    </Link>
                   </Button>
                 </div>
               </div>
