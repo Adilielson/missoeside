@@ -8,7 +8,6 @@ import { SectionTag } from "@/components/SectionTag";
 import { Button } from "@/components/ui/button";
 import hero2 from "@/assets/hero-2.png";
 
-
 export const Route = createFileRoute("/projeto")({
   component: ProjectPage,
 });
@@ -22,7 +21,7 @@ function ProjectPage() {
       <section className="relative pt-32 pb-16 lg:pt-40 lg:pb-24 overflow-hidden">
         <div className="absolute inset-0 z-0">
           <img 
-            src={africaXaiXai} 
+            src={hero2} 
             alt="Projeto África Xai Xai" 
             className="w-full h-full object-cover blur-[2px] opacity-20"
           />
@@ -70,7 +69,7 @@ function ProjectPage() {
               >
                 <div className="aspect-video w-full rounded-3xl overflow-hidden mb-10 shadow-2xl">
                   <img 
-                    src={africaXaiXai} 
+                    src={hero2} 
                     alt="Destaque do Projeto" 
                     className="w-full h-full object-cover"
                   />
