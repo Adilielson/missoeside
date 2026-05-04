@@ -2,15 +2,23 @@ import { createFileRoute } from "@tanstack/react-router";
 import { Navbar } from "@/components/sections/Navbar";
 import { Footer } from "@/components/sections/Footer";
 import { ContactBar } from "@/components/sections/ContactBar";
-import { motion } from "framer-motion";
-import { Heart, Calendar, MapPin, Share2, ArrowRight } from "lucide-react";
+import { motion, AnimatePresence } from "framer-motion";
+import { Heart, Calendar, MapPin, Share2, ArrowRight, ChevronLeft, ChevronRight } from "lucide-react";
 import { SectionTag } from "@/components/SectionTag";
 import { Button } from "@/components/ui/button";
+import { useState, useEffect } from "react";
 import hero2 from "@/assets/hero-2.png";
 
 export const Route = createFileRoute("/projeto")({
   component: ProjectPage,
 });
+
+const galleryImages = [
+  hero2,
+  "https://images.unsplash.com/photo-1488521787991-ed7bbaae773c?q=80&w=2070&auto=format&fit=crop",
+  "https://images.unsplash.com/photo-1497633762265-9d179a990aa6?q=80&w=2073&auto=format&fit=crop",
+  "https://images.unsplash.com/photo-1469571486292-0ba58a3f068b?q=80&w=2070&auto=format&fit=crop",
+];
 
 function ProjectPage() {
   return (
