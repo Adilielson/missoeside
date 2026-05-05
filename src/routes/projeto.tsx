@@ -240,7 +240,7 @@ function ProjectPage() {
               {[...galleryImages, ...galleryImages].map((img, i) => (
                 <div 
                   key={i} 
-                  className="w-[300px] md:w-[450px] aspect-[4/3] rounded-[40px] overflow-hidden shadow-2xl border-4 border-white/5"
+                  className="w-[300px] md:w-[450px] aspect-[4/3] rounded-[40px] overflow-hidden shadow-2xl border-4 border-white"
                 >
                   <img 
                     src={img} 
