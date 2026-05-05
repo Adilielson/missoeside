@@ -9,7 +9,7 @@ import { Button } from "@/components/ui/button";
 import { useState, useEffect } from "react";
 import hero2 from "@/assets/hero-2.png";
 
-export const Route = createFileRoute("/projeto")({
+export const Route = createFileRoute("/projeto/$slug")({
   component: ProjectPage,
 });
 

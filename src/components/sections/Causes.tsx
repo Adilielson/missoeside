@@ -4,40 +4,9 @@ import { Heart, ArrowRight, ArrowLeft, Users } from "lucide-react";
 import { SectionTag } from "../SectionTag";
 import { Button } from "@/components/ui/button";
 import { Link } from "@tanstack/react-router";
-import africaXaiXai from "@/assets/hero-2.png"; // Changed to use the existing image asset correctly
-import cause1 from "@/assets/hero-2.png"; // fallback or same for now
+import { getActiveProjects } from "@/data/projects";
 
-
-const causes = [
-  {
-    title: "África",
-    subtitle: "Xai Xai / Gaza",
-    desc: "Construção de poços artesianos em comunidades carentes para erradicar doenças.",
-    image: africaXaiXai,
-    category: "Saúde",
-  },
-  {
-    title: "África",
-    subtitle: "Xai Xai / Gaza",
-    desc: "Fornecimento de materiais escolares e treinamento para professores locais.",
-    image: "https://images.unsplash.com/photo-1497633762265-9d179a990aa6?q=80&w=2073&auto=format&fit=crop",
-    category: "Educação",
-  },
-  {
-    title: "Alívio à Fome",
-    subtitle: "América Latina",
-    desc: "Distribuição de cestas básicas e apoio a hortas comunitárias autossustentáveis.",
-    image: "https://images.unsplash.com/photo-1488521787991-ed7bbaae773c?q=80&w=2070&auto=format&fit=crop",
-    category: "Alimentação",
-  },
-  {
-    title: "Apoio a Refugiados",
-    subtitle: "Vítimas de Guerra",
-    desc: "Assistência médica e psicológica imediata para famílias deslocadas por conflitos.",
-    image: "https://images.unsplash.com/photo-1469571486292-0ba58a3f068b?q=80&w=2070&auto=format&fit=crop",
-    category: "Emergência",
-  },
-];
+const projects = getActiveProjects();
 
 export function Causes() {
   const scrollRef = useRef<HTMLDivElement>(null);
