@@ -35,7 +35,7 @@ function ProjectPage() {
 
   return (
     <main className="min-h-screen selection:bg-brand-orange selection:text-white bg-brand-light">
-      <Navbar />
+      <Navbar dark />
       
       {/* Hero Section of the Post */}
       <section className="relative pt-32 pb-16 lg:pt-40 lg:pb-24 overflow-hidden bg-brand-dark">
@@ -218,10 +218,10 @@ function ProjectPage() {
       </section>
 
       {/* Full Width Automatic Bottom Gallery */}
-      <section className="py-24 bg-brand-dark overflow-hidden">
+      <section className="pb-24 bg-brand-light overflow-hidden">
         <div className="max-w-7xl mx-auto px-5 sm:px-6 mb-12">
           <SectionTag icon={Heart} text="Galeria do Projeto" />
-          <h2 className="text-3xl md:text-5xl font-black text-white uppercase tracking-tighter">
+          <h2 className="text-3xl md:text-5xl font-black text-brand-dark uppercase tracking-tighter">
             Nossa Jornada em <span className="text-brand-orange">Imagens</span>
           </h2>
         </div>
@@ -240,7 +240,7 @@ function ProjectPage() {
               {[...galleryImages, ...galleryImages].map((img, i) => (
                 <div 
                   key={i} 
-                  className="w-[300px] md:w-[450px] aspect-[4/3] rounded-[40px] overflow-hidden shadow-2xl border-4 border-white/5"
+                  className="w-[300px] md:w-[450px] aspect-[4/3] rounded-[40px] overflow-hidden shadow-2xl border-4 border-white"
                 >
                   <img 
                     src={img} 
