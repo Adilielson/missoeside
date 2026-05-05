@@ -17,7 +17,6 @@ const IndexRoute = IndexRouteImport.update({
   path: '/',
   getParentRoute: () => rootRouteImport,
 } as any)
-
 const ProjetoSlugRoute = ProjetoSlugRouteImport.update({
   id: '/projeto/$slug',
   path: '/projeto/$slug',
@@ -28,18 +27,15 @@ export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/projeto/$slug': typeof ProjetoSlugRoute
 }
-
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/projeto/$slug': typeof ProjetoSlugRoute
 }
-
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
   '/projeto/$slug': typeof ProjetoSlugRoute
 }
-
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
   fullPaths: '/' | '/projeto/$slug'
@@ -48,7 +44,6 @@ export interface FileRouteTypes {
   id: '__root__' | '/' | '/projeto/$slug'
   fileRoutesById: FileRoutesById
 }
-
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   ProjetoSlugRoute: typeof ProjetoSlugRoute
@@ -77,7 +72,15 @@ const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   ProjetoSlugRoute: ProjetoSlugRoute,
 }
-
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
   ._addFileTypes<FileRouteTypes>()
+
+import type { getRouter } from './router.tsx'
+import type { createStart } from '@tanstack/react-start'
+declare module '@tanstack/react-start' {
+  interface Register {
+    ssr: true
+    router: Awaited<ReturnType<typeof getRouter>>
+  }
+}
