@@ -15,7 +15,7 @@ const menuItems = [
   { name: "Contato", href: "#contato" },
 ];
 
-export function Navbar() {
+export function Navbar({ dark = false }: { dark?: boolean }) {
   const [isScrolled, setIsScrolled] = useState(false);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
