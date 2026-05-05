@@ -3,7 +3,7 @@ import { Navbar } from "@/components/sections/Navbar";
 import { Footer } from "@/components/sections/Footer";
 import { ContactBar } from "@/components/sections/ContactBar";
 import { motion } from "framer-motion";
-import { Heart, Calendar, MapPin, Share2, ArrowRight } from "lucide-react";
+import { Heart, Calendar, MapPin, Share2, ArrowRight, ChevronLeft } from "lucide-react";
 import { SectionTag } from "@/components/SectionTag";
 import { Button } from "@/components/ui/button";
 import { useState, useEffect } from "react";
