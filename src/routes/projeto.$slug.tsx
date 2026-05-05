@@ -45,13 +45,15 @@ function ProjectPage() {
   return (
     <main className="min-h-screen selection:bg-brand-orange selection:text-white bg-brand-light">
       <Navbar dark />
-      <div className="absolute top-24 left-5 sm:left-10 z-30">
-        <Button asChild variant="ghost" className="text-white hover:bg-white/10 flex items-center gap-2 font-bold uppercase tracking-widest text-xs">
-          <Link to="/">
-            <ChevronLeft className="w-4 h-4" />
-            Voltar para Início
-          </Link>
-        </Button>
+      <div className="absolute top-28 left-0 right-0 z-30 pointer-events-none">
+        <div className="max-w-7xl mx-auto px-5 sm:px-6">
+          <Button asChild variant="ghost" className="text-white hover:bg-white/10 pointer-events-auto inline-flex items-center gap-2 font-bold uppercase tracking-widest text-[10px] sm:text-xs p-0 hover:text-brand-orange transition-colors">
+            <Link to="/">
+              <ChevronLeft className="w-4 h-4" />
+              Voltar para Início
+            </Link>
+          </Button>
+        </div>
       </div>
       {/* Hero Section of the Post */}
       <section className="relative pt-32 pb-16 lg:pt-40 lg:pb-24 overflow-hidden bg-brand-dark">
