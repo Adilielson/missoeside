@@ -53,8 +53,6 @@ function ProjectPage() {
           </Link>
         </Button>
       </div>
-      <section className="relative pt-32 pb-16 lg:pt-40 lg:pb-24 overflow-hidden bg-brand-dark">
-
       {/* Hero Section of the Post */}
       <section className="relative pt-32 pb-16 lg:pt-40 lg:pb-24 overflow-hidden bg-brand-dark">
         <div className="absolute inset-0 z-0">
