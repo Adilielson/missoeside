@@ -43,7 +43,7 @@ function ProjectPage() {
   const progressPercent = Math.min(Math.round((project.raisedAmount / project.goalAmount) * 100), 100);
 
   return (
-    <main className="min-h-screen selection:bg-brand-orange selection:text-white bg-brand-light">
+    <main className="min-h-screen selection:bg-brand-orange selection:text-white bg-brand-light relative">
       <Navbar dark />
       <div className="absolute top-28 left-0 right-0 z-30 pointer-events-none">
         <div className="max-w-7xl mx-auto px-5 sm:px-6">
