@@ -4,40 +4,9 @@ import { Heart, ArrowRight, ArrowLeft, Users } from "lucide-react";
 import { SectionTag } from "../SectionTag";
 import { Button } from "@/components/ui/button";
 import { Link } from "@tanstack/react-router";
-import africaXaiXai from "@/assets/hero-2.png"; // Changed to use the existing image asset correctly
-import cause1 from "@/assets/hero-2.png"; // fallback or same for now
+import { getActiveProjects } from "@/data/projects";
 
-
-const causes = [
-  {
-    title: "África",
-    subtitle: "Xai Xai / Gaza",
-    desc: "Construção de poços artesianos em comunidades carentes para erradicar doenças.",
-    image: africaXaiXai,
-    category: "Saúde",
-  },
-  {
-    title: "África",
-    subtitle: "Xai Xai / Gaza",
-    desc: "Fornecimento de materiais escolares e treinamento para professores locais.",
-    image: "https://images.unsplash.com/photo-1497633762265-9d179a990aa6?q=80&w=2073&auto=format&fit=crop",
-    category: "Educação",
-  },
-  {
-    title: "Alívio à Fome",
-    subtitle: "América Latina",
-    desc: "Distribuição de cestas básicas e apoio a hortas comunitárias autossustentáveis.",
-    image: "https://images.unsplash.com/photo-1488521787991-ed7bbaae773c?q=80&w=2070&auto=format&fit=crop",
-    category: "Alimentação",
-  },
-  {
-    title: "Apoio a Refugiados",
-    subtitle: "Vítimas de Guerra",
-    desc: "Assistência médica e psicológica imediata para famílias deslocadas por conflitos.",
-    image: "https://images.unsplash.com/photo-1469571486292-0ba58a3f068b?q=80&w=2070&auto=format&fit=crop",
-    category: "Emergência",
-  },
-];
+const projectsList = getActiveProjects();
 
 export function Causes() {
   const scrollRef = useRef<HTMLDivElement>(null);
@@ -69,9 +38,9 @@ export function Causes() {
           className="flex-1 flex gap-6 overflow-x-auto pb-8 snap-x snap-mandatory scrollbar-hide no-scrollbar"
           style={{ msOverflowStyle: 'none', scrollbarWidth: 'none' }}
         >
-          {causes.map((cause, index) => (
+          {projectsList.map((project, index) => (
             <motion.div
-              key={index}
+              key={project.id}
               initial={{ opacity: 0, y: 50 }}
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true }}
@@ -80,32 +49,35 @@ export function Causes() {
             >
               <div className="relative h-64 overflow-hidden">
                 <img 
-                  src={cause.image} 
-                  alt={cause.title} 
+                  src={project.coverImage} 
+                  alt={project.title} 
                   className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110"
                 />
                 <div className="absolute top-4 left-4 bg-brand-orange text-white text-[10px] font-bold uppercase tracking-widest px-4 py-2 rounded-full">
-                  {cause.category}
+                  {project.category}
                 </div>
               </div>
               <div className="p-6 sm:p-8">
                 <h3 className="text-xl sm:text-2xl font-black text-brand-dark mb-1 group-hover:text-brand-orange transition-colors">
-                  {cause.title}
+                  {project.title}
                 </h3>
                 <p className="text-sm font-bold text-brand-orange uppercase tracking-wider mb-4">
-                  {cause.subtitle}
+                  {project.subtitle}
                 </p>
                 <p className="text-brand-dark/50 text-sm mb-8 line-clamp-2">
-                  {cause.desc}
+                  {project.introText}
                 </p>
 
                 <div className="flex flex-col sm:flex-row gap-3">
-                  <Button className="flex-1 bg-brand-orange hover:bg-brand-orange/90 text-white border-none py-6 rounded-2xl font-bold group/btn">
+                  <Button 
+                    onClick={() => alert(`Apoiar: ${project.title}`)}
+                    className="flex-1 bg-brand-orange hover:bg-brand-orange/90 text-white border-none py-6 rounded-2xl font-bold group/btn"
+                  >
                     Apoiar Agora
                     <ArrowRight className="w-4 h-4 ml-2 group-hover/btn:translate-x-1 transition-transform" />
                   </Button>
                   <Button asChild variant="outline" className="flex-1 border-2 border-brand-orange/20 bg-transparent hover:bg-brand-orange/10 text-brand-orange py-6 rounded-2xl font-bold">
-                    <Link to="/projeto">
+                    <Link to="/projeto/$slug" params={{ slug: project.slug }}>
                       Conhecer mais
                     </Link>
                   </Button>
