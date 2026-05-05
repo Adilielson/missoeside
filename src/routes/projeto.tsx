@@ -221,7 +221,7 @@ function ProjectPage() {
       <section className="pb-24 bg-brand-light overflow-hidden">
         <div className="max-w-7xl mx-auto px-5 sm:px-6 mb-12">
           <SectionTag icon={Heart} text="Galeria do Projeto" />
-          <h2 className="text-3xl md:text-5xl font-black text-white uppercase tracking-tighter">
+          <h2 className="text-3xl md:text-5xl font-black text-brand-dark uppercase tracking-tighter">
             Nossa Jornada em <span className="text-brand-orange">Imagens</span>
           </h2>
         </div>
