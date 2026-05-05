@@ -1,37 +1,46 @@
-import { createFileRoute } from "@tanstack/react-router";
+import { createFileRoute, Link } from "@tanstack/react-router";
 import { Navbar } from "@/components/sections/Navbar";
 import { Footer } from "@/components/sections/Footer";
 import { ContactBar } from "@/components/sections/ContactBar";
-import { motion, AnimatePresence } from "framer-motion";
-import { Heart, Calendar, MapPin, Share2, ArrowRight, ChevronLeft, ChevronRight } from "lucide-react";
+import { motion } from "framer-motion";
+import { Heart, Calendar, MapPin, Share2, ArrowRight } from "lucide-react";
 import { SectionTag } from "@/components/SectionTag";
 import { Button } from "@/components/ui/button";
 import { useState, useEffect } from "react";
-import hero2 from "@/assets/hero-2.png";
+import { getProjectBySlug, getOtherProjects } from "@/data/projects";
 
 export const Route = createFileRoute("/projeto/$slug")({
   component: ProjectPage,
 });
 
-const galleryImages = [
-  hero2,
-  "https://images.unsplash.com/photo-1488521787991-ed7bbaae773c?q=80&w=2070&auto=format&fit=crop",
-  "https://images.unsplash.com/photo-1497633762265-9d179a990aa6?q=80&w=2073&auto=format&fit=crop",
-  "https://images.unsplash.com/photo-1469571486292-0ba58a3f068b?q=80&w=2070&auto=format&fit=crop",
-];
-
 function ProjectPage() {
+  const { slug } = Route.useParams();
+  const project = getProjectBySlug(slug);
   const [currentImg, setCurrentImg] = useState(0);
 
   useEffect(() => {
+    if (!project) return;
     const timer = setInterval(() => {
-      setCurrentImg((prev) => (prev + 1) % galleryImages.length);
+      setCurrentImg((prev) => (prev + 1) % project.gallery.length);
     }, 5000);
     return () => clearInterval(timer);
-  }, []);
+  }, [project]);
 
-  const nextImg = () => setCurrentImg((prev) => (prev + 1) % galleryImages.length);
-  const prevImg = () => setCurrentImg((prev) => (prev - 1 + galleryImages.length) % galleryImages.length);
+  if (!project) {
+    return (
+      <main className="min-h-screen bg-brand-light flex items-center justify-center p-5">
+        <div className="text-center">
+          <h1 className="text-4xl font-black text-brand-dark mb-6">Projeto não encontrado</h1>
+          <Button asChild className="bg-brand-orange hover:bg-brand-orange/90 text-white py-6 px-8 rounded-2xl font-bold">
+            <Link to="/">Ver todos os projetos</Link>
+          </Button>
+        </div>
+      </main>
+    );
+  }
+
+  const otherProjects = getOtherProjects(project.slug);
+  const progressPercent = Math.min(Math.round((project.raisedAmount / project.goalAmount) * 100), 100);
 
   return (
     <main className="min-h-screen selection:bg-brand-orange selection:text-white bg-brand-light">
@@ -41,7 +50,7 @@ function ProjectPage() {
       <section className="relative pt-32 pb-16 lg:pt-40 lg:pb-24 overflow-hidden bg-brand-dark">
         <div className="absolute inset-0 z-0">
           <img 
-            src={hero2} 
+            src={project.coverImage} 
             alt="Background" 
             className="w-full h-full object-cover blur-sm opacity-30"
           />
@@ -63,25 +72,25 @@ function ProjectPage() {
               className="aspect-video w-full rounded-3xl overflow-hidden mb-12 shadow-2xl border-4 border-white/5"
             >
               <img 
-                src={hero2} 
-                alt="Destaque do Projeto" 
+                src={project.coverImage} 
+                alt={project.title} 
                 className="w-full h-full object-cover"
               />
             </motion.div>
 
-            <SectionTag icon={Heart} text="Saúde / Missões" />
+            <SectionTag icon={Heart} text={project.category} />
             <h1 className="text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-black text-white leading-[1.05] mb-8">
-              África: <span className="text-brand-orange">Xai Xai / Gaza</span>
+              {project.title}: <span className="text-brand-orange">{project.subtitle}</span>
             </h1>
             
             <div className="flex flex-wrap items-center justify-center gap-6 text-white/60 font-bold text-sm uppercase tracking-widest">
               <div className="flex items-center gap-2">
                 <Calendar className="w-5 h-5 text-brand-orange" />
-                <span>04 de Maio, 2026</span>
+                <span>{project.date}</span>
               </div>
               <div className="flex items-center gap-2">
                 <MapPin className="w-5 h-5 text-brand-orange" />
-                <span>Moçambique, África</span>
+                <span>{project.location}</span>
               </div>
             </div>
           </motion.div>
@@ -103,31 +112,31 @@ function ProjectPage() {
               >
                 <div className="prose prose-lg max-w-none text-brand-dark/70 leading-relaxed">
                   <p className="text-xl font-bold text-brand-dark mb-6">
-                    A Agência Cristã Missionária IDE está mobilizando esforços para transformar a realidade da comunidade de Xai Xai, na província de Gaza, Moçambique.
+                    {project.introText}
                   </p>
                   
                   <p className="mb-6">
-                    Moçambique enfrenta desafios significativos no acesso a água potável e saneamento básico. Em Xai Xai, muitas famílias ainda dependem de fontes de água não tratada, o que resulta em altos índices de doenças hídricas, afetando principalmente as crianças da região.
+                    {project.bodyText}
                   </p>
 
                   <h3 className="text-2xl font-black text-brand-dark mt-10 mb-4 uppercase tracking-tight">O Que Estamos Fazendo</h3>
                   <p className="mb-6">
-                    Nosso projeto foca na construção de poços artesianos equipados com sistemas de filtragem solar. Não se trata apenas de cavar um poço, mas de garantir que a comunidade tenha autonomia e saúde a longo prazo. Além da infraestrutura, nossa equipe de missionários realiza treinamentos sobre higiene e cuidados com a saúde.
+                    {project.whatWeDo}
                   </p>
 
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-6 my-10">
                     <div className="bg-brand-light p-6 rounded-3xl border border-brand-orange/10">
                       <h4 className="font-black text-brand-orange mb-2 uppercase tracking-widest text-xs">Objetivo do Projeto</h4>
-                      <p className="text-sm font-medium">Instalação de 5 poços artesianos de alta profundidade para servir mais de 10.000 pessoas.</p>
+                      <p className="text-sm font-medium">{project.projectGoal}</p>
                     </div>
                     <div className="bg-brand-light p-6 rounded-3xl border border-brand-orange/10">
                       <h4 className="font-black text-brand-orange mb-2 uppercase tracking-widest text-xs">Impacto Espiritual</h4>
-                      <p className="text-sm font-medium">Através da água física, levamos a "Água da Vida", estabelecendo pontos de pregação e apoio espiritual.</p>
+                      <p className="text-sm font-medium">{project.spiritualImpact}</p>
                     </div>
                   </div>
 
                   <p>
-                    Junte-se a nós nesta causa. Cada contribuição nos aproxima de mais um metro perfurado, de mais uma criança saudável e de uma comunidade que pode sonhar com um futuro melhor. O amor de Deus se manifesta através de nossas ações práticas.
+                    {project.callToAction}
                   </p>
                 </div>
 
@@ -156,24 +165,30 @@ function ProjectPage() {
               >
                 <h3 className="text-2xl font-black mb-6 leading-tight">Ajude este Projeto</h3>
                 <p className="text-white/60 mb-8 text-sm leading-relaxed">
-                  Sua doação é o combustível para que possamos continuar alcançando vidas em Xai Xai.
+                  Sua doação é o combustível para que possamos continuar alcançando vidas em {project.subtitle}.
                 </p>
 
                 <div className="space-y-4 mb-8">
                   <div className="flex justify-between font-black text-lg">
                     <span>Progresso</span>
-                    <span className="text-brand-orange">65%</span>
+                    <span className="text-brand-orange">{progressPercent}%</span>
                   </div>
                   <div className="h-3 w-full bg-white/10 rounded-full overflow-hidden">
-                    <div className="h-full bg-brand-orange w-[65%]" />
+                    <div 
+                      className="h-full bg-brand-orange transition-all duration-1000" 
+                      style={{ width: `${progressPercent}%` }} 
+                    />
                   </div>
                   <div className="flex justify-between text-xs font-bold opacity-50 uppercase tracking-widest">
-                    <span>R$ 13.000,00</span>
-                    <span>Meta: R$ 20.000,00</span>
+                    <span>{project.raisedAmount.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })}</span>
+                    <span>Meta: {project.goalAmount.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })}</span>
                   </div>
                 </div>
 
-                <Button className="w-full bg-brand-gradient hover:opacity-90 text-white py-8 rounded-2xl font-black text-lg shadow-lg shadow-brand-orange/20">
+                <Button 
+                  onClick={() => alert(`Apoiar: ${project.title}`)}
+                  className="w-full bg-brand-gradient hover:opacity-90 text-white py-8 rounded-2xl font-black text-lg shadow-lg shadow-brand-orange/20"
+                >
                   Apoiar Agora
                   <ArrowRight className="w-5 h-5 ml-2" />
                 </Button>
@@ -192,22 +207,27 @@ function ProjectPage() {
               >
                 <h4 className="text-lg font-black text-brand-dark mb-6 uppercase tracking-tight">Outros Projetos</h4>
                 <div className="space-y-6">
-                  {[1, 2].map((i) => (
-                    <div key={i} className="flex gap-4 group cursor-pointer">
+                  {otherProjects.map((other) => (
+                    <Link 
+                      key={other.id} 
+                      to="/projeto/$slug" 
+                      params={{ slug: other.slug }}
+                      className="flex gap-4 group cursor-pointer"
+                    >
                       <div className="w-20 h-20 rounded-2xl overflow-hidden shrink-0">
                         <img 
-                          src={`https://images.unsplash.com/photo-${1500000000000 + i}?q=80&w=200&auto=format&fit=crop`} 
-                          alt="Outro Projeto" 
+                          src={other.coverImage} 
+                          alt={other.title} 
                           className="w-full h-full object-cover group-hover:scale-110 transition-transform"
                         />
                       </div>
                       <div>
                         <h5 className="font-black text-brand-dark text-sm leading-tight group-hover:text-brand-orange transition-colors mb-1">
-                          Educação Infantil em Gaza
+                          {other.title}: {other.subtitle}
                         </h5>
-                        <p className="text-[10px] font-bold text-brand-orange uppercase tracking-widest">África</p>
+                        <p className="text-[10px] font-bold text-brand-orange uppercase tracking-widest">{other.country}</p>
                       </div>
-                    </div>
+                    </Link>
                   ))}
                 </div>
               </motion.div>
@@ -237,7 +257,7 @@ function ProjectPage() {
               }}
               className="flex gap-6 shrink-0"
             >
-              {[...galleryImages, ...galleryImages].map((img, i) => (
+              {[...project.gallery, ...project.gallery].map((img, i) => (
                 <div 
                   key={i} 
                   className="w-[300px] md:w-[450px] aspect-[4/3] rounded-[40px] overflow-hidden shadow-2xl border-4 border-white"
