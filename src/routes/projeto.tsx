@@ -218,7 +218,7 @@ function ProjectPage() {
       </section>
 
       {/* Full Width Automatic Bottom Gallery */}
-      <section className="py-24 bg-brand-dark overflow-hidden">
+      <section className="pb-24 bg-brand-light overflow-hidden">
         <div className="max-w-7xl mx-auto px-5 sm:px-6 mb-12">
           <SectionTag icon={Heart} text="Galeria do Projeto" />
           <h2 className="text-3xl md:text-5xl font-black text-white uppercase tracking-tighter">
