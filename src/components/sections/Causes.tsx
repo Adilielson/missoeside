@@ -26,7 +26,6 @@ export function Causes() {
           <SectionTag icon={Heart} text="Ajude e Done" light />
           <h2 className="text-3xl sm:text-4xl md:text-5xl font-black text-brand-dark leading-tight">
             Inspirando e Ajudando por um&nbsp;Mundo Melhor
-            <span className="text-brand-orange">Mundo Melhor</span>
           </h2>
         </div>
       </div>
