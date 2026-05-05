@@ -47,9 +47,9 @@ function ProjectPage() {
       <Navbar dark />
       <div className="absolute top-28 left-0 right-0 z-30 pointer-events-none">
         <div className="max-w-7xl mx-auto px-5 sm:px-6">
-          <Button asChild variant="ghost" className="text-white hover:bg-white/10 pointer-events-auto inline-flex items-center gap-2 font-bold uppercase tracking-widest text-[10px] sm:text-xs p-0 hover:text-brand-orange transition-colors">
+          <Button asChild variant="ghost" className="text-white hover:bg-white/10 pointer-events-auto inline-flex items-center gap-2 font-bold uppercase tracking-widest text-[10px] sm:text-xs p-0 group hover:text-brand-orange transition-colors">
             <Link to="/">
-              <ChevronLeft className="w-4 h-4" />
+              <ChevronLeft className="w-4 h-4 group-hover:-translate-x-1 transition-transform" />
               Voltar para Início
             </Link>
           </Button>
