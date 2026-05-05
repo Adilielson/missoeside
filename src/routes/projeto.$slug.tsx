@@ -88,8 +88,9 @@ function ProjectPage() {
             </motion.div>
 
             <SectionTag icon={Heart} text={project.category} />
-            <h1 className="text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-black text-white leading-[1.05] mb-8">
-              {project.title}: <span className="text-brand-orange">{project.subtitle}</span>
+            <h1 className="text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-black text-white leading-[1.05] mb-8 flex flex-col items-center">
+              <span>{project.title}:</span>
+              <span className="text-brand-orange">{project.subtitle}</span>
             </h1>
             
             <div className="flex flex-wrap items-center justify-center gap-6 text-white/60 font-bold text-sm uppercase tracking-widest">
