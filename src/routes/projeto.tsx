@@ -35,7 +35,7 @@ function ProjectPage() {
 
   return (
     <main className="min-h-screen selection:bg-brand-orange selection:text-white bg-brand-light">
-      <Navbar />
+      <Navbar dark />
       
       {/* Hero Section of the Post */}
       <section className="relative pt-32 pb-16 lg:pt-40 lg:pb-24 overflow-hidden bg-brand-dark">
