@@ -281,6 +281,60 @@ export type Database = {
         }
         Relationships: []
       }
+      projects: {
+        Row: {
+          category: string | null
+          city: string | null
+          country: string | null
+          cover_image: string | null
+          created_at: string
+          current_amount: number | null
+          description: string | null
+          featured: boolean | null
+          goal_amount: number | null
+          id: string
+          name: string
+          short_description: string | null
+          slug: string
+          status: Database["public"]["Enums"]["project_status"]
+          updated_at: string
+        }
+        Insert: {
+          category?: string | null
+          city?: string | null
+          country?: string | null
+          cover_image?: string | null
+          created_at?: string
+          current_amount?: number | null
+          description?: string | null
+          featured?: boolean | null
+          goal_amount?: number | null
+          id?: string
+          name: string
+          short_description?: string | null
+          slug: string
+          status?: Database["public"]["Enums"]["project_status"]
+          updated_at?: string
+        }
+        Update: {
+          category?: string | null
+          city?: string | null
+          country?: string | null
+          cover_image?: string | null
+          created_at?: string
+          current_amount?: number | null
+          description?: string | null
+          featured?: boolean | null
+          goal_amount?: number | null
+          id?: string
+          name?: string
+          short_description?: string | null
+          slug?: string
+          status?: Database["public"]["Enums"]["project_status"]
+          updated_at?: string
+        }
+        Relationships: []
+      }
       site_content: {
         Row: {
           id: string
@@ -360,6 +414,7 @@ export type Database = {
       notification_status: "SENT" | "FAILED" | "PENDING"
       payment_method: "PIX" | "CREDIT_CARD" | "BOLETO"
       post_status: "DRAFT" | "PUBLISHED" | "ARCHIVED"
+      project_status: "DRAFT" | "PUBLISHED"
       user_role: "admin" | "editor"
     }
     CompositeTypes: {
@@ -501,6 +556,7 @@ export const Constants = {
       notification_status: ["SENT", "FAILED", "PENDING"],
       payment_method: ["PIX", "CREDIT_CARD", "BOLETO"],
       post_status: ["DRAFT", "PUBLISHED", "ARCHIVED"],
+      project_status: ["DRAFT", "PUBLISHED"],
       user_role: ["admin", "editor"],
     },
   },
