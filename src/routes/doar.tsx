@@ -234,7 +234,16 @@ function DoarPage() {
             {method === "CREDIT_CARD" && (
               <div className="grid grid-cols-2 gap-3 mt-3">
                 <Input placeholder="Número do cartão" value={cardNumber} onChange={(e) => setCardNumber(e.target.value)} className="h-12 col-span-2 bg-white/5 border-white/10 text-white placeholder:text-white/40" />
-                <Input placeholder="Validade (MM/AA)" value={cardExp} onChange={(e) => setCardExp(e.target.value)} className="h-12 bg-white/5 border-white/10 text-white placeholder:text-white/40" />
+                <Input 
+                  placeholder="Validade (MM/AA)" 
+                  value={cardExp} 
+                  maxLength={5}
+                  onChange={(e) => {
+                    const v = e.target.value.replace(/\D/g, "").slice(0, 4);
+                    setCardExp(v.length >= 3 ? `${v.slice(0, 2)}/${v.slice(2)}` : v);
+                  }} 
+                  className="h-12 bg-white/5 border-white/10 text-white placeholder:text-white/40" 
+                />
                 <Input placeholder="CVV" value={cardCvv} onChange={(e) => setCardCvv(e.target.value)} className="h-12 bg-white/5 border-white/10 text-white placeholder:text-white/40" />
               </div>
             )}
