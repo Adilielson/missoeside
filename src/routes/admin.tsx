@@ -3,6 +3,7 @@ import { useEffect, useState } from "react";
 import { 
   LayoutDashboard, 
   Briefcase, 
+  Settings,
   LogOut, 
   Menu, 
   X,
@@ -86,6 +87,7 @@ function AdminLayout() {
   const menuItems = [
     { label: "Dashboard", icon: LayoutDashboard, path: "/admin" },
     { label: "Projetos / Missões", icon: Briefcase, path: "/admin/projects" },
+    { label: "Configurações", icon: Settings, path: "/admin/settings" },
   ];
 
   return (
