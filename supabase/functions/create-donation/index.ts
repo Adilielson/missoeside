@@ -97,7 +97,8 @@ Deno.serve(async (req) => {
       billingType,
       value: payload.amount,
       dueDate: dueDate.toISOString().split("T")[0],
-      description: `Doação IDE Missões - ${payload.donor_name}`,
+      description: `Doação IDE Missões - ${payload.donor_name}${payload.campaign ? ` (Projeto: ${payload.campaign})` : ""}`,
+      externalReference: payload.campaign || "Geral",
     };
 
     if (billingType === "CREDIT_CARD" && payload.card) {
@@ -164,7 +165,18 @@ Deno.serve(async (req) => {
       boletoUrl = payment.bankSlipUrl ?? payment.invoiceUrl ?? null;
     }
 
-    // 4. Save donation
+    // 4. Get Project Name for notification
+    let projectName = payload.campaign || "Geral";
+    if (payload.campaign) {
+      const { data: proj } = await supabase
+        .from("projects")
+        .select("name")
+        .eq("slug", payload.campaign)
+        .single();
+      if (proj) projectName = proj.name;
+    }
+
+    // 5. Save donation
     const { data: donation, error: dbError } = await supabase
       .from("donations")
       .insert({
@@ -192,6 +204,23 @@ Deno.serve(async (req) => {
         status: 500,
         headers: { ...corsHeaders, "Content-Type": "application/json" },
       });
+    }
+
+    // 6. Send automatic notification (WhatsApp/Email)
+    try {
+      const message = `Olá ${payload.donor_name}, obrigado pela sua doação de R$ ${payload.amount.toFixed(2).replace('.', ',')} para o projeto ${projectName}. Sua ajuda transforma vidas! 💛`;
+      
+      await supabase.functions.invoke("send-notification", {
+        body: {
+          donationId: donation.id,
+          message: message,
+          email: payload.donor_email,
+          phone: payload.donor_phone,
+        }
+      });
+    } catch (notifErr) {
+      console.error("Erro ao disparar notificação automática:", notifErr);
+      // Não trava o fluxo principal se a notificação falhar
     }
 
     return new Response(
