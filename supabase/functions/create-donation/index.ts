@@ -23,6 +23,7 @@ interface DonationPayload {
     expiryYear: string;
     ccv: string;
   };
+  campaign?: string;
 }
 
 Deno.serve(async (req) => {
@@ -175,6 +176,7 @@ Deno.serve(async (req) => {
         pix_qrcode: pixQrcode,
         pix_payload: pixPayload,
         boleto_url: boletoUrl,
+        campaign: payload.campaign,
       })
       .select()
       .single();
