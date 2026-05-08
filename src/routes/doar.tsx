@@ -130,16 +130,16 @@ function DoarPage() {
   }
 
   return (
-    <main className="min-h-screen flex flex-col lg:flex-row bg-white">
+    <main className="min-h-screen flex flex-col lg:flex-row bg-brand-dark">
       {/* LEFT: Form */}
       <section className="w-full lg:w-[45%] flex flex-col px-5 sm:px-10 py-8 overflow-y-auto">
         <Link to="/" className="inline-block mb-6">
           <img src={logoIde} alt="IDE Missões" className="h-12 w-auto" />
         </Link>
 
-        <div className="max-w-xl w-full mx-auto bg-white rounded-3xl shadow-xl border border-slate-100 p-6 sm:p-8">
-          <h1 className="text-2xl sm:text-3xl font-black text-[#0a1628]">Faça uma Doação Agora</h1>
-          <p className="text-slate-500 mt-1">Sua doação transforma vidas!</p>
+        <div className="max-w-xl w-full mx-auto bg-white/5 backdrop-blur-sm rounded-3xl shadow-2xl border border-white/10 p-6 sm:p-8">
+          <h1 className="text-2xl sm:text-3xl font-black text-white">Faça uma Doação Agora</h1>
+          <p className="text-white/60 mt-1">Sua doação transforma vidas!</p>
 
           {/* Type */}
           <Section title="SELECIONE TIPO DA DOAÇÃO">
@@ -185,16 +185,16 @@ function DoarPage() {
           {/* Personal */}
           <Section title="SEUS DADOS">
             <div className="grid sm:grid-cols-2 gap-3">
-              <Input placeholder="Nome Completo*" value={name} onChange={(e) => setName(e.target.value)} className="h-12" />
-              <Input placeholder="Celular com DDD*" value={phone} onChange={(e) => setPhone(e.target.value)} className="h-12" />
-              <Input placeholder="Email" type="email" value={email} onChange={(e) => setEmail(e.target.value)} className="h-12" />
-              <Input placeholder="CPF/CNPJ*" value={cpf} onChange={(e) => setCpf(e.target.value)} className="h-12" />
+              <Input placeholder="Nome Completo*" value={name} onChange={(e) => setName(e.target.value)} className="h-12 bg-white/5 border-white/10 text-white placeholder:text-white/40" />
+              <Input placeholder="Celular com DDD*" value={phone} onChange={(e) => setPhone(e.target.value)} className="h-12 bg-white/5 border-white/10 text-white placeholder:text-white/40" />
+              <Input placeholder="Email" type="email" value={email} onChange={(e) => setEmail(e.target.value)} className="h-12 bg-white/5 border-white/10 text-white placeholder:text-white/40" />
+              <Input placeholder="CPF/CNPJ*" value={cpf} onChange={(e) => setCpf(e.target.value)} className="h-12 bg-white/5 border-white/10 text-white placeholder:text-white/40" />
               <Input
                 placeholder="Data de Nascimento*"
                 type="date"
                 value={birth}
                 onChange={(e) => setBirth(e.target.value)}
-                className="h-12 sm:col-span-2"
+                className="h-12 sm:col-span-2 bg-white/5 border-white/10 text-white placeholder:text-white/40"
               />
             </div>
           </Section>
@@ -215,20 +215,20 @@ function DoarPage() {
 
             {method === "CREDIT_CARD" && (
               <div className="grid grid-cols-2 gap-3 mt-3">
-                <Input placeholder="Número do cartão" value={cardNumber} onChange={(e) => setCardNumber(e.target.value)} className="h-12 col-span-2" />
-                <Input placeholder="Validade (MM/AA)" value={cardExp} onChange={(e) => setCardExp(e.target.value)} className="h-12" />
-                <Input placeholder="CVV" value={cardCvv} onChange={(e) => setCardCvv(e.target.value)} className="h-12" />
+                <Input placeholder="Número do cartão" value={cardNumber} onChange={(e) => setCardNumber(e.target.value)} className="h-12 col-span-2 bg-white/5 border-white/10 text-white placeholder:text-white/40" />
+                <Input placeholder="Validade (MM/AA)" value={cardExp} onChange={(e) => setCardExp(e.target.value)} className="h-12 bg-white/5 border-white/10 text-white placeholder:text-white/40" />
+                <Input placeholder="CVV" value={cardCvv} onChange={(e) => setCardCvv(e.target.value)} className="h-12 bg-white/5 border-white/10 text-white placeholder:text-white/40" />
               </div>
             )}
           </Section>
 
           {/* Terms */}
-          <label className="flex items-start gap-2 mt-6 text-sm text-slate-600 cursor-pointer">
+          <label className="flex items-start gap-2 mt-6 text-sm text-white/70 cursor-pointer">
             <input
               type="checkbox"
               checked={accepted}
               onChange={(e) => setAccepted(e.target.checked)}
-              className="mt-1 accent-[#e8440c]"
+              className="mt-1 accent-brand-orange"
             />
             <span>Li e aceito as Políticas de Privacidade</span>
           </label>
@@ -248,7 +248,7 @@ function DoarPage() {
             )}
           </Button>
 
-          <div className="mt-5 flex flex-col items-center gap-1 text-xs text-slate-400">
+          <div className="mt-5 flex flex-col items-center gap-1 text-xs text-white/40">
             <span className="flex items-center gap-1.5">
               <Lock className="w-3.5 h-3.5" /> Você está em um ambiente seguro
             </span>
@@ -304,7 +304,7 @@ function DoarPage() {
 function Section({ title, children }: { title: string; children: React.ReactNode }) {
   return (
     <div className="mt-6">
-      <p className="text-xs font-bold text-slate-500 tracking-wider mb-3">{title}</p>
+      <p className="text-xs font-bold text-white/50 tracking-wider mb-3">{title}</p>
       {children}
     </div>
   );
@@ -326,8 +326,8 @@ function Toggle({
       className={cn(
         "h-12 rounded-xl font-bold text-sm border-2 transition-all",
         active
-          ? "bg-[#e8440c] border-[#e8440c] text-white shadow-md shadow-[#e8440c]/30"
-          : "bg-white border-slate-200 text-slate-700 hover:border-[#e8440c]/40"
+          ? "bg-brand-orange border-brand-orange text-white shadow-md shadow-brand-orange/30"
+          : "bg-white/5 border-white/10 text-white/80 hover:border-brand-orange/60"
       )}
     >
       {children}
@@ -353,8 +353,8 @@ function MethodBtn({
       className={cn(
         "h-12 rounded-xl font-bold text-xs sm:text-sm border-2 flex items-center justify-center gap-2 transition-all",
         active
-          ? "bg-[#e8440c] border-[#e8440c] text-white shadow-md shadow-[#e8440c]/30"
-          : "bg-white border-slate-200 text-slate-700 hover:border-[#e8440c]/40"
+          ? "bg-brand-orange border-brand-orange text-white shadow-md shadow-brand-orange/30"
+          : "bg-white/5 border-white/10 text-white/80 hover:border-brand-orange/60"
       )}
     >
       {icon}
