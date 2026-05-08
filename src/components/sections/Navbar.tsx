@@ -9,7 +9,7 @@ const menuItems = [
   { name: "Início", href: "#" },
   { name: "Sobre", href: "#sobre" },
   { name: "Missões", href: "#missoes" },
-  { name: "Doações", href: "#doacoes" },
+  { name: "Doações", href: "#missoes" },
   { name: "Eventos", href: "#eventos" },
   { name: "Blog", href: "#blog" },
   { name: "Contato", href: "#contato" },
