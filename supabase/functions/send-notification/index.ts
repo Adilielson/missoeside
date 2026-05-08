@@ -89,7 +89,7 @@ Deno.serve(async (req) => {
       .replace(/{{project_name}}/g, projectName);
 
     // 3. Enviar via Gmail SMTP
-    const gmailUser = Deno.env.get("GMAIL_USER");
+    const gmailUser = Deno.env.get("GMAIL_USER") || "agenciaidei@gmail.com";
     const gmailPass = Deno.env.get("GMAIL_APP_PASSWORD");
 
     if (!gmailUser || !gmailPass) {
