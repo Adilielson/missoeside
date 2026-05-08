@@ -91,7 +91,7 @@ Deno.serve(async (req) => {
     // 1. Buscar doação e dados do projeto
     const { data: donation, error: fetchErr } = await supabase
       .from("donations")
-      .select("*, project:projects(name, email_subject, email_template)")
+      .select("*, project:projects(name, cover_image, email_subject, email_template)")
       .eq("id", donationId)
       .single();
 
