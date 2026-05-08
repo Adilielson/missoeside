@@ -97,7 +97,8 @@ Deno.serve(async (req) => {
       billingType,
       value: payload.amount,
       dueDate: dueDate.toISOString().split("T")[0],
-      description: `Doação IDE Missões - ${payload.donor_name}`,
+      description: `Doação IDE Missões - ${payload.donor_name}${payload.campaign ? ` (Projeto: ${payload.campaign})` : ""}`,
+      externalReference: payload.campaign || "Geral",
     };
 
     if (billingType === "CREDIT_CARD" && payload.card) {
