@@ -165,7 +165,18 @@ Deno.serve(async (req) => {
       boletoUrl = payment.bankSlipUrl ?? payment.invoiceUrl ?? null;
     }
 
-    // 4. Save donation
+    // 4. Get Project Name for notification
+    let projectName = payload.campaign || "Geral";
+    if (payload.campaign) {
+      const { data: proj } = await supabase
+        .from("projects")
+        .select("name")
+        .eq("slug", payload.campaign)
+        .single();
+      if (proj) projectName = proj.name;
+    }
+
+    // 5. Save donation
     const { data: donation, error: dbError } = await supabase
       .from("donations")
       .insert({
