@@ -185,16 +185,16 @@ function DoarPage() {
           {/* Personal */}
           <Section title="SEUS DADOS">
             <div className="grid sm:grid-cols-2 gap-3">
-              <Input placeholder="Nome Completo*" value={name} onChange={(e) => setName(e.target.value)} className="h-12" />
-              <Input placeholder="Celular com DDD*" value={phone} onChange={(e) => setPhone(e.target.value)} className="h-12" />
-              <Input placeholder="Email" type="email" value={email} onChange={(e) => setEmail(e.target.value)} className="h-12" />
-              <Input placeholder="CPF/CNPJ*" value={cpf} onChange={(e) => setCpf(e.target.value)} className="h-12" />
+              <Input placeholder="Nome Completo*" value={name} onChange={(e) => setName(e.target.value)} className="h-12 bg-white/5 border-white/10 text-white placeholder:text-white/40" />
+              <Input placeholder="Celular com DDD*" value={phone} onChange={(e) => setPhone(e.target.value)} className="h-12 bg-white/5 border-white/10 text-white placeholder:text-white/40" />
+              <Input placeholder="Email" type="email" value={email} onChange={(e) => setEmail(e.target.value)} className="h-12 bg-white/5 border-white/10 text-white placeholder:text-white/40" />
+              <Input placeholder="CPF/CNPJ*" value={cpf} onChange={(e) => setCpf(e.target.value)} className="h-12 bg-white/5 border-white/10 text-white placeholder:text-white/40" />
               <Input
                 placeholder="Data de Nascimento*"
                 type="date"
                 value={birth}
                 onChange={(e) => setBirth(e.target.value)}
-                className="h-12 sm:col-span-2"
+                className="h-12 sm:col-span-2 bg-white/5 border-white/10 text-white placeholder:text-white/40"
               />
             </div>
           </Section>
@@ -215,20 +215,20 @@ function DoarPage() {
 
             {method === "CREDIT_CARD" && (
               <div className="grid grid-cols-2 gap-3 mt-3">
-                <Input placeholder="Número do cartão" value={cardNumber} onChange={(e) => setCardNumber(e.target.value)} className="h-12 col-span-2" />
-                <Input placeholder="Validade (MM/AA)" value={cardExp} onChange={(e) => setCardExp(e.target.value)} className="h-12" />
-                <Input placeholder="CVV" value={cardCvv} onChange={(e) => setCardCvv(e.target.value)} className="h-12" />
+                <Input placeholder="Número do cartão" value={cardNumber} onChange={(e) => setCardNumber(e.target.value)} className="h-12 col-span-2 bg-white/5 border-white/10 text-white placeholder:text-white/40" />
+                <Input placeholder="Validade (MM/AA)" value={cardExp} onChange={(e) => setCardExp(e.target.value)} className="h-12 bg-white/5 border-white/10 text-white placeholder:text-white/40" />
+                <Input placeholder="CVV" value={cardCvv} onChange={(e) => setCardCvv(e.target.value)} className="h-12 bg-white/5 border-white/10 text-white placeholder:text-white/40" />
               </div>
             )}
           </Section>
 
           {/* Terms */}
-          <label className="flex items-start gap-2 mt-6 text-sm text-slate-600 cursor-pointer">
+          <label className="flex items-start gap-2 mt-6 text-sm text-white/70 cursor-pointer">
             <input
               type="checkbox"
               checked={accepted}
               onChange={(e) => setAccepted(e.target.checked)}
-              className="mt-1 accent-[#e8440c]"
+              className="mt-1 accent-brand-orange"
             />
             <span>Li e aceito as Políticas de Privacidade</span>
           </label>
