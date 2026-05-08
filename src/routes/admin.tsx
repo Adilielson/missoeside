@@ -80,8 +80,6 @@ function AdminLayout() {
   const menuItems = [
     { label: "Dashboard", icon: LayoutDashboard, path: "/admin" },
     { label: "Projetos / Missões", icon: Briefcase, path: "/admin/projects" },
-    { label: "Usuários", icon: Users, path: "/admin/users" },
-    { label: "Configurações", icon: Settings, path: "/admin/settings" },
   ];
 
   return (
