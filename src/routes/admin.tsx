@@ -7,8 +7,7 @@ import {
   Menu, 
   X,
   Shield,
-  Loader2,
-  ChevronRight
+  Loader2
 } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { cn } from "@/lib/utils";
@@ -135,7 +134,6 @@ function AdminLayout() {
                   <item.icon className={cn("w-5 h-5", location.pathname === item.path ? "text-white" : "text-white/40 group-hover:text-white/80")} />
                   <span className="font-medium">{item.label}</span>
                 </div>
-                {item.isExternal && <ChevronRight className="w-4 h-4 text-white/20 group-hover:text-white/60" />}
               </Link>
             ))}
           </nav>
