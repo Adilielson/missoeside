@@ -1,0 +1,380 @@
+import { createFileRoute, Link } from "@tanstack/react-router";
+import { useEffect, useState } from "react";
+import { Heart, Loader2, Lock, QrCode, CreditCard, FileText, Copy, Check } from "lucide-react";
+import { toast } from "sonner";
+import { supabase } from "@/integrations/supabase/client";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import { cn } from "@/lib/utils";
+import logoIde from "@/assets/logo-ide.png";
+import bgImage from "@/assets/africa-xai-xai.png";
+
+export const Route = createFileRoute("/doar")({
+  head: () => ({
+    meta: [
+      { title: "Doe Agora — IDE Missões para o Mundo" },
+      { name: "description", content: "Faça uma doação e transforme vidas através de missões." },
+      { property: "og:title", content: "Doe Agora — IDE Missões" },
+      { property: "og:description", content: "Sua doação transforma vidas. Contribua hoje." },
+    ],
+  }),
+  component: DoarPage,
+});
+
+const META = 500000;
+const PRESETS = [200, 100, 75, 50, 25];
+type Method = "PIX" | "CREDIT_CARD" | "BOLETO";
+type DonationType = "MONTHLY" | "ONE_TIME";
+
+function brl(v: number) {
+  return v.toLocaleString("pt-BR", { style: "currency", currency: "BRL" });
+}
+
+function DoarPage() {
+  const [raised, setRaised] = useState(0);
+  const [type, setType] = useState<DonationType>("ONE_TIME");
+  const [amount, setAmount] = useState<number>(100);
+  const [customMode, setCustomMode] = useState(false);
+  const [customValue, setCustomValue] = useState("");
+  const [method, setMethod] = useState<Method>("PIX");
+  const [accepted, setAccepted] = useState(false);
+  const [loading, setLoading] = useState(false);
+
+  // form
+  const [name, setName] = useState("");
+  const [phone, setPhone] = useState("");
+  const [email, setEmail] = useState("");
+  const [cpf, setCpf] = useState("");
+  const [birth, setBirth] = useState("");
+
+  // card
+  const [cardNumber, setCardNumber] = useState("");
+  const [cardExp, setCardExp] = useState("");
+  const [cardCvv, setCardCvv] = useState("");
+
+  // result modals
+  const [pixData, setPixData] = useState<{ qr: string | null; payload: string | null } | null>(null);
+  const [copied, setCopied] = useState(false);
+
+  useEffect(() => {
+    (async () => {
+      const { data } = await supabase
+        .from("donations")
+        .select("amount,status")
+        .in("status", ["CONFIRMED", "RECEIVED"]);
+      if (data) setRaised(data.reduce((s, d) => s + Number(d.amount || 0), 0));
+    })();
+  }, []);
+
+  const finalAmount = customMode ? Number(customValue.replace(",", ".")) || 0 : amount;
+  const progress = Math.min(100, (raised / META) * 100);
+
+  async function handleSubmit() {
+    if (!accepted) return toast.error("Aceite as Políticas de Privacidade.");
+    if (!name || !phone || !cpf || !birth) return toast.error("Preencha os campos obrigatórios.");
+    if (finalAmount < 5) return toast.error("Valor mínimo: R$ 5,00");
+    if (method === "CREDIT_CARD" && (!cardNumber || !cardExp || !cardCvv))
+      return toast.error("Preencha os dados do cartão.");
+
+    setLoading(true);
+    try {
+      const [mm, yy] = cardExp.split("/");
+      const { data, error } = await supabase.functions.invoke("create-donation", {
+        body: {
+          donor_name: name,
+          donor_email: email,
+          donor_phone: phone,
+          donor_cpf: cpf,
+          donor_birthdate: birth,
+          amount: finalAmount,
+          type,
+          payment_method: method,
+          card:
+            method === "CREDIT_CARD"
+              ? {
+                  holderName: name,
+                  number: cardNumber,
+                  expiryMonth: mm,
+                  expiryYear: yy?.length === 2 ? `20${yy}` : yy,
+                  ccv: cardCvv,
+                }
+              : undefined,
+        },
+      });
+      if (error) throw error;
+      if ((data as any)?.error) throw new Error((data as any).error);
+
+      toast.success("Doação registrada! Obrigado 💛");
+
+      if (method === "PIX") {
+        setPixData({ qr: data.pix_qrcode, payload: data.pix_payload });
+      } else if (method === "BOLETO" && data.boleto_url) {
+        window.open(data.boleto_url, "_blank");
+      } else if (method === "CREDIT_CARD") {
+        toast.success("Pagamento processado com sucesso!");
+      }
+    } catch (e: any) {
+      toast.error(e.message || "Erro ao processar doação.");
+    } finally {
+      setLoading(false);
+    }
+  }
+
+  function copyPix() {
+    if (pixData?.payload) {
+      navigator.clipboard.writeText(pixData.payload);
+      setCopied(true);
+      setTimeout(() => setCopied(false), 2000);
+    }
+  }
+
+  return (
+    <main className="min-h-screen flex flex-col lg:flex-row bg-white">
+      {/* LEFT: Form */}
+      <section className="w-full lg:w-[45%] flex flex-col px-5 sm:px-10 py-8 overflow-y-auto">
+        <Link to="/" className="inline-block mb-6">
+          <img src={logoIde} alt="IDE Missões" className="h-12 w-auto" />
+        </Link>
+
+        <div className="max-w-xl w-full mx-auto bg-white rounded-3xl shadow-xl border border-slate-100 p-6 sm:p-8">
+          <h1 className="text-2xl sm:text-3xl font-black text-[#0a1628]">Faça uma Doação Agora</h1>
+          <p className="text-slate-500 mt-1">Sua doação transforma vidas!</p>
+
+          {/* Progress */}
+          <div className="mt-6">
+            <p className="text-sm font-semibold text-slate-700">
+              Ajude a alcançar a meta de {brl(META)}
+            </p>
+            <div className="h-3 bg-slate-100 rounded-full mt-2 overflow-hidden">
+              <div
+                className="h-full bg-gradient-to-r from-[#e8440c] to-amber-400 transition-all"
+                style={{ width: `${progress}%` }}
+              />
+            </div>
+            <p className="text-xs text-slate-500 mt-1">
+              {brl(raised)} arrecadados de {brl(META)}
+            </p>
+          </div>
+
+          {/* Type */}
+          <Section title="SELECIONE TIPO DA DOAÇÃO">
+            <div className="grid grid-cols-2 gap-3">
+              {(["MONTHLY", "ONE_TIME"] as DonationType[]).map((t) => (
+                <Toggle key={t} active={type === t} onClick={() => setType(t)}>
+                  {t === "MONTHLY" ? "Mensal" : "Único"}
+                </Toggle>
+              ))}
+            </div>
+          </Section>
+
+          {/* Amount */}
+          <Section title="SELECIONE VALOR DA DOAÇÃO">
+            <div className="grid grid-cols-3 gap-3">
+              {PRESETS.map((v) => (
+                <Toggle
+                  key={v}
+                  active={!customMode && amount === v}
+                  onClick={() => {
+                    setCustomMode(false);
+                    setAmount(v);
+                  }}
+                >
+                  {brl(v)}
+                </Toggle>
+              ))}
+              <Toggle active={customMode} onClick={() => setCustomMode(true)}>
+                OUTRO
+              </Toggle>
+            </div>
+            {customMode && (
+              <Input
+                type="number"
+                placeholder="Valor personalizado (R$)"
+                className="mt-3 h-12"
+                value={customValue}
+                onChange={(e) => setCustomValue(e.target.value)}
+              />
+            )}
+          </Section>
+
+          {/* Personal */}
+          <Section title="SEUS DADOS">
+            <div className="grid sm:grid-cols-2 gap-3">
+              <Input placeholder="Nome Completo*" value={name} onChange={(e) => setName(e.target.value)} className="h-12" />
+              <Input placeholder="Celular com DDD*" value={phone} onChange={(e) => setPhone(e.target.value)} className="h-12" />
+              <Input placeholder="Email" type="email" value={email} onChange={(e) => setEmail(e.target.value)} className="h-12" />
+              <Input placeholder="CPF/CNPJ*" value={cpf} onChange={(e) => setCpf(e.target.value)} className="h-12" />
+              <Input
+                placeholder="Data de Nascimento*"
+                type="date"
+                value={birth}
+                onChange={(e) => setBirth(e.target.value)}
+                className="h-12 sm:col-span-2"
+              />
+            </div>
+          </Section>
+
+          {/* Method */}
+          <Section title="SELECIONE FORMA DE PAGAMENTO">
+            <div className="grid grid-cols-3 gap-3">
+              <MethodBtn active={method === "PIX"} onClick={() => setMethod("PIX")} icon={<QrCode className="w-4 h-4" />}>
+                PIX
+              </MethodBtn>
+              <MethodBtn active={method === "CREDIT_CARD"} onClick={() => setMethod("CREDIT_CARD")} icon={<CreditCard className="w-4 h-4" />}>
+                CARTÃO
+              </MethodBtn>
+              <MethodBtn active={method === "BOLETO"} onClick={() => setMethod("BOLETO")} icon={<FileText className="w-4 h-4" />}>
+                BOLETO
+              </MethodBtn>
+            </div>
+
+            {method === "CREDIT_CARD" && (
+              <div className="grid grid-cols-2 gap-3 mt-3">
+                <Input placeholder="Número do cartão" value={cardNumber} onChange={(e) => setCardNumber(e.target.value)} className="h-12 col-span-2" />
+                <Input placeholder="Validade (MM/AA)" value={cardExp} onChange={(e) => setCardExp(e.target.value)} className="h-12" />
+                <Input placeholder="CVV" value={cardCvv} onChange={(e) => setCardCvv(e.target.value)} className="h-12" />
+              </div>
+            )}
+          </Section>
+
+          {/* Terms */}
+          <label className="flex items-start gap-2 mt-6 text-sm text-slate-600 cursor-pointer">
+            <input
+              type="checkbox"
+              checked={accepted}
+              onChange={(e) => setAccepted(e.target.checked)}
+              className="mt-1 accent-[#e8440c]"
+            />
+            <span>Li e aceito as Políticas de Privacidade</span>
+          </label>
+
+          <Button
+            onClick={handleSubmit}
+            disabled={loading}
+            className="w-full mt-5 h-14 text-base font-black bg-[#e8440c] hover:bg-[#c93a09] text-white rounded-xl shadow-lg shadow-[#e8440c]/30"
+          >
+            {loading ? (
+              <Loader2 className="w-5 h-5 animate-spin" />
+            ) : (
+              <>
+                <Heart className="w-5 h-5 fill-white" />
+                DOAR {brl(finalAmount)}
+              </>
+            )}
+          </Button>
+
+          <div className="mt-5 flex flex-col items-center gap-1 text-xs text-slate-400">
+            <span className="flex items-center gap-1.5">
+              <Lock className="w-3.5 h-3.5" /> Você está em um ambiente seguro
+            </span>
+            <span>Powered by Asaas</span>
+          </div>
+        </div>
+      </section>
+
+      {/* RIGHT: Image */}
+      <aside className="hidden lg:block lg:w-[55%] relative">
+        <img src={bgImage} alt="Missões IDE" className="absolute inset-0 w-full h-full object-cover" />
+        <div className="absolute inset-0 bg-gradient-to-br from-[#0a1628]/40 via-[#0a1628]/20 to-[#e8440c]/20" />
+        <div className="absolute bottom-10 left-10 right-10 text-white">
+          <h2 className="text-4xl font-black leading-tight drop-shadow-lg">
+            Cada doação alcança uma vida.
+          </h2>
+          <p className="mt-2 text-white/90 max-w-md drop-shadow">
+            Juntos, levamos esperança aos lugares onde ninguém mais vai.
+          </p>
+        </div>
+      </aside>
+
+      {/* PIX modal */}
+      <Dialog open={!!pixData} onOpenChange={(o) => !o && setPixData(null)}>
+        <DialogContent className="max-w-md">
+          <DialogHeader>
+            <DialogTitle>Pague com PIX</DialogTitle>
+          </DialogHeader>
+          <div className="flex flex-col items-center gap-4">
+            {pixData?.qr ? (
+              <img src={pixData.qr} alt="QR Code PIX" className="w-64 h-64 rounded-lg border" />
+            ) : (
+              <p className="text-sm text-slate-500">QR Code indisponível.</p>
+            )}
+            {pixData?.payload && (
+              <>
+                <p className="text-xs text-slate-500 break-all bg-slate-50 p-3 rounded font-mono">
+                  {pixData.payload}
+                </p>
+                <Button onClick={copyPix} className="w-full bg-[#e8440c] hover:bg-[#c93a09]">
+                  {copied ? <Check className="w-4 h-4" /> : <Copy className="w-4 h-4" />}
+                  {copied ? "Copiado!" : "Copiar código PIX"}
+                </Button>
+              </>
+            )}
+          </div>
+        </DialogContent>
+      </Dialog>
+    </main>
+  );
+}
+
+function Section({ title, children }: { title: string; children: React.ReactNode }) {
+  return (
+    <div className="mt-6">
+      <p className="text-xs font-bold text-slate-500 tracking-wider mb-3">{title}</p>
+      {children}
+    </div>
+  );
+}
+
+function Toggle({
+  active,
+  onClick,
+  children,
+}: {
+  active: boolean;
+  onClick: () => void;
+  children: React.ReactNode;
+}) {
+  return (
+    <button
+      type="button"
+      onClick={onClick}
+      className={cn(
+        "h-12 rounded-xl font-bold text-sm border-2 transition-all",
+        active
+          ? "bg-[#e8440c] border-[#e8440c] text-white shadow-md shadow-[#e8440c]/30"
+          : "bg-white border-slate-200 text-slate-700 hover:border-[#e8440c]/40"
+      )}
+    >
+      {children}
+    </button>
+  );
+}
+
+function MethodBtn({
+  active,
+  onClick,
+  icon,
+  children,
+}: {
+  active: boolean;
+  onClick: () => void;
+  icon: React.ReactNode;
+  children: React.ReactNode;
+}) {
+  return (
+    <button
+      type="button"
+      onClick={onClick}
+      className={cn(
+        "h-12 rounded-xl font-bold text-xs sm:text-sm border-2 flex items-center justify-center gap-2 transition-all",
+        active
+          ? "bg-[#e8440c] border-[#e8440c] text-white shadow-md shadow-[#e8440c]/30"
+          : "bg-white border-slate-200 text-slate-700 hover:border-[#e8440c]/40"
+      )}
+    >
+      {icon}
+      {children}
+    </button>
+  );
+}

@@ -1,0 +1,206 @@
+// @ts-nocheck
+import { createClient } from "https://esm.sh/@supabase/supabase-js@2.45.0";
+
+const corsHeaders = {
+  "Access-Control-Allow-Origin": "*",
+  "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type",
+  "Access-Control-Allow-Methods": "POST, OPTIONS",
+};
+
+interface DonationPayload {
+  donor_name: string;
+  donor_email: string;
+  donor_phone?: string;
+  donor_cpf?: string;
+  donor_birthdate?: string;
+  amount: number;
+  type: "ONE_TIME" | "MONTHLY";
+  payment_method: "PIX" | "CREDIT_CARD" | "BOLETO";
+  card?: {
+    holderName: string;
+    number: string;
+    expiryMonth: string;
+    expiryYear: string;
+    ccv: string;
+  };
+}
+
+Deno.serve(async (req) => {
+  if (req.method === "OPTIONS") return new Response(null, { headers: corsHeaders });
+
+  try {
+    const supabase = createClient(
+      Deno.env.get("SUPABASE_URL")!,
+      Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!
+    );
+
+    // Read Asaas credentials from system_settings
+    const { data: settings } = await supabase
+      .from("system_settings")
+      .select("key,value")
+      .in("key", ["ASAAS_API_KEY", "ASAAS_ENV"]);
+
+    const settingsMap = Object.fromEntries((settings ?? []).map((s) => [s.key, s.value]));
+    const apiKey = settingsMap.ASAAS_API_KEY || Deno.env.get("ASAAS_API_KEY");
+    const env = (settingsMap.ASAAS_ENV || Deno.env.get("ASAAS_ENV") || "sandbox").toLowerCase();
+
+    if (!apiKey) {
+      return new Response(
+        JSON.stringify({ error: "Credenciais Asaas não configuradas no painel admin." }),
+        { status: 400, headers: { ...corsHeaders, "Content-Type": "application/json" } }
+      );
+    }
+
+    const baseUrl =
+      env === "production" || env === "prod"
+        ? "https://api.asaas.com/v3"
+        : "https://api-sandbox.asaas.com/v3";
+
+    const payload: DonationPayload = await req.json();
+
+    // 1. Create or fetch customer
+    const customerRes = await fetch(`${baseUrl}/customers`, {
+      method: "POST",
+      headers: {
+        access_token: apiKey,
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        name: payload.donor_name,
+        email: payload.donor_email,
+        mobilePhone: payload.donor_phone?.replace(/\D/g, ""),
+        cpfCnpj: payload.donor_cpf?.replace(/\D/g, ""),
+      }),
+    });
+    const customer = await customerRes.json();
+    if (!customerRes.ok) {
+      return new Response(JSON.stringify({ error: "Erro ao criar cliente Asaas", details: customer }), {
+        status: 400,
+        headers: { ...corsHeaders, "Content-Type": "application/json" },
+      });
+    }
+
+    // 2. Create payment
+    const dueDate = new Date();
+    dueDate.setDate(dueDate.getDate() + (payload.payment_method === "BOLETO" ? 3 : 1));
+
+    const billingType =
+      payload.payment_method === "PIX"
+        ? "PIX"
+        : payload.payment_method === "BOLETO"
+        ? "BOLETO"
+        : "CREDIT_CARD";
+
+    const paymentBody: Record<string, unknown> = {
+      customer: customer.id,
+      billingType,
+      value: payload.amount,
+      dueDate: dueDate.toISOString().split("T")[0],
+      description: `Doação IDE Missões - ${payload.donor_name}`,
+    };
+
+    if (billingType === "CREDIT_CARD" && payload.card) {
+      paymentBody.creditCard = {
+        holderName: payload.card.holderName,
+        number: payload.card.number.replace(/\D/g, ""),
+        expiryMonth: payload.card.expiryMonth,
+        expiryYear: payload.card.expiryYear,
+        ccv: payload.card.ccv,
+      };
+      paymentBody.creditCardHolderInfo = {
+        name: payload.donor_name,
+        email: payload.donor_email,
+        cpfCnpj: payload.donor_cpf?.replace(/\D/g, ""),
+        postalCode: "00000000",
+        addressNumber: "0",
+        phone: payload.donor_phone?.replace(/\D/g, ""),
+      };
+    }
+
+    const endpoint = payload.type === "MONTHLY" ? "/subscriptions" : "/payments";
+    if (payload.type === "MONTHLY") {
+      paymentBody.cycle = "MONTHLY";
+      paymentBody.nextDueDate = paymentBody.dueDate;
+      delete paymentBody.dueDate;
+    }
+
+    const payRes = await fetch(`${baseUrl}${endpoint}`, {
+      method: "POST",
+      headers: { access_token: apiKey, "Content-Type": "application/json" },
+      body: JSON.stringify(paymentBody),
+    });
+    const payment = await payRes.json();
+    if (!payRes.ok) {
+      return new Response(JSON.stringify({ error: "Erro ao criar pagamento", details: payment }), {
+        status: 400,
+        headers: { ...corsHeaders, "Content-Type": "application/json" },
+      });
+    }
+
+    // 3. Get PIX QR if applicable
+    let pixQrcode: string | null = null;
+    let pixPayload: string | null = null;
+    let boletoUrl: string | null = null;
+
+    if (billingType === "PIX" && payload.type === "ONE_TIME") {
+      const qrRes = await fetch(`${baseUrl}/payments/${payment.id}/pixQrCode`, {
+        headers: { access_token: apiKey },
+      });
+      if (qrRes.ok) {
+        const qr = await qrRes.json();
+        pixQrcode = qr.encodedImage ? `data:image/png;base64,${qr.encodedImage}` : null;
+        pixPayload = qr.payload ?? null;
+      }
+    }
+
+    if (billingType === "BOLETO") {
+      boletoUrl = payment.bankSlipUrl ?? payment.invoiceUrl ?? null;
+    }
+
+    // 4. Save donation
+    const { data: donation, error: dbError } = await supabase
+      .from("donations")
+      .insert({
+        donor_name: payload.donor_name,
+        donor_email: payload.donor_email,
+        donor_phone: payload.donor_phone,
+        donor_cpf: payload.donor_cpf,
+        amount: payload.amount,
+        type: payload.type,
+        payment_method: payload.payment_method,
+        status: "PENDING",
+        asaas_id: payment.id,
+        asaas_customer: customer.id,
+        asaas_link: payment.invoiceUrl ?? null,
+        pix_qrcode: pixQrcode,
+        pix_payload: pixPayload,
+        boleto_url: boletoUrl,
+      })
+      .select()
+      .single();
+
+    if (dbError) {
+      return new Response(JSON.stringify({ error: dbError.message }), {
+        status: 500,
+        headers: { ...corsHeaders, "Content-Type": "application/json" },
+      });
+    }
+
+    return new Response(
+      JSON.stringify({
+        success: true,
+        donation,
+        pix_qrcode: pixQrcode,
+        pix_payload: pixPayload,
+        boleto_url: boletoUrl,
+        invoice_url: payment.invoiceUrl,
+      }),
+      { headers: { ...corsHeaders, "Content-Type": "application/json" } }
+    );
+  } catch (err) {
+    return new Response(JSON.stringify({ error: (err as Error).message }), {
+      status: 500,
+      headers: { ...corsHeaders, "Content-Type": "application/json" },
+    });
+  }
+});
