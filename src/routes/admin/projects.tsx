@@ -66,6 +66,8 @@ type Project = {
   status: "DRAFT" | "PUBLISHED";
   featured: boolean | null;
   gallery: string[] | null;
+  email_subject: string | null;
+  email_template: string | null;
   created_at: string;
 };
 
