@@ -143,14 +143,20 @@ Deno.serve(async (req) => {
     let pixPayload: string | null = null;
     let boletoUrl: string | null = null;
 
-    if (billingType === "PIX" && payload.type === "ONE_TIME") {
+    if (billingType === "PIX") {
+      console.log(`Buscando QR Code para pagamento ${payment.id}...`);
       const qrRes = await fetch(`${baseUrl}/payments/${payment.id}/pixQrCode`, {
         headers: { access_token: apiKey },
       });
+      
+      const qrData = await qrRes.json();
+      console.log("Resposta QR Code Asaas:", JSON.stringify(qrData));
+      
       if (qrRes.ok) {
-        const qr = await qrRes.json();
-        pixQrcode = qr.encodedImage ? `data:image/png;base64,${qr.encodedImage}` : null;
-        pixPayload = qr.payload ?? null;
+        pixQrcode = qrData.encodedImage ? `data:image/png;base64,${qrData.encodedImage}` : null;
+        pixPayload = qrData.payload ?? null;
+      } else {
+        console.error("Erro ao buscar QR Code:", qrData);
       }
     }
 
