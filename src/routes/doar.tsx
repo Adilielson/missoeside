@@ -115,6 +115,7 @@ function DoarPage() {
           type,
           payment_method: method,
           campaign: projectSlug || "Geral",
+          project_name: projectData?.name || "Geral",
           card:
             method === "CREDIT_CARD"
               ? {
