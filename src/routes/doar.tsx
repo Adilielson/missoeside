@@ -94,7 +94,16 @@ function DoarPage() {
 
     setLoading(true);
     try {
-      const [mm, yy] = cardExp.split("/");
+      // Parse expiry: aceita "MM/AA", "MM/AAAA" ou "MMAA"
+      const cleanExp = cardExp.replace(/\D/g, "");
+      const mm = cleanExp.slice(0, 2);
+      const yyRaw = cleanExp.slice(2);
+      const yy = yyRaw.length === 2 ? `20${yyRaw}` : yyRaw;
+      
+      if (method === "CREDIT_CARD" && (mm.length !== 2 || yy.length !== 4)) {
+        setLoading(false);
+        return toast.error("Validade do cartão inválida. Use MM/AA");
+      }
       const { data, error } = await supabase.functions.invoke("create-donation", {
         body: {
           donor_name: name,
@@ -112,7 +121,7 @@ function DoarPage() {
                   holderName: name,
                   number: cardNumber,
                   expiryMonth: mm,
-                  expiryYear: yy?.length === 2 ? `20${yy}` : yy,
+                  expiryYear: yy,
                   ccv: cardCvv,
                 }
               : undefined,
@@ -225,7 +234,16 @@ function DoarPage() {
             {method === "CREDIT_CARD" && (
               <div className="grid grid-cols-2 gap-3 mt-3">
                 <Input placeholder="Número do cartão" value={cardNumber} onChange={(e) => setCardNumber(e.target.value)} className="h-12 col-span-2 bg-white/5 border-white/10 text-white placeholder:text-white/40" />
-                <Input placeholder="Validade (MM/AA)" value={cardExp} onChange={(e) => setCardExp(e.target.value)} className="h-12 bg-white/5 border-white/10 text-white placeholder:text-white/40" />
+                <Input 
+                  placeholder="Validade (MM/AA)" 
+                  value={cardExp} 
+                  maxLength={5}
+                  onChange={(e) => {
+                    const v = e.target.value.replace(/\D/g, "").slice(0, 4);
+                    setCardExp(v.length >= 3 ? `${v.slice(0, 2)}/${v.slice(2)}` : v);
+                  }} 
+                  className="h-12 bg-white/5 border-white/10 text-white placeholder:text-white/40" 
+                />
                 <Input placeholder="CVV" value={cardCvv} onChange={(e) => setCardCvv(e.target.value)} className="h-12 bg-white/5 border-white/10 text-white placeholder:text-white/40" />
               </div>
             )}
