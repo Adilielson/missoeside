@@ -9,7 +9,7 @@ const corsHeaders = {
 
 const KEYS = [
   "ASAAS_API_KEY",
-  "ASAAS_BASE_URL",
+  "ASAAS_ENV",
   "ASAAS_WEBHOOK_TOKEN",
   "RESEND_API_KEY",
   "RESEND_FROM",
@@ -83,12 +83,16 @@ Deno.serve(async (req) => {
 
       try {
         if (service === "asaas") {
-          const baseUrl = cfg.ASAAS_BASE_URL || "https://api-sandbox.asaas.com/v3";
+          const env = (cfg.ASAAS_ENV || "sandbox").toLowerCase();
+          const baseUrl = env === "production" || env === "prod" 
+            ? "https://api.asaas.com/v3" 
+            : "https://api-sandbox.asaas.com/v3";
+          
           const r = await fetch(`${baseUrl}/customers?limit=1`, {
             headers: { access_token: cfg.ASAAS_API_KEY ?? "" },
           });
           if (!r.ok) throw new Error(`HTTP ${r.status}: ${await r.text()}`);
-          return json({ ok: true, message: "Conectado ao Asaas com sucesso" });
+          return json({ ok: true, message: `Conectado ao Asaas (${env}) com sucesso` });
         }
         if (service === "resend") {
           const r = await fetch("https://api.resend.com/domains", {
