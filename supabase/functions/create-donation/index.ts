@@ -204,6 +204,7 @@ Deno.serve(async (req) => {
         pix_payload: pixPayload,
         boleto_url: boletoUrl,
         campaign: payload.campaign,
+        project_id: projectId,
       })
       .select()
       .single();
