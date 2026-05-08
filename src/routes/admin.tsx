@@ -3,22 +3,15 @@ import { useEffect, useState } from "react";
 import { 
   LayoutDashboard, 
   Briefcase, 
-  Users, 
-  Settings, 
   LogOut, 
   Menu, 
   X,
   Shield,
   Loader2,
-  Lock,
-  ExternalLink,
   ChevronRight
 } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
 import { cn } from "@/lib/utils";
-import { toast } from "sonner";
 
 export const Route = createFileRoute("/admin")({
   component: AdminLayout,
@@ -27,21 +20,26 @@ export const Route = createFileRoute("/admin")({
 function AdminLayout() {
   const [loading, setLoading] = useState(true);
   const [authed, setAuthed] = useState(false);
-  const [password, setPassword] = useState("");
-  const [authLoading, setAuthLoading] = useState(false);
   const [sidebarOpen, setSidebarOpen] = useState(true);
   const navigate = useNavigate();
   const location = useLocation();
 
-  // No admin, verificamos se o usuário está logado E se é admin OU se ele usou a senha de superadmin
   useEffect(() => {
-    const isSuperAuthed = sessionStorage.getItem("superadmin-session") === "true";
-    if (isSuperAuthed) {
-      setAuthed(true);
-      setLoading(false);
-    } else {
-      checkAdmin();
-    }
+    checkAdmin();
+    
+    // Subscribe to auth changes
+    const { data: { subscription } } = supabase.auth.onAuthStateChange((event, session) => {
+      if (event === 'SIGNED_OUT') {
+        setAuthed(false);
+        navigate({ to: "/admin/login" });
+      } else if (session) {
+        checkAdmin();
+      }
+    });
+
+    return () => {
+      subscription.unsubscribe();
+    };
   }, []);
 
   async function checkAdmin() {
@@ -49,19 +47,15 @@ function AdminLayout() {
       const { data: { session } } = await supabase.auth.getSession();
       
       if (!session) {
+        setAuthed(false);
         setLoading(false);
+        if (location.pathname !== "/admin/login") {
+          navigate({ to: "/admin/login" });
+        }
         return;
       }
 
-      const { data: profile, error } = await supabase
-        .from("profiles")
-        .select("role")
-        .eq("id", session.user.id)
-        .single();
-
-      if (profile?.role === "admin") {
-        setAuthed(true);
-      }
+      setAuthed(true);
     } catch (error) {
       console.error("Error checking admin:", error);
     } finally {
@@ -69,37 +63,8 @@ function AdminLayout() {
     }
   }
 
-  async function handleLogin(e: React.FormEvent) {
-    e.preventDefault();
-    setAuthLoading(true);
-    try {
-      // Usamos a mesma Edge Function de superadmin para validar o acesso
-      const { data, error } = await supabase.functions.invoke("superadmin-settings", {
-        body: { action: "list" },
-        headers: { "x-superadmin-password": password },
-      });
-
-      if (error || (data as any)?.error) {
-        throw new Error((data as any)?.error || "Acesso negado");
-      }
-
-      sessionStorage.setItem("superadmin-session", "true");
-      sessionStorage.setItem("superadmin-key", password);
-      setAuthed(true);
-      toast.success("Acesso Superadmin concedido");
-    } catch (err: any) {
-      toast.error("Senha incorreta ou erro de conexão");
-    } finally {
-      setAuthLoading(false);
-    }
-  }
-
   async function handleLogout() {
-    sessionStorage.removeItem("superadmin-session");
-    sessionStorage.removeItem("superadmin-key");
     await supabase.auth.signOut();
-    setAuthed(false);
-    navigate({ to: "/" });
   }
 
   if (loading) {
@@ -110,48 +75,14 @@ function AdminLayout() {
     );
   }
 
-  if (!authed) {
-    return (
-      <main className="min-h-screen flex items-center justify-center bg-[#0a1628] px-4 relative overflow-hidden">
-        <div className="absolute inset-0 bg-[radial-gradient(circle_at_30%_20%,rgba(232,68,12,0.15),transparent_50%)]" />
-        <div className="absolute inset-0 bg-[radial-gradient(circle_at_70%_80%,rgba(232,68,12,0.08),transparent_50%)]" />
-        <form onSubmit={handleLogin} className="relative w-full max-w-md bg-white/[0.03] backdrop-blur-xl border border-white/10 rounded-3xl p-8 shadow-2xl">
-          <div className="flex items-center gap-3 mb-8">
-            <div className="w-12 h-12 rounded-2xl bg-gradient-to-br from-[#e8440c] to-[#c93a09] flex items-center justify-center shadow-lg shadow-[#e8440c]/30">
-              <Shield className="w-6 h-6 text-white" />
-            </div>
-            <div>
-              <h1 className="text-xl font-black text-white">Admin Access</h1>
-              <p className="text-xs text-white/50">Entre com sua senha master</p>
-            </div>
-          </div>
-          <div className="space-y-4">
-            <div>
-              <label className="text-xs font-bold text-white/60 tracking-wider">SENHA MASTER</label>
-              <Input
-                type="password"
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
-                placeholder="••••••••"
-                className="mt-2 h-12 bg-black/30 border-white/10 text-white"
-                autoFocus
-              />
-            </div>
-            <Button
-              type="submit"
-              disabled={authLoading || !password}
-              className="w-full h-12 bg-[#e8440c] hover:bg-[#c93a09] font-bold"
-            >
-              {authLoading ? <Loader2 className="w-4 h-4 animate-spin" /> : <><Lock className="w-4 h-4" /> Acessar Painel</>}
-            </Button>
-            <div className="pt-4 border-t border-white/5 text-center">
-              <Link to="/" className="text-xs text-white/40 hover:text-white transition-colors">Voltar para o site</Link>
-            </div>
-          </div>
-        </form>
-      </main>
-    );
+  if (!authed && location.pathname !== "/admin/login") {
+    return null; // Let useEffect handle redirect
   }
+
+  if (location.pathname === "/admin/login") {
+    return <Outlet />;
+  }
+
 
   const menuItems = [
     { label: "Dashboard", icon: LayoutDashboard, path: "/admin" },
