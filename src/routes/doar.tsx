@@ -130,16 +130,16 @@ function DoarPage() {
   }
 
   return (
-    <main className="min-h-screen flex flex-col lg:flex-row bg-white">
+    <main className="min-h-screen flex flex-col lg:flex-row bg-brand-dark">
       {/* LEFT: Form */}
       <section className="w-full lg:w-[45%] flex flex-col px-5 sm:px-10 py-8 overflow-y-auto">
         <Link to="/" className="inline-block mb-6">
           <img src={logoIde} alt="IDE Missões" className="h-12 w-auto" />
         </Link>
 
-        <div className="max-w-xl w-full mx-auto bg-white rounded-3xl shadow-xl border border-slate-100 p-6 sm:p-8">
-          <h1 className="text-2xl sm:text-3xl font-black text-[#0a1628]">Faça uma Doação Agora</h1>
-          <p className="text-slate-500 mt-1">Sua doação transforma vidas!</p>
+        <div className="max-w-xl w-full mx-auto bg-white/5 backdrop-blur-sm rounded-3xl shadow-2xl border border-white/10 p-6 sm:p-8">
+          <h1 className="text-2xl sm:text-3xl font-black text-white">Faça uma Doação Agora</h1>
+          <p className="text-white/60 mt-1">Sua doação transforma vidas!</p>
 
           {/* Type */}
           <Section title="SELECIONE TIPO DA DOAÇÃO">
