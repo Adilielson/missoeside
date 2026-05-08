@@ -94,7 +94,16 @@ function DoarPage() {
 
     setLoading(true);
     try {
-      const [mm, yy] = cardExp.split("/");
+      // Parse expiry: aceita "MM/AA", "MM/AAAA" ou "MMAA"
+      const cleanExp = cardExp.replace(/\D/g, "");
+      const mm = cleanExp.slice(0, 2);
+      const yyRaw = cleanExp.slice(2);
+      const yy = yyRaw.length === 2 ? `20${yyRaw}` : yyRaw;
+      
+      if (method === "CREDIT_CARD" && (mm.length !== 2 || yy.length !== 4)) {
+        setLoading(false);
+        return toast.error("Validade do cartão inválida. Use MM/AA");
+      }
       const { data, error } = await supabase.functions.invoke("create-donation", {
         body: {
           donor_name: name,
