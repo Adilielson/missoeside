@@ -107,10 +107,13 @@ Deno.serve(async (req) => {
 
     // 2. Substituir variáveis no template
     const formattedAmount = Number(donation.amount).toLocaleString('pt-BR', { minimumFractionDigits: 2 });
+    const headerImage = donation.project?.cover_image || "https://images.unsplash.com/photo-1488521787991-ed7bbaae773c?q=80&w=1200&auto=format&fit=crop";
+    
     htmlBody = htmlBody
       .replace(/{{donor_name}}/g, donation.donor_name)
       .replace(/{{amount}}/g, formattedAmount)
-      .replace(/{{project_name}}/g, projectName);
+      .replace(/{{project_name}}/g, projectName)
+      .replace(/{{header_image}}/g, headerImage);
 
     // 3. Enviar via Gmail SMTP
     const gmailUser = Deno.env.get("GMAIL_USER") || "agenciaidei@gmail.com";
