@@ -290,6 +290,8 @@ export type Database = {
           created_at: string
           current_amount: number | null
           description: string | null
+          email_subject: string | null
+          email_template: string | null
           featured: boolean | null
           gallery: string[] | null
           goal_amount: number | null
@@ -308,6 +310,8 @@ export type Database = {
           created_at?: string
           current_amount?: number | null
           description?: string | null
+          email_subject?: string | null
+          email_template?: string | null
           featured?: boolean | null
           gallery?: string[] | null
           goal_amount?: number | null
@@ -326,6 +330,8 @@ export type Database = {
           created_at?: string
           current_amount?: number | null
           description?: string | null
+          email_subject?: string | null
+          email_template?: string | null
           featured?: boolean | null
           gallery?: string[] | null
           goal_amount?: number | null
