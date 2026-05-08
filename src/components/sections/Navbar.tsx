@@ -4,6 +4,7 @@ import { Search, ArrowRight, Menu, X, ChevronDown } from "lucide-react";
 import { Logo } from "../Logo";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
+import { Link } from "@tanstack/react-router";
 
 const menuItems = [
   { name: "Início", href: "#" },
