@@ -33,7 +33,6 @@ function ProjectPage() {
   const [project, setProject] = useState<DbProject | null>(null);
   const [otherProjects, setOtherProjects] = useState<DbProject[]>([]);
   const [loading, setLoading] = useState(true);
-  const [currentImg, setCurrentImg] = useState(0);
 
   useEffect(() => {
     fetchProject();
@@ -67,14 +66,6 @@ function ProjectPage() {
       setLoading(false);
     }
   }
-
-  useEffect(() => {
-    if (!project || !project.gallery || project.gallery.length === 0) return;
-    const timer = setInterval(() => {
-      setCurrentImg((prev) => (prev + 1) % (project.gallery?.length || 1));
-    }, 5000);
-    return () => clearInterval(timer);
-  }, [project]);
 
   if (loading) {
     return (
@@ -112,11 +103,11 @@ function ProjectPage() {
           </Button>
         </div>
       </div>
-      {/* Hero Section of the Post */}
+      
       <section className="relative pt-32 pb-16 lg:pt-40 lg:pb-24 overflow-hidden bg-brand-dark">
         <div className="absolute inset-0 z-0">
           <img 
-            src={project.coverImage} 
+            src={project.cover_image || ""} 
             alt="Background" 
             className="w-full h-full object-cover blur-sm opacity-30"
           />
@@ -130,7 +121,6 @@ function ProjectPage() {
             transition={{ duration: 0.6 }}
             className="max-w-5xl mx-auto text-center"
           >
-            {/* Static Image as it was before */}
             <motion.div 
               initial={{ opacity: 0, scale: 0.95 }}
               animate={{ opacity: 1, scale: 1 }}
@@ -138,38 +128,35 @@ function ProjectPage() {
               className="aspect-video w-full rounded-3xl overflow-hidden mb-12 shadow-2xl border-4 border-white/5"
             >
               <img 
-                src={project.coverImage} 
-                alt={project.title} 
+                src={project.cover_image || ""} 
+                alt={project.name} 
                 className="w-full h-full object-cover"
               />
             </motion.div>
 
-            <SectionTag icon={Heart} text={project.category} />
+            <SectionTag icon={Heart} text={project.category || "PROJETO"} />
             <h1 className="text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-black text-white leading-[1.05] mb-8 flex flex-col items-center">
-              <span>{project.title}:</span>
-              <span className="text-brand-orange">{project.subtitle}</span>
+              <span>{project.name}</span>
             </h1>
             
             <div className="flex flex-wrap items-center justify-center gap-6 text-white/60 font-bold text-sm uppercase tracking-widest">
               <div className="flex items-center gap-2">
                 <Calendar className="w-5 h-5 text-brand-orange" />
-                <span>{project.date}</span>
+                <span>{new Date(project.created_at).toLocaleDateString('pt-BR')}</span>
               </div>
               <div className="flex items-center gap-2">
                 <MapPin className="w-5 h-5 text-brand-orange" />
-                <span>{project.location}</span>
+                <span>{project.country || "Missão Global"}</span>
               </div>
             </div>
           </motion.div>
         </div>
       </section>
 
-      {/* Content Section */}
       <section className="pb-24 relative -mt-10 lg:-mt-16 z-20">
         <div className="max-w-7xl mx-auto px-5 sm:px-6">
           <div className="grid grid-cols-1 lg:grid-cols-12 gap-12">
             
-            {/* Main Content */}
             <div className="lg:col-span-8 space-y-12">
               <motion.div 
                 initial={{ opacity: 0, y: 30 }}
@@ -179,22 +166,12 @@ function ProjectPage() {
               >
                 <div className="prose prose-lg max-w-none text-brand-dark/70 leading-relaxed">
                   <p className="text-xl font-bold text-brand-dark mb-6">
-                    {project.introText}
+                    {project.short_description}
                   </p>
                   
-                  <p className="mb-6">
-                    {project.bodyText}
-                  </p>
-
-                  <h3 className="text-2xl font-black text-brand-dark mt-10 mb-4 uppercase tracking-tight">O Que Estamos Fazendo</h3>
-                  <p className="mb-6">
-                    {project.whatWeDo}
-                  </p>
-
-
-                  <p>
-                    {project.callToAction}
-                  </p>
+                  <div className="whitespace-pre-wrap">
+                    {project.description}
+                  </div>
                 </div>
 
                 <div className="mt-12 pt-10 border-t border-brand-orange/10 flex flex-wrap items-center justify-between gap-6">
@@ -208,12 +185,9 @@ function ProjectPage() {
                   </div>
                 </div>
               </motion.div>
-
             </div>
 
-            {/* Sidebar */}
             <div className="lg:col-span-4 space-y-8">
-              {/* Donation Widget */}
               <motion.div 
                 initial={{ opacity: 0, x: 30 }}
                 animate={{ opacity: 1, x: 0 }}
@@ -222,10 +196,11 @@ function ProjectPage() {
               >
                 <h3 className="text-2xl font-black mb-6 leading-tight">Ajude este Projeto</h3>
                 <p className="text-white/60 mb-8 text-sm leading-relaxed">
-                  Sua doação é o combustível para que possamos continuar alcançando vidas em {project.subtitle}.
+                  Sua doação é o combustível para que possamos continuar alcançando vidas através deste projeto.
                 </p>
+
                 <Button 
-                  onClick={() => alert(`Apoiar: ${project.title}`)}
+                  onClick={() => alert(`Apoiar: ${project.name}`)}
                   className="w-full bg-brand-gradient hover:opacity-90 text-white py-8 rounded-2xl font-black text-lg shadow-lg shadow-brand-orange/20"
                 >
                   Apoiar Agora
@@ -237,7 +212,6 @@ function ProjectPage() {
                 </p>
               </motion.div>
 
-              {/* Related Projects */}
               <motion.div 
                 initial={{ opacity: 0, x: 30 }}
                 animate={{ opacity: 1, x: 0 }}
@@ -255,14 +229,14 @@ function ProjectPage() {
                     >
                       <div className="w-20 h-20 rounded-2xl overflow-hidden shrink-0">
                         <img 
-                          src={other.coverImage} 
-                          alt={other.title} 
+                          src={other.cover_image || ""} 
+                          alt={other.name} 
                           className="w-full h-full object-cover group-hover:scale-110 transition-transform"
                         />
                       </div>
                       <div>
                         <h5 className="font-black text-brand-dark text-sm leading-tight group-hover:text-brand-orange transition-colors mb-1">
-                          {other.title}: {other.subtitle}
+                          {other.name}
                         </h5>
                         <p className="text-[10px] font-bold text-brand-orange uppercase tracking-widest">{other.country}</p>
                       </div>
@@ -276,42 +250,43 @@ function ProjectPage() {
         </div>
       </section>
 
-      {/* Full Width Automatic Bottom Gallery */}
-      <section className="pb-24 bg-brand-light overflow-hidden">
-        <div className="max-w-7xl mx-auto px-5 sm:px-6 mb-12">
-          <SectionTag icon={Heart} text="Galeria do Projeto" />
-          <h2 className="text-3xl md:text-5xl font-black text-brand-dark uppercase tracking-tighter">
-            Nossa Jornada em <span className="text-brand-orange">Imagens</span>
-          </h2>
-        </div>
-
-        <div className="relative group">
-          <div className="flex gap-6 overflow-hidden py-10">
-            <motion.div 
-              animate={{ x: ["0%", "-50%"] }}
-              transition={{ 
-                duration: 30, 
-                ease: "linear", 
-                repeat: Infinity 
-              }}
-              className="flex gap-6 shrink-0"
-            >
-              {[...project.gallery, ...project.gallery].map((img, i) => (
-                <div 
-                  key={i} 
-                  className="w-[300px] md:w-[450px] aspect-[4/3] rounded-[40px] overflow-hidden shadow-2xl border-4 border-white"
-                >
-                  <img 
-                    src={img} 
-                    alt={`Galeria ${i}`} 
-                    className="w-full h-full object-cover"
-                  />
-                </div>
-              ))}
-            </motion.div>
+      {project.gallery && project.gallery.length > 0 && (
+        <section className="pb-24 bg-brand-light overflow-hidden">
+          <div className="max-w-7xl mx-auto px-5 sm:px-6 mb-12">
+            <SectionTag icon={Heart} text="Galeria do Projeto" />
+            <h2 className="text-3xl md:text-5xl font-black text-brand-dark uppercase tracking-tighter">
+              Nossa Jornada em <span className="text-brand-orange">Imagens</span>
+            </h2>
           </div>
-        </div>
-      </section>
+
+          <div className="relative group">
+            <div className="flex gap-6 overflow-hidden py-10">
+              <motion.div 
+                animate={{ x: ["0%", "-50%"] }}
+                transition={{ 
+                  duration: 30, 
+                  ease: "linear", 
+                  repeat: Infinity 
+                }}
+                className="flex gap-6 shrink-0"
+              >
+                {[...project.gallery, ...project.gallery].map((img, i) => (
+                  <div 
+                    key={i} 
+                    className="w-[300px] md:w-[450px] aspect-[4/3] rounded-[40px] overflow-hidden shadow-2xl border-4 border-white"
+                  >
+                    <img 
+                      src={img} 
+                      alt={`Galeria ${i}`} 
+                      className="w-full h-full object-cover"
+                    />
+                  </div>
+                ))}
+              </motion.div>
+            </div>
+          </div>
+        </section>
+      )}
 
       <ContactBar />
       <Footer />
