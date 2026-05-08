@@ -65,6 +65,7 @@ type Project = {
   current_amount: number | null;
   status: "DRAFT" | "PUBLISHED";
   featured: boolean | null;
+  gallery: string[] | null;
   created_at: string;
 };
 
@@ -91,6 +92,7 @@ function ProjectsPage() {
     status: "DRAFT",
     featured: false,
     cover_image: null,
+    gallery: [],
   });
 
   useEffect(() => {
@@ -133,6 +135,7 @@ function ProjectsPage() {
         status: "DRAFT",
         featured: false,
         cover_image: null,
+        gallery: [],
       });
     }
     setIsFormOpen(true);
@@ -160,6 +163,7 @@ function ProjectsPage() {
         status: formData.status,
         featured: formData.featured,
         cover_image: formData.cover_image,
+        gallery: formData.gallery || [],
       };
 
       if (editingProject) {
@@ -239,6 +243,50 @@ function ProjectsPage() {
     } finally {
       setUploading(false);
     }
+  }
+
+  async function handleUploadGallery(e: React.ChangeEvent<HTMLInputElement>) {
+    const files = e.target.files;
+    if (!files || files.length === 0) return;
+
+    setUploading(true);
+    try {
+      const uploadPromises = Array.from(files).map(async (file) => {
+        const fileExt = file.name.split(".").pop();
+        const fileName = `${Math.random()}.${fileExt}`;
+        const filePath = `gallery/${fileName}`;
+
+        const { error: uploadError } = await supabase.storage
+          .from("project-covers")
+          .upload(filePath, file);
+
+        if (uploadError) throw uploadError;
+
+        const { data: { publicUrl } } = supabase.storage
+          .from("project-covers")
+          .getPublicUrl(filePath);
+
+        return publicUrl;
+      });
+
+      const urls = await Promise.all(uploadPromises);
+      setFormData(prev => ({ 
+        ...prev, 
+        gallery: [...(prev.gallery || []), ...urls] 
+      }));
+      toast.success(`${urls.length} imagem(ns) enviada(s)!`);
+    } catch (error: any) {
+      toast.error("Erro no upload da galeria: " + error.message);
+    } finally {
+      setUploading(false);
+    }
+  }
+
+  function handleRemoveGalleryImage(index: number) {
+    setFormData(prev => ({
+      ...prev,
+      gallery: (prev.gallery || []).filter((_, i) => i !== index)
+    }));
   }
 
   const filteredProjects = projects.filter(p => 
@@ -500,6 +548,41 @@ function ProjectsPage() {
                   </div>
                 </div>
               </div>
+              <div className="space-y-2">
+                <Label className="text-xs font-bold text-white/50 tracking-widest uppercase">Galeria de Imagens</Label>
+                <div className="grid grid-cols-3 sm:grid-cols-4 gap-3">
+                  {(formData.gallery || []).map((img, index) => (
+                    <div key={index} className="relative aspect-square rounded-lg overflow-hidden border border-white/10 group">
+                      <img src={img} alt={`Gallery ${index}`} className="w-full h-full object-cover" />
+                      <button
+                        type="button"
+                        onClick={() => handleRemoveGalleryImage(index)}
+                        className="absolute inset-0 bg-black/60 opacity-0 group-hover:opacity-100 flex items-center justify-center transition-opacity"
+                      >
+                        <Trash2 className="w-5 h-5 text-red-500" />
+                      </button>
+                    </div>
+                  ))}
+                  <button
+                    type="button"
+                    onClick={() => document.getElementById('gallery-upload')?.click()}
+                    disabled={uploading}
+                    className="aspect-square rounded-lg border-2 border-dashed border-white/10 hover:border-brand-orange/50 flex flex-col items-center justify-center gap-2 transition-colors bg-white/5"
+                  >
+                    {uploading ? <Loader2 className="w-5 h-5 animate-spin" /> : <Plus className="w-5 h-5" />}
+                    <span className="text-[10px] font-bold uppercase tracking-wider">Adicionar</span>
+                  </button>
+                </div>
+                <input 
+                  id="gallery-upload" 
+                  type="file" 
+                  accept="image/*" 
+                  multiple 
+                  className="hidden" 
+                  onChange={handleUploadGallery}
+                />
+              </div>
+
 
               <div className="flex items-center justify-between p-4 bg-white/5 rounded-xl border border-white/10">
                 <div className="space-y-0.5">
