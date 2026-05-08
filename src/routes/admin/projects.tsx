@@ -617,10 +617,37 @@ function ProjectsPage() {
                     <SelectItem value="DRAFT">Rascunho</SelectItem>
                     <SelectItem value="PUBLISHED">Publicado</SelectItem>
                   </SelectContent>
-                </Select>
               </div>
             </div>
-            
+
+            <div className="md:col-span-2 space-y-4 border-t border-white/10 pt-6">
+              <h3 className="text-lg font-black text-brand-orange">E-mail de Agradecimento</h3>
+              <p className="text-xs text-white/50">Configure o e-mail que o doador receberá após a doação para este projeto.</p>
+              
+              <div className="space-y-2">
+                <Label className="text-xs font-bold text-white/50 tracking-widest uppercase">Assunto do E-mail</Label>
+                <Input 
+                  value={formData.email_subject || ""} 
+                  onChange={e => setFormData({...formData, email_subject: e.target.value})}
+                  placeholder="Ex: Obrigado pela sua generosidade!"
+                  className="bg-white/5 border-white/10"
+                />
+              </div>
+
+              <div className="space-y-2">
+                <Label className="text-xs font-bold text-white/50 tracking-widest uppercase">Template HTML (opcional)</Label>
+                <div className="text-[10px] text-white/30 mb-2">
+                  Use: {"{{donor_name}}"}, {"{{amount}}"}, {"{{project_name}}"} para personalizar. Deixe vazio para usar o padrão.
+                </div>
+                <Textarea 
+                  value={formData.email_template || ""} 
+                  onChange={e => setFormData({...formData, email_template: e.target.value})}
+                  placeholder="<div>Olá {{donor_name}}, obrigado pela doação de R$ {{amount}}...</div>"
+                  className="bg-white/5 border-white/10 font-mono h-48"
+                />
+              </div>
+            </div>
+
             <DialogFooter className="md:col-span-2 pt-4 gap-2">
               <Button 
                 type="button" 
