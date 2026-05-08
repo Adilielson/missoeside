@@ -3,7 +3,7 @@ import { Navbar } from "@/components/sections/Navbar";
 import { Hero } from "@/components/sections/Hero";
 import { About } from "@/components/sections/About";
 import { Causes } from "@/components/sections/Causes";
-import { CustomDonation } from "@/components/sections/CustomDonation";
+
 import { Stats } from "@/components/sections/Stats";
 import { Events } from "@/components/sections/Events";
 import { Volunteers } from "@/components/sections/Volunteers";
@@ -25,7 +25,6 @@ function Index() {
       <Hero />
       <About />
       <Causes />
-      <CustomDonation />
       <Stats />
       <Events />
       <Volunteers />
