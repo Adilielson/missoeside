@@ -11,36 +11,60 @@ const DEFAULT_TEMPLATE = `
 <html>
 <head>
   <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <style>
-    body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; line-height: 1.6; color: #333; margin: 0; padding: 0; background-color: #f9f9f9; }
-    .container { max-width: 600px; margin: 20px auto; padding: 30px; background-color: #ffffff; border-radius: 8px; box-shadow: 0 4px 6px rgba(0,0,0,0.1); }
-    .header { text-align: center; margin-bottom: 20px; color: #f59e0b; }
-    .content { margin-bottom: 30px; }
-    .footer { text-align: center; font-size: 12px; color: #666; border-top: 1px solid #eee; padding-top: 20px; }
-    .amount-box { background-color: #fef3c7; border: 1px solid #fde68a; padding: 15px; border-radius: 6px; text-align: center; margin: 20px 0; }
-    .amount { font-size: 24px; font-weight: bold; color: #d97706; }
+    body { font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif; line-height: 1.6; color: #333333; margin: 0; padding: 0; background-color: #f4f4f7; }
+    .wrapper { width: 100%; table-layout: fixed; background-color: #f4f4f7; padding-bottom: 40px; }
+    .main { background-color: #ffffff; margin: 0 auto; width: 100%; max-width: 600px; border-spacing: 0; color: #333333; border-radius: 8px; overflow: hidden; margin-top: 20px; }
+    .header-image { width: 100%; max-width: 600px; height: auto; display: block; border: 0; }
+    .content { padding: 40px 30px; text-align: center; }
+    .greeting { font-size: 24px; font-weight: bold; color: #1a1a1a; margin-bottom: 20px; }
+    .text { font-size: 16px; color: #51545e; margin-bottom: 30px; line-height: 1.8; }
+    .amount-card { background-color: #fffaf0; border: 2px dashed #f59e0b; padding: 25px; border-radius: 12px; margin: 30px 0; }
+    .amount-label { font-size: 14px; text-transform: uppercase; letter-spacing: 1px; color: #92400e; font-weight: bold; margin-bottom: 5px; }
+    .amount-value { font-size: 36px; font-weight: 900; color: #d97706; }
+    .project-badge { display: inline-block; background-color: #fef3c7; color: #92400e; padding: 4px 12px; border-radius: 20px; font-size: 12px; font-weight: bold; margin-top: 10px; }
+    .footer { padding: 30px; text-align: center; background-color: #1a202c; color: #ffffff; }
+    .footer p { margin: 5px 0; font-size: 14px; opacity: 0.8; }
+    .social-links { margin-top: 20px; }
+    .heart { color: #e8440c; }
   </style>
 </head>
 <body>
-  <div class="container">
-    <div class="header">
-      <h2>Obrigado pela sua generosidade!</h2>
-    </div>
-    <div class="content">
-      <p>Olá, <strong>{{donor_name}}</strong>!</p>
-      <p>Confirmamos com alegria o recebimento da sua doação para o projeto <strong>{{project_name}}</strong>.</p>
-      
-      <div class="amount-box">
-        <span class="amount">R$ {{amount}}</span>
-      </div>
-      
-      <p>Sua ajuda é fundamental para que possamos continuar nossa missão. Sua contribuição faz a diferença e transforma vidas!</p>
-      <p>Que Deus te abençoe ricamente.</p>
-    </div>
-    <div class="footer">
-      <p><strong>IDE Missões</strong><br>Levando a palavra até os confins da terra.</p>
-      <p>Este é um e-mail automático, por favor não responda.</p>
-    </div>
+  <div class="wrapper">
+    <table class="main" align="center">
+      <tr>
+        <td>
+          <img src="https://images.unsplash.com/photo-1488521787991-ed7bbaae773c?q=80&w=1200&auto=format&fit=crop" alt="IDE Missões" class="header-image">
+        </td>
+      </tr>
+      <tr>
+        <td class="content">
+          <div class="greeting">Olá, {{donor_name}}!</div>
+          <div class="text">
+            Recebemos com muita gratidão a sua oferta. Seu apoio é a resposta de orações e o combustível que nos permite levar esperança e auxílio para quem mais precisa através do projeto:
+            <br>
+            <span class="project-badge">{{project_name}}</span>
+          </div>
+          
+          <div class="amount-card">
+            <div class="amount-label">Valor da sua doação</div>
+            <div class="amount-value">R$ {{amount}}</div>
+          </div>
+          
+          <div class="text">
+            "Cada um dê conforme determinou em seu coração, não com pesar ou por obrigação, pois Deus ama quem dá com alegria." <br><strong>(2 Coríntios 9:7)</strong>
+          </div>
+        </td>
+      </tr>
+      <tr>
+        <td class="footer">
+          <p><strong>IDE Missões</strong></p>
+          <p>Levando o Reino até os confins da terra <span class="heart">❤</span></p>
+          <p style="font-size: 11px; margin-top: 20px; opacity: 0.5;">Este é um envio automático. Não é necessário responder.</p>
+        </td>
+      </tr>
+    </table>
   </div>
 </body>
 </html>
