@@ -87,7 +87,6 @@ function AdminLayout() {
   const menuItems = [
     { label: "Dashboard", icon: LayoutDashboard, path: "/admin" },
     { label: "Projetos / Missões", icon: Briefcase, path: "/admin/projects" },
-    { label: "Credenciais Master", icon: Shield, path: "/superadmin", isExternal: true },
   ];
 
   return (
