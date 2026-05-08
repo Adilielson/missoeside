@@ -4,12 +4,13 @@ import { Search, ArrowRight, Menu, X, ChevronDown } from "lucide-react";
 import { Logo } from "../Logo";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
+import { Link } from "@tanstack/react-router";
 
 const menuItems = [
-  { name: "Início", href: "#" },
+  { name: "Início", href: "/" },
   { name: "Sobre", href: "#sobre" },
-  { name: "Missões", href: "#missoes" },
-  { name: "Doações", href: "#missoes" },
+  { name: "Projetos", href: "/nossos-projetos" },
+  { name: "Doações", href: "/nossos-projetos" },
   { name: "Eventos", href: "#eventos" },
   { name: "Blog", href: "#blog" },
   { name: "Contato", href: "#contato" },
@@ -46,15 +47,16 @@ export function Navbar({ dark = false }: { dark?: boolean }) {
         <div className="hidden lg:flex items-center gap-8">
           {menuItems.map((item) => (
             <div key={item.name} className="group relative">
-              <a
-                href={item.href}
+              <Link
+                to={item.href.startsWith("/") ? item.href : undefined}
+                hash={!item.href.startsWith("/") ? item.href.replace("#", "") : undefined}
                 className="text-white/90 hover:text-brand-orange text-sm font-medium transition-colors flex items-center gap-1"
               >
                 {item.name}
-                {["Missões", "Doações"].includes(item.name) && (
+                {["Projetos", "Doações"].includes(item.name) && (
                   <ChevronDown className="w-4 h-4 opacity-50" />
                 )}
-              </a>
+              </Link>
               <motion.div
                 className="absolute -bottom-1 left-0 w-0 h-0.5 bg-brand-orange transition-all duration-300 group-hover:w-full"
               />
@@ -94,14 +96,15 @@ export function Navbar({ dark = false }: { dark?: boolean }) {
           >
             <div className="flex flex-col py-6 gap-4">
               {menuItems.map((item) => (
-                <a
+                <Link
                   key={item.name}
-                  href={item.href}
+                  to={item.href.startsWith("/") ? item.href : undefined}
+                  hash={!item.href.startsWith("/") ? item.href.replace("#", "") : undefined}
                   className="text-white hover:text-brand-orange text-lg font-medium"
                   onClick={() => setMobileMenuOpen(false)}
                 >
                   {item.name}
-                </a>
+                </Link>
               ))}
               <Button className="bg-brand-gradient text-white mt-4 rounded-full w-full">
                 Junte-se a Nós
