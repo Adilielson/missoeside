@@ -291,6 +291,7 @@ export type Database = {
           current_amount: number | null
           description: string | null
           featured: boolean | null
+          gallery: string[] | null
           goal_amount: number | null
           id: string
           name: string
@@ -308,6 +309,7 @@ export type Database = {
           current_amount?: number | null
           description?: string | null
           featured?: boolean | null
+          gallery?: string[] | null
           goal_amount?: number | null
           id?: string
           name: string
@@ -325,6 +327,7 @@ export type Database = {
           current_amount?: number | null
           description?: string | null
           featured?: boolean | null
+          gallery?: string[] | null
           goal_amount?: number | null
           id?: string
           name?: string
