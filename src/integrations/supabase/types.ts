@@ -34,6 +34,7 @@ export type Database = {
           payment_method: Database["public"]["Enums"]["payment_method"]
           pix_payload: string | null
           pix_qrcode: string | null
+          project_id: string | null
           status: Database["public"]["Enums"]["donation_status"]
           type: Database["public"]["Enums"]["donation_type"]
           updated_at: string
@@ -58,6 +59,7 @@ export type Database = {
           payment_method: Database["public"]["Enums"]["payment_method"]
           pix_payload?: string | null
           pix_qrcode?: string | null
+          project_id?: string | null
           status?: Database["public"]["Enums"]["donation_status"]
           type?: Database["public"]["Enums"]["donation_type"]
           updated_at?: string
@@ -82,12 +84,21 @@ export type Database = {
           payment_method?: Database["public"]["Enums"]["payment_method"]
           pix_payload?: string | null
           pix_qrcode?: string | null
+          project_id?: string | null
           status?: Database["public"]["Enums"]["donation_status"]
           type?: Database["public"]["Enums"]["donation_type"]
           updated_at?: string
           whatsapp_sent?: boolean | null
         }
-        Relationships: []
+        Relationships: [
+          {
+            foreignKeyName: "donations_project_id_fkey"
+            columns: ["project_id"]
+            isOneToOne: false
+            referencedRelation: "projects"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       events: {
         Row: {
