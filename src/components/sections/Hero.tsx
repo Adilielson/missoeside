@@ -126,11 +126,16 @@ export function Hero() {
             transition={{ delay: 0.8 }}
             className="flex flex-col sm:flex-row flex-wrap items-center justify-center lg:justify-start gap-6 sm:gap-8"
           >
-            <Button className="bg-brand-gradient hover:opacity-90 text-white text-base font-bold px-7 py-6 rounded-full group shadow-lg shadow-brand-orange/30 w-full sm:w-auto">
-              <span className="w-7 h-7 rounded-full bg-white/20 flex items-center justify-center mr-2">
-                <ChevronRight className="w-4 h-4" />
-              </span>
-              Fazer Doação
+            <Button 
+              asChild
+              className="bg-brand-gradient hover:opacity-90 text-white text-base font-bold px-7 py-6 rounded-full group shadow-lg shadow-brand-orange/30 w-full sm:w-auto cursor-pointer"
+            >
+              <a href="#missoes">
+                <span className="w-7 h-7 rounded-full bg-white/20 flex items-center justify-center mr-2">
+                  <ChevronRight className="w-4 h-4" />
+                </span>
+                Fazer Doação
+              </a>
             </Button>
 
             <div className="flex items-center gap-4">
