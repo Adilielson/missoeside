@@ -409,12 +409,12 @@ function ProjectsPage() {
               </div>
 
               <div className="space-y-2">
-                <Label className="text-xs font-bold text-white/50 tracking-widest uppercase">Descrição Completa</Label>
+                <Label className="text-xs font-bold text-white/50 tracking-widest uppercase">Objetivo do projeto</Label>
                 <Textarea 
                   value={formData.description || ""} 
                   onChange={e => setFormData({...formData, description: e.target.value})}
-                  placeholder="Conte os detalhes do projeto..."
-                  className="bg-white/5 border-white/10 resize-none h-32"
+                  placeholder="Descreva o objetivo e detalhes do projeto..."
+                  className="bg-white/5 border-white/10 resize-none h-48"
                 />
               </div>
             </div>

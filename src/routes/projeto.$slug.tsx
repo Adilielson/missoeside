@@ -134,16 +134,6 @@ function ProjectPage() {
                     {project.whatWeDo}
                   </p>
 
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-6 my-10">
-                    <div className="bg-brand-light p-6 rounded-3xl border border-brand-orange/10">
-                      <h4 className="font-black text-brand-orange mb-2 uppercase tracking-widest text-xs">Objetivo do Projeto</h4>
-                      <p className="text-sm font-medium">{project.projectGoal}</p>
-                    </div>
-                    <div className="bg-brand-light p-6 rounded-3xl border border-brand-orange/10">
-                      <h4 className="font-black text-brand-orange mb-2 uppercase tracking-widest text-xs">Impacto Espiritual</h4>
-                      <p className="text-sm font-medium">{project.spiritualImpact}</p>
-                    </div>
-                  </div>
 
                   <p>
                     {project.callToAction}
