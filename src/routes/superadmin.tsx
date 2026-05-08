@@ -179,18 +179,28 @@ function SuperadminPage() {
             </div>
           </div>
           <label className="text-xs font-bold text-white/60 tracking-wider">SENHA DE ACESSO</label>
-          <Input
-            type="password"
-            value={password}
-            onChange={(e) => setPassword(e.target.value)}
-            placeholder="••••••••"
-            className="mt-2 h-12 bg-black/30 border-white/10 text-white"
-            autoFocus
-          />
+          <div className="mt-2 relative">
+            <Input
+              type="password"
+              value={password}
+              onChange={(e) => {
+                console.log("Password changed:", e.target.value);
+                setPassword(e.target.value);
+              }}
+              placeholder="Digite a senha"
+              className="h-12 bg-black/50 border-white/20 text-white placeholder:text-white/20 focus:border-[#e8440c] transition-colors"
+              autoFocus
+            />
+          </div>
           <Button
             type="submit"
-            disabled={authLoading || !password}
-            className="w-full mt-5 h-12 bg-[#e8440c] hover:bg-[#c93a09] font-bold"
+            disabled={authLoading}
+            className={cn(
+              "w-full mt-5 h-12 font-bold transition-all",
+              password 
+                ? "bg-[#e8440c] hover:bg-[#c93a09] text-white opacity-100 cursor-pointer" 
+                : "bg-white/5 text-white/20 cursor-not-allowed opacity-50"
+            )}
           >
             {authLoading ? <Loader2 className="w-4 h-4 animate-spin" /> : <><Lock className="w-4 h-4" /> Entrar</>}
           </Button>
