@@ -95,6 +95,8 @@ function ProjectsPage() {
     featured: false,
     cover_image: null,
     gallery: [],
+    email_subject: "Obrigado pela sua doação!",
+    email_template: "",
   });
 
   useEffect(() => {
