@@ -87,7 +87,7 @@ function DoarPage() {
 
   async function handleSubmit() {
     if (!accepted) return toast.error("Aceite as Políticas de Privacidade.");
-    if (!name || !phone || !cpf || !birth) return toast.error("Preencha os campos obrigatórios.");
+    if (!name || !phone || !cpf) return toast.error("Preencha os campos obrigatórios.");
     if (finalAmount < 5) return toast.error("Valor mínimo: R$ 5,00");
     if (method === "CREDIT_CARD" && (!cardNumber || !cardExp || !cardCvv))
       return toast.error("Preencha os dados do cartão.");
@@ -189,9 +189,9 @@ function DoarPage() {
             </div>
             {customMode && (
               <Input
-                type="number"
-                placeholder="Valor personalizado (R$)"
-                className="mt-3 h-12"
+                type="text"
+                placeholder="Valor personalizado (R$ 0,00)"
+                className="mt-3 h-12 bg-white/5 border-white/10 text-white placeholder:text-white/40"
                 value={customValue}
                 onChange={(e) => setCustomValue(e.target.value)}
               />
@@ -205,13 +205,6 @@ function DoarPage() {
               <Input placeholder="Celular com DDD*" value={phone} onChange={(e) => setPhone(e.target.value)} className="h-12 bg-white/5 border-white/10 text-white placeholder:text-white/40" />
               <Input placeholder="Email" type="email" value={email} onChange={(e) => setEmail(e.target.value)} className="h-12 bg-white/5 border-white/10 text-white placeholder:text-white/40" />
               <Input placeholder="CPF/CNPJ*" value={cpf} onChange={(e) => setCpf(e.target.value)} className="h-12 bg-white/5 border-white/10 text-white placeholder:text-white/40" />
-              <Input
-                placeholder="Data de Nascimento*"
-                type="date"
-                value={birth}
-                onChange={(e) => setBirth(e.target.value)}
-                className="h-12 sm:col-span-2 bg-white/5 border-white/10 text-white placeholder:text-white/40"
-              />
             </div>
           </Section>
 
