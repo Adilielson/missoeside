@@ -63,7 +63,7 @@ function DoarPage() {
         .from("donations")
         .select("amount,status")
         .in("status", ["CONFIRMED", "RECEIVED"]);
-      if (data) setRaised(data.reduce((s, d) => s + Number(d.amount || 0), 0));
+      if (data) setRaised(data.reduce((s: number, d: { amount: number | string | null }) => s + Number(d.amount || 0), 0));
     })();
   }, []);
 
