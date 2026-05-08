@@ -89,6 +89,168 @@ export type Database = {
         }
         Relationships: []
       }
+      events: {
+        Row: {
+          author_id: string | null
+          city: string | null
+          cover_image: string | null
+          created_at: string
+          description: string | null
+          end_date: string | null
+          event_date: string
+          id: string
+          location: string | null
+          max_attendees: number | null
+          registration_url: string | null
+          slug: string
+          state: string | null
+          status: Database["public"]["Enums"]["event_status"]
+          title: string
+          updated_at: string
+        }
+        Insert: {
+          author_id?: string | null
+          city?: string | null
+          cover_image?: string | null
+          created_at?: string
+          description?: string | null
+          end_date?: string | null
+          event_date: string
+          id?: string
+          location?: string | null
+          max_attendees?: number | null
+          registration_url?: string | null
+          slug: string
+          state?: string | null
+          status?: Database["public"]["Enums"]["event_status"]
+          title: string
+          updated_at?: string
+        }
+        Update: {
+          author_id?: string | null
+          city?: string | null
+          cover_image?: string | null
+          created_at?: string
+          description?: string | null
+          end_date?: string | null
+          event_date?: string
+          id?: string
+          location?: string | null
+          max_attendees?: number | null
+          registration_url?: string | null
+          slug?: string
+          state?: string | null
+          status?: Database["public"]["Enums"]["event_status"]
+          title?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "events_author_id_fkey"
+            columns: ["author_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      notification_log: {
+        Row: {
+          channel: Database["public"]["Enums"]["notification_channel"]
+          donation_id: string
+          error_msg: string | null
+          id: string
+          provider_id: string | null
+          recipient: string
+          sent_at: string
+          status: Database["public"]["Enums"]["notification_status"]
+        }
+        Insert: {
+          channel: Database["public"]["Enums"]["notification_channel"]
+          donation_id: string
+          error_msg?: string | null
+          id?: string
+          provider_id?: string | null
+          recipient: string
+          sent_at?: string
+          status?: Database["public"]["Enums"]["notification_status"]
+        }
+        Update: {
+          channel?: Database["public"]["Enums"]["notification_channel"]
+          donation_id?: string
+          error_msg?: string | null
+          id?: string
+          provider_id?: string | null
+          recipient?: string
+          sent_at?: string
+          status?: Database["public"]["Enums"]["notification_status"]
+        }
+        Relationships: [
+          {
+            foreignKeyName: "notification_log_donation_id_fkey"
+            columns: ["donation_id"]
+            isOneToOne: false
+            referencedRelation: "donations"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      posts: {
+        Row: {
+          author_id: string | null
+          category: string | null
+          content: string | null
+          cover_image: string | null
+          created_at: string
+          excerpt: string | null
+          id: string
+          published_at: string | null
+          slug: string
+          status: Database["public"]["Enums"]["post_status"]
+          tags: string[] | null
+          title: string
+          updated_at: string
+        }
+        Insert: {
+          author_id?: string | null
+          category?: string | null
+          content?: string | null
+          cover_image?: string | null
+          created_at?: string
+          excerpt?: string | null
+          id?: string
+          published_at?: string | null
+          slug: string
+          status?: Database["public"]["Enums"]["post_status"]
+          tags?: string[] | null
+          title: string
+          updated_at?: string
+        }
+        Update: {
+          author_id?: string | null
+          category?: string | null
+          content?: string | null
+          cover_image?: string | null
+          created_at?: string
+          excerpt?: string | null
+          id?: string
+          published_at?: string | null
+          slug?: string
+          status?: Database["public"]["Enums"]["post_status"]
+          tags?: string[] | null
+          title?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "posts_author_id_fkey"
+            columns: ["author_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       profiles: {
         Row: {
           avatar_url: string | null
@@ -169,7 +331,11 @@ export type Database = {
         | "CANCELLED"
         | "REFUNDED"
       donation_type: "ONE_TIME" | "MONTHLY"
+      event_status: "DRAFT" | "PUBLISHED" | "CANCELLED"
+      notification_channel: "EMAIL" | "WHATSAPP"
+      notification_status: "SENT" | "FAILED" | "PENDING"
       payment_method: "PIX" | "CREDIT_CARD" | "BOLETO"
+      post_status: "DRAFT" | "PUBLISHED" | "ARCHIVED"
       user_role: "admin" | "editor"
     }
     CompositeTypes: {
@@ -306,7 +472,11 @@ export const Constants = {
         "REFUNDED",
       ],
       donation_type: ["ONE_TIME", "MONTHLY"],
+      event_status: ["DRAFT", "PUBLISHED", "CANCELLED"],
+      notification_channel: ["EMAIL", "WHATSAPP"],
+      notification_status: ["SENT", "FAILED", "PENDING"],
       payment_method: ["PIX", "CREDIT_CARD", "BOLETO"],
+      post_status: ["DRAFT", "PUBLISHED", "ARCHIVED"],
       user_role: ["admin", "editor"],
     },
   },
