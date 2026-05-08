@@ -146,17 +146,33 @@ function ProjectsPage() {
         throw new Error("Nome e Slug são obrigatórios.");
       }
 
+      // Narrowing types for Supabase insert/update
+      const payload = {
+        name: formData.name,
+        slug: formData.slug,
+        description: formData.description,
+        short_description: formData.short_description,
+        category: formData.category,
+        country: formData.country,
+        city: formData.city,
+        goal_amount: formData.goal_amount,
+        current_amount: formData.current_amount,
+        status: formData.status,
+        featured: formData.featured,
+        cover_image: formData.cover_image,
+      };
+
       if (editingProject) {
         const { error } = await supabase
           .from("projects")
-          .update(formData)
+          .update(payload)
           .eq("id", editingProject.id);
         if (error) throw error;
         toast.success("Projeto atualizado com sucesso!");
       } else {
         const { error } = await supabase
           .from("projects")
-          .insert([formData]);
+          .insert([payload]);
         if (error) throw error;
         toast.success("Projeto criado com sucesso!");
       }
