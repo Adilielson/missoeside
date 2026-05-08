@@ -9,9 +9,15 @@
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
 import { Route as rootRouteImport } from './routes/__root'
+import { Route as DoarRouteImport } from './routes/doar'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as ProjetoSlugRouteImport } from './routes/projeto.$slug'
 
+const DoarRoute = DoarRouteImport.update({
+  id: '/doar',
+  path: '/doar',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const IndexRoute = IndexRouteImport.update({
   id: '/',
   path: '/',
@@ -25,32 +31,43 @@ const ProjetoSlugRoute = ProjetoSlugRouteImport.update({
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
+  '/doar': typeof DoarRoute
   '/projeto/$slug': typeof ProjetoSlugRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
+  '/doar': typeof DoarRoute
   '/projeto/$slug': typeof ProjetoSlugRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
+  '/doar': typeof DoarRoute
   '/projeto/$slug': typeof ProjetoSlugRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/' | '/projeto/$slug'
+  fullPaths: '/' | '/doar' | '/projeto/$slug'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/projeto/$slug'
-  id: '__root__' | '/' | '/projeto/$slug'
+  to: '/' | '/doar' | '/projeto/$slug'
+  id: '__root__' | '/' | '/doar' | '/projeto/$slug'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
+  DoarRoute: typeof DoarRoute
   ProjetoSlugRoute: typeof ProjetoSlugRoute
 }
 
 declare module '@tanstack/react-router' {
   interface FileRoutesByPath {
+    '/doar': {
+      id: '/doar'
+      path: '/doar'
+      fullPath: '/doar'
+      preLoaderRoute: typeof DoarRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/': {
       id: '/'
       path: '/'
@@ -70,6 +87,7 @@ declare module '@tanstack/react-router' {
 
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
+  DoarRoute: DoarRoute,
   ProjetoSlugRoute: ProjetoSlugRoute,
 }
 export const routeTree = rootRouteImport
