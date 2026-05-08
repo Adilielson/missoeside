@@ -1,2 +1,5 @@
 [functions.create-donation]
 verify_jwt = false
+
+[functions.superadmin-settings]
+verify_jwt = false
