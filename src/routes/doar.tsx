@@ -248,7 +248,7 @@ function DoarPage() {
             )}
           </Button>
 
-          <div className="mt-5 flex flex-col items-center gap-1 text-xs text-slate-400">
+          <div className="mt-5 flex flex-col items-center gap-1 text-xs text-white/40">
             <span className="flex items-center gap-1.5">
               <Lock className="w-3.5 h-3.5" /> Você está em um ambiente seguro
             </span>
