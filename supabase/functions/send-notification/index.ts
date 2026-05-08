@@ -35,7 +35,7 @@ const DEFAULT_TEMPLATE = `
     <table class="main" align="center">
       <tr>
         <td>
-          <img src="https://images.unsplash.com/photo-1488521787991-ed7bbaae773c?q=80&w=1200&auto=format&fit=crop" alt="IDE Missões" class="header-image">
+          <img src="{{header_image}}" alt="IDE Missões" class="header-image">
         </td>
       </tr>
       <tr>
@@ -91,7 +91,7 @@ Deno.serve(async (req) => {
     // 1. Buscar doação e dados do projeto
     const { data: donation, error: fetchErr } = await supabase
       .from("donations")
-      .select("*, project:projects(name, email_subject, email_template)")
+      .select("*, project:projects(name, cover_image, email_subject, email_template)")
       .eq("id", donationId)
       .single();
 
@@ -107,10 +107,13 @@ Deno.serve(async (req) => {
 
     // 2. Substituir variáveis no template
     const formattedAmount = Number(donation.amount).toLocaleString('pt-BR', { minimumFractionDigits: 2 });
+    const headerImage = donation.project?.cover_image || "https://images.unsplash.com/photo-1488521787991-ed7bbaae773c?q=80&w=1200&auto=format&fit=crop";
+    
     htmlBody = htmlBody
       .replace(/{{donor_name}}/g, donation.donor_name)
       .replace(/{{amount}}/g, formattedAmount)
-      .replace(/{{project_name}}/g, projectName);
+      .replace(/{{project_name}}/g, projectName)
+      .replace(/{{header_image}}/g, headerImage);
 
     // 3. Enviar via Gmail SMTP
     const gmailUser = Deno.env.get("GMAIL_USER") || "agenciaidei@gmail.com";
