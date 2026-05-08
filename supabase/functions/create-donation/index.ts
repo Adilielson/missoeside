@@ -60,15 +60,20 @@ Deno.serve(async (req) => {
 
     const payload: DonationPayload = await req.json();
 
-    // 0. Get Project Name if not provided
+    // 0. Get Project ID and Name
     let projectName = payload.project_name || payload.campaign || "Geral";
-    if (payload.campaign && !payload.project_name) {
+    let projectId: string | null = null;
+    
+    if (payload.campaign) {
       const { data: proj } = await supabase
         .from("projects")
-        .select("name")
+        .select("id, name")
         .eq("slug", payload.campaign)
         .single();
-      if (proj) projectName = proj.name;
+      if (proj) {
+        projectName = proj.name;
+        projectId = proj.id;
+      }
     }
 
     // 1. Create or fetch customer
@@ -199,6 +204,7 @@ Deno.serve(async (req) => {
         pix_payload: pixPayload,
         boleto_url: boletoUrl,
         campaign: payload.campaign,
+        project_id: projectId,
       })
       .select()
       .single();
