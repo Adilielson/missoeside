@@ -121,7 +121,7 @@ function DoarPage() {
                   holderName: name,
                   number: cardNumber,
                   expiryMonth: mm,
-                  expiryYear: yy?.length === 2 ? `20${yy}` : yy,
+                  expiryYear: yy,
                   ccv: cardCvv,
                 }
               : undefined,
