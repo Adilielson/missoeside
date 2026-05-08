@@ -168,6 +168,8 @@ function ProjectsPage() {
         featured: formData.featured,
         cover_image: formData.cover_image,
         gallery: formData.gallery || [],
+        email_subject: formData.email_subject,
+        email_template: formData.email_template,
       };
 
       if (editingProject) {
