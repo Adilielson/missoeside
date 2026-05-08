@@ -617,6 +617,7 @@ function ProjectsPage() {
                     <SelectItem value="DRAFT">Rascunho</SelectItem>
                     <SelectItem value="PUBLISHED">Publicado</SelectItem>
                   </SelectContent>
+                </Select>
               </div>
             </div>
 
