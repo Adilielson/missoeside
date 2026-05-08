@@ -1,15 +1,45 @@
-import { useRef } from "react";
+import { useRef, useEffect, useState } from "react";
 import { motion } from "framer-motion";
-import { Heart, ArrowRight, ArrowLeft, Users } from "lucide-react";
+import { Heart, ArrowRight, ArrowLeft, Users, Loader2 } from "lucide-react";
 import { SectionTag } from "../SectionTag";
 import { Button } from "@/components/ui/button";
 import { Link } from "@tanstack/react-router";
-import { getActiveProjects } from "@/data/projects";
+import { supabase } from "@/integrations/supabase/client";
 
-const projectsList = getActiveProjects();
+type Project = {
+  id: string;
+  name: string;
+  slug: string;
+  category: string | null;
+  short_description: string | null;
+  cover_image: string | null;
+};
 
 export function Causes() {
   const scrollRef = useRef<HTMLDivElement>(null);
+  const [projects, setProjects] = useState<Project[]>([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    fetchProjects();
+  }, []);
+
+  async function fetchProjects() {
+    try {
+      const { data, error } = await supabase
+        .from("projects")
+        .select("id, name, slug, category, short_description, cover_image")
+        .eq("status", "PUBLISHED")
+        .order("created_at", { ascending: false });
+
+      if (error) throw error;
+      setProjects(data as Project[]);
+    } catch (error) {
+      console.error("Error fetching projects:", error);
+    } finally {
+      setLoading(false);
+    }
+  }
 
   const scroll = (direction: "left" | "right") => {
     if (scrollRef.current) {
@@ -37,7 +67,15 @@ export function Causes() {
           className="flex-1 flex gap-6 overflow-x-auto pb-8 snap-x snap-mandatory scrollbar-hide no-scrollbar"
           style={{ msOverflowStyle: 'none', scrollbarWidth: 'none' }}
         >
-          {projectsList.map((project, index) => (
+          {loading ? (
+            <div className="flex-1 flex items-center justify-center h-96">
+              <Loader2 className="w-8 h-8 animate-spin text-brand-orange" />
+            </div>
+          ) : projects.length === 0 ? (
+            <div className="flex-1 flex items-center justify-center h-96 text-brand-dark/40">
+              Nenhum projeto publicado ainda.
+            </div>
+          ) : projects.map((project, index) => (
             <motion.div
               key={project.id}
               initial={{ opacity: 0, y: 50 }}
@@ -48,8 +86,8 @@ export function Causes() {
             >
               <div className="relative h-64 overflow-hidden">
                 <img 
-                  src={project.coverImage} 
-                  alt={project.title} 
+                  src={project.cover_image || ""} 
+                  alt={project.name} 
                   className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110"
                 />
                 <div className="absolute top-4 left-4 bg-brand-orange text-white text-[10px] font-bold uppercase tracking-widest px-4 py-2 rounded-full">
@@ -58,18 +96,15 @@ export function Causes() {
               </div>
               <div className="p-6 sm:p-8">
                 <h3 className="text-xl sm:text-2xl font-black text-brand-dark mb-1 group-hover:text-brand-orange transition-colors">
-                  {project.title}
+                  {project.name}
                 </h3>
-                <p className="text-sm font-bold text-brand-orange uppercase tracking-wider mb-4">
-                  {project.subtitle}
-                </p>
                 <p className="text-brand-dark/50 text-sm mb-8 line-clamp-2">
-                  {project.introText}
+                  {project.short_description}
                 </p>
 
                 <div className="flex flex-col sm:flex-row gap-3">
                   <Button 
-                    onClick={() => alert(`Apoiar: ${project.title}`)}
+                    onClick={() => alert(`Apoiar: ${project.name}`)}
                     className="flex-1 bg-brand-orange hover:bg-brand-orange/90 text-white border-none py-6 rounded-2xl font-bold group/btn"
                   >
                     Apoiar Agora
