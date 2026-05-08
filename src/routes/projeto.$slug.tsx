@@ -167,7 +167,13 @@ function ProjectPage() {
                 <p className="text-white/60 mb-8 text-sm leading-relaxed">
                   Sua doação é o combustível para que possamos continuar alcançando vidas em {project.subtitle}.
                 </p>
-
+                <Button 
+                  onClick={() => alert(`Apoiar: ${project.title}`)}
+                  className="w-full bg-brand-gradient hover:opacity-90 text-white py-8 rounded-2xl font-black text-lg shadow-lg shadow-brand-orange/20"
+                >
+                  Apoiar Agora
+                  <ArrowRight className="w-5 h-5 ml-2" />
+                </Button>
 
                 <p className="text-center text-[10px] uppercase tracking-widest font-bold text-white/30 mt-6">
                   Doação Segura e Transparente
