@@ -8,7 +8,7 @@ import { cn } from "@/lib/utils";
 const menuItems = [
   { name: "Início", href: "#" },
   { name: "Sobre", href: "#sobre" },
-  { name: "Missões", href: "#missoes" },
+  { name: "Projetos", href: "/nossos-projetos" },
   { name: "Doações", href: "#missoes" },
   { name: "Eventos", href: "#eventos" },
   { name: "Blog", href: "#blog" },
@@ -51,7 +51,7 @@ export function Navbar({ dark = false }: { dark?: boolean }) {
                 className="text-white/90 hover:text-brand-orange text-sm font-medium transition-colors flex items-center gap-1"
               >
                 {item.name}
-                {["Missões", "Doações"].includes(item.name) && (
+                {["Projetos", "Doações"].includes(item.name) && (
                   <ChevronDown className="w-4 h-4 opacity-50" />
                 )}
               </a>
