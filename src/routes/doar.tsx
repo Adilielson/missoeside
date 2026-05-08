@@ -304,7 +304,7 @@ function DoarPage() {
 function Section({ title, children }: { title: string; children: React.ReactNode }) {
   return (
     <div className="mt-6">
-      <p className="text-xs font-bold text-slate-500 tracking-wider mb-3">{title}</p>
+      <p className="text-xs font-bold text-white/50 tracking-wider mb-3">{title}</p>
       {children}
     </div>
   );
@@ -326,8 +326,8 @@ function Toggle({
       className={cn(
         "h-12 rounded-xl font-bold text-sm border-2 transition-all",
         active
-          ? "bg-[#e8440c] border-[#e8440c] text-white shadow-md shadow-[#e8440c]/30"
-          : "bg-white border-slate-200 text-slate-700 hover:border-[#e8440c]/40"
+          ? "bg-brand-orange border-brand-orange text-white shadow-md shadow-brand-orange/30"
+          : "bg-white/5 border-white/10 text-white/80 hover:border-brand-orange/60"
       )}
     >
       {children}
