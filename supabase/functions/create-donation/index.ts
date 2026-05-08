@@ -24,6 +24,7 @@ interface DonationPayload {
     ccv: string;
   };
   campaign?: string;
+  project_name?: string;
 }
 
 Deno.serve(async (req) => {
@@ -58,6 +59,17 @@ Deno.serve(async (req) => {
         : "https://api-sandbox.asaas.com/v3";
 
     const payload: DonationPayload = await req.json();
+
+    // 0. Get Project Name if not provided
+    let projectName = payload.project_name || payload.campaign || "Geral";
+    if (payload.campaign && !payload.project_name) {
+      const { data: proj } = await supabase
+        .from("projects")
+        .select("name")
+        .eq("slug", payload.campaign)
+        .single();
+      if (proj) projectName = proj.name;
+    }
 
     // 1. Create or fetch customer
     const customerRes = await fetch(`${baseUrl}/customers`, {
@@ -97,8 +109,8 @@ Deno.serve(async (req) => {
       billingType,
       value: payload.amount,
       dueDate: dueDate.toISOString().split("T")[0],
-      description: `Doação IDE Missões - ${payload.donor_name}${payload.campaign ? ` (Projeto: ${payload.campaign})` : ""}`,
-      externalReference: payload.campaign || "Geral",
+      description: `Doação IDE Missões - ${payload.donor_name}${projectName ? ` (Projeto: ${projectName})` : ""}`,
+      externalReference: projectName || payload.campaign || "Geral",
     };
 
     if (billingType === "CREDIT_CARD" && payload.card) {
