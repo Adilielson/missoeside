@@ -200,11 +200,13 @@ function ProjectPage() {
                 </p>
 
                 <Button 
-                  onClick={() => alert(`Apoiar: ${project.name}`)}
+                  asChild
                   className="w-full bg-brand-gradient hover:opacity-90 text-white py-8 rounded-2xl font-black text-lg shadow-lg shadow-brand-orange/20"
                 >
-                  Apoiar Agora
-                  <ArrowRight className="w-5 h-5 ml-2" />
+                  <Link to="/doar" search={{ project: project.slug }}>
+                    Apoiar Agora
+                    <ArrowRight className="w-5 h-5 ml-2" />
+                  </Link>
                 </Button>
 
                 <p className="text-center text-[10px] uppercase tracking-widest font-bold text-white/30 mt-6">
