@@ -206,6 +206,23 @@ Deno.serve(async (req) => {
       });
     }
 
+    // 6. Send automatic notification (WhatsApp/Email)
+    try {
+      const message = `Olá ${payload.donor_name}, obrigado pela sua doação de R$ ${payload.amount.toFixed(2).replace('.', ',')} para o projeto ${projectName}. Sua ajuda transforma vidas! 💛`;
+      
+      await supabase.functions.invoke("send-notification", {
+        body: {
+          donationId: donation.id,
+          message: message,
+          email: payload.donor_email,
+          phone: payload.donor_phone,
+        }
+      });
+    } catch (notifErr) {
+      console.error("Erro ao disparar notificação automática:", notifErr);
+      // Não trava o fluxo principal se a notificação falhar
+    }
+
     return new Response(
       JSON.stringify({
         success: true,
