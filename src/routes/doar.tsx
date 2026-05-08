@@ -32,6 +32,9 @@ function brl(v: number) {
 }
 
 function DoarPage() {
+  const search = Route.useSearch() as { project?: string };
+  const projectSlug = search.project;
+
   const [raised, setRaised] = useState(0);
   const [type, setType] = useState<DonationType>("ONE_TIME");
   const [amount, setAmount] = useState<number>(100);
@@ -40,6 +43,7 @@ function DoarPage() {
   const [method, setMethod] = useState<Method>("PIX");
   const [accepted, setAccepted] = useState(false);
   const [loading, setLoading] = useState(false);
+  const [projectData, setProjectData] = useState<{ name: string; cover_image: string | null; short_description: string | null } | null>(null);
 
   // form
   const [name, setName] = useState("");
@@ -65,7 +69,18 @@ function DoarPage() {
         .in("status", ["CONFIRMED", "RECEIVED"]);
       if (data) setRaised(data.reduce((s: number, d: { amount: number | string | null }) => s + Number(d.amount || 0), 0));
     })();
-  }, []);
+
+    if (projectSlug) {
+      (async () => {
+        const { data } = await supabase
+          .from("projects")
+          .select("name, cover_image, short_description")
+          .eq("slug", projectSlug)
+          .single();
+        if (data) setProjectData(data);
+      })();
+    }
+  }, [projectSlug]);
 
   const finalAmount = customMode ? Number(customValue.replace(",", ".")) || 0 : amount;
   const progress = Math.min(100, (raised / META) * 100);
@@ -90,6 +105,7 @@ function DoarPage() {
           amount: finalAmount,
           type,
           payment_method: method,
+          campaign: projectSlug || "Geral",
           card:
             method === "CREDIT_CARD"
               ? {
@@ -257,17 +273,43 @@ function DoarPage() {
         </div>
       </section>
 
-      {/* RIGHT: Image */}
-      <aside className="hidden lg:block lg:w-[55%] relative">
-        <img src={bgImage} alt="Missões IDE" className="absolute inset-0 w-full h-full object-cover" />
-        <div className="absolute inset-0 bg-gradient-to-br from-[#0a1628]/40 via-[#0a1628]/20 to-[#e8440c]/20" />
-        <div className="absolute bottom-10 left-10 right-10 text-white">
-          <h2 className="text-4xl font-black leading-tight drop-shadow-lg">
-            Cada doação alcança uma vida.
-          </h2>
-          <p className="mt-2 text-white/90 max-w-md drop-shadow">
-            Juntos, levamos esperança aos lugares onde ninguém mais vai.
-          </p>
+      {/* RIGHT: Image / Project Info */}
+      <aside className="hidden lg:block lg:w-[55%] relative overflow-hidden">
+        <img 
+          src={projectData?.cover_image || bgImage} 
+          alt={projectData?.name || "Missões IDE"} 
+          className="absolute inset-0 w-full h-full object-cover transition-all duration-700" 
+        />
+        <div className="absolute inset-0 bg-gradient-to-br from-[#0a1628]/60 via-[#0a1628]/40 to-[#e8440c]/30" />
+        <div className="absolute bottom-10 left-10 right-10 text-white z-10">
+          {projectData ? (
+            <>
+              <div className="inline-flex items-center gap-2 bg-brand-orange/90 px-4 py-2 rounded-full mb-6 backdrop-blur-md shadow-lg border border-white/20">
+                <Heart className="w-4 h-4 fill-white animate-pulse" />
+                <span className="text-xs font-black uppercase tracking-widest">Projeto Selecionado</span>
+              </div>
+              <h2 className="text-5xl font-black leading-tight drop-shadow-2xl mb-4">
+                {projectData.name}
+              </h2>
+              <p className="text-lg text-white/90 max-w-xl drop-shadow-lg leading-relaxed font-medium">
+                {projectData.short_description}
+              </p>
+              <div className="mt-8 pt-8 border-t border-white/20">
+                <p className="text-sm font-bold text-white/70 uppercase tracking-widest">
+                  Destino da doação: <span className="text-brand-orange">{projectData.name}</span>
+                </p>
+              </div>
+            </>
+          ) : (
+            <>
+              <h2 className="text-4xl font-black leading-tight drop-shadow-lg">
+                Cada doação alcança uma vida.
+              </h2>
+              <p className="mt-2 text-white/90 max-w-md drop-shadow">
+                Juntos, levamos esperança aos lugares onde ninguém mais vai.
+              </p>
+            </>
+          )}
         </div>
       </aside>
 

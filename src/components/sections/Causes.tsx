@@ -102,13 +102,15 @@ export function Causes() {
                   {project.short_description}
                 </p>
 
-                <div className="flex flex-col sm:flex-row gap-3">
+                 <div className="flex flex-col sm:flex-row gap-3">
                   <Button 
-                    onClick={() => alert(`Apoiar: ${project.name}`)}
+                    asChild
                     className="flex-1 bg-brand-orange hover:bg-brand-orange/90 text-white border-none py-6 rounded-2xl font-bold group/btn"
                   >
-                    Apoiar Agora
-                    <ArrowRight className="w-4 h-4 ml-2 group-hover/btn:translate-x-1 transition-transform" />
+                    <Link to="/doar" search={{ project: project.slug }}>
+                      Apoiar Agora
+                      <ArrowRight className="w-4 h-4 ml-2 group-hover/btn:translate-x-1 transition-transform" />
+                    </Link>
                   </Button>
                   <Button asChild variant="outline" className="flex-1 border-2 border-brand-orange/20 bg-transparent hover:bg-brand-orange/10 text-brand-orange py-6 rounded-2xl font-bold">
                     <Link to="/projeto/$slug" params={{ slug: project.slug }}>
