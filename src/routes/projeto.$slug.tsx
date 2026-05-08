@@ -168,30 +168,6 @@ function ProjectPage() {
                   Sua doação é o combustível para que possamos continuar alcançando vidas em {project.subtitle}.
                 </p>
 
-                <div className="space-y-4 mb-8">
-                  <div className="flex justify-between font-black text-lg">
-                    <span>Progresso</span>
-                    <span className="text-brand-orange">{progressPercent}%</span>
-                  </div>
-                  <div className="h-3 w-full bg-white/10 rounded-full overflow-hidden">
-                    <div 
-                      className="h-full bg-brand-orange transition-all duration-1000" 
-                      style={{ width: `${progressPercent}%` }} 
-                    />
-                  </div>
-                  <div className="flex justify-between text-xs font-bold opacity-50 uppercase tracking-widest">
-                    <span>{project.raisedAmount.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })}</span>
-                    <span>Meta: {project.goalAmount.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })}</span>
-                  </div>
-                </div>
-
-                <Button 
-                  onClick={() => alert(`Apoiar: ${project.title}`)}
-                  className="w-full bg-brand-gradient hover:opacity-90 text-white py-8 rounded-2xl font-black text-lg shadow-lg shadow-brand-orange/20"
-                >
-                  Apoiar Agora
-                  <ArrowRight className="w-5 h-5 ml-2" />
-                </Button>
 
                 <p className="text-center text-[10px] uppercase tracking-widest font-bold text-white/30 mt-6">
                   Doação Segura e Transparente
