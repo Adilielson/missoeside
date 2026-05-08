@@ -9,7 +9,7 @@ const corsHeaders = {
 
 const KEYS = [
   "ASAAS_API_KEY",
-  "ASAAS_BASE_URL",
+  "ASAAS_ENV",
   "ASAAS_WEBHOOK_TOKEN",
   "RESEND_API_KEY",
   "RESEND_FROM",
