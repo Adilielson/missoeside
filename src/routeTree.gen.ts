@@ -9,10 +9,16 @@
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
 import { Route as rootRouteImport } from './routes/__root'
+import { Route as SuperadminRouteImport } from './routes/superadmin'
 import { Route as DoarRouteImport } from './routes/doar'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as ProjetoSlugRouteImport } from './routes/projeto.$slug'
 
+const SuperadminRoute = SuperadminRouteImport.update({
+  id: '/superadmin',
+  path: '/superadmin',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const DoarRoute = DoarRouteImport.update({
   id: '/doar',
   path: '/doar',
@@ -32,35 +38,46 @@ const ProjetoSlugRoute = ProjetoSlugRouteImport.update({
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/doar': typeof DoarRoute
+  '/superadmin': typeof SuperadminRoute
   '/projeto/$slug': typeof ProjetoSlugRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/doar': typeof DoarRoute
+  '/superadmin': typeof SuperadminRoute
   '/projeto/$slug': typeof ProjetoSlugRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
   '/doar': typeof DoarRoute
+  '/superadmin': typeof SuperadminRoute
   '/projeto/$slug': typeof ProjetoSlugRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/' | '/doar' | '/projeto/$slug'
+  fullPaths: '/' | '/doar' | '/superadmin' | '/projeto/$slug'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/doar' | '/projeto/$slug'
-  id: '__root__' | '/' | '/doar' | '/projeto/$slug'
+  to: '/' | '/doar' | '/superadmin' | '/projeto/$slug'
+  id: '__root__' | '/' | '/doar' | '/superadmin' | '/projeto/$slug'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   DoarRoute: typeof DoarRoute
+  SuperadminRoute: typeof SuperadminRoute
   ProjetoSlugRoute: typeof ProjetoSlugRoute
 }
 
 declare module '@tanstack/react-router' {
   interface FileRoutesByPath {
+    '/superadmin': {
+      id: '/superadmin'
+      path: '/superadmin'
+      fullPath: '/superadmin'
+      preLoaderRoute: typeof SuperadminRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/doar': {
       id: '/doar'
       path: '/doar'
@@ -88,6 +105,7 @@ declare module '@tanstack/react-router' {
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   DoarRoute: DoarRoute,
+  SuperadminRoute: SuperadminRoute,
   ProjetoSlugRoute: ProjetoSlugRoute,
 }
 export const routeTree = rootRouteImport
