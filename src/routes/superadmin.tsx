@@ -51,7 +51,7 @@ const GROUPS: GroupDef[] = [
     service: "asaas",
     fields: [
       { key: "ASAAS_API_KEY", label: "API Key", description: "Chave da API do Asaas (production ou sandbox).", placeholder: "$aact_..." },
-      { key: "ASAAS_BASE_URL", label: "Base URL", description: "URL da API. Sandbox ou produção.", placeholder: "https://api-sandbox.asaas.com/v3" },
+      { key: "ASAAS_ENV", label: "Ambiente", description: "Define se as chamadas serão para Sandbox ou Produção.", placeholder: "sandbox ou production" },
       { key: "ASAAS_WEBHOOK_TOKEN", label: "Webhook Token", description: "Token secreto enviado no header asaas-access-token." },
     ],
   },
