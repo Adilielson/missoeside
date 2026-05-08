@@ -353,8 +353,8 @@ function MethodBtn({
       className={cn(
         "h-12 rounded-xl font-bold text-xs sm:text-sm border-2 flex items-center justify-center gap-2 transition-all",
         active
-          ? "bg-[#e8440c] border-[#e8440c] text-white shadow-md shadow-[#e8440c]/30"
-          : "bg-white border-slate-200 text-slate-700 hover:border-[#e8440c]/40"
+          ? "bg-brand-orange border-brand-orange text-white shadow-md shadow-brand-orange/30"
+          : "bg-white/5 border-white/10 text-white/80 hover:border-brand-orange/60"
       )}
     >
       {icon}
