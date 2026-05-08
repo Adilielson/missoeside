@@ -35,7 +35,7 @@ const DEFAULT_TEMPLATE = `
     <table class="main" align="center">
       <tr>
         <td>
-          <img src="https://images.unsplash.com/photo-1488521787991-ed7bbaae773c?q=80&w=1200&auto=format&fit=crop" alt="IDE Missões" class="header-image">
+          <img src="{{header_image}}" alt="IDE Missões" class="header-image">
         </td>
       </tr>
       <tr>
