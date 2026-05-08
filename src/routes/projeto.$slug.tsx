@@ -3,28 +3,86 @@ import { Navbar } from "@/components/sections/Navbar";
 import { Footer } from "@/components/sections/Footer";
 import { ContactBar } from "@/components/sections/ContactBar";
 import { motion } from "framer-motion";
-import { Heart, Calendar, MapPin, Share2, ArrowRight, ChevronLeft } from "lucide-react";
+import { Heart, Calendar, MapPin, Share2, ArrowRight, ChevronLeft, Loader2 } from "lucide-react";
 import { SectionTag } from "@/components/SectionTag";
 import { Button } from "@/components/ui/button";
 import { useState, useEffect } from "react";
-import { getProjectBySlug, getOtherProjects } from "@/data/projects";
+import { supabase } from "@/integrations/supabase/client";
 
 export const Route = createFileRoute("/projeto/$slug")({
   component: ProjectPage,
 });
 
+type DbProject = {
+  id: string;
+  name: string;
+  slug: string;
+  description: string | null;
+  short_description: string | null;
+  cover_image: string | null;
+  category: string | null;
+  country: string | null;
+  goal_amount: number | null;
+  current_amount: number | null;
+  gallery: string[] | null;
+  created_at: string;
+};
+
 function ProjectPage() {
   const { slug } = Route.useParams();
-  const project = getProjectBySlug(slug);
+  const [project, setProject] = useState<DbProject | null>(null);
+  const [otherProjects, setOtherProjects] = useState<DbProject[]>([]);
+  const [loading, setLoading] = useState(true);
   const [currentImg, setCurrentImg] = useState(0);
 
   useEffect(() => {
-    if (!project) return;
+    fetchProject();
+  }, [slug]);
+
+  async function fetchProject() {
+    setLoading(true);
+    try {
+      const { data, error } = await supabase
+        .from("projects")
+        .select("*")
+        .eq("slug", slug)
+        .eq("status", "PUBLISHED")
+        .single();
+
+      if (error) throw error;
+      setProject(data as DbProject);
+
+      // Fetch other projects
+      const { data: others } = await supabase
+        .from("projects")
+        .select("*")
+        .eq("status", "PUBLISHED")
+        .neq("slug", slug)
+        .limit(3);
+      
+      if (others) setOtherProjects(others as DbProject[]);
+    } catch (error) {
+      console.error("Error fetching project:", error);
+    } finally {
+      setLoading(false);
+    }
+  }
+
+  useEffect(() => {
+    if (!project || !project.gallery || project.gallery.length === 0) return;
     const timer = setInterval(() => {
-      setCurrentImg((prev) => (prev + 1) % project.gallery.length);
+      setCurrentImg((prev) => (prev + 1) % (project.gallery?.length || 1));
     }, 5000);
     return () => clearInterval(timer);
   }, [project]);
+
+  if (loading) {
+    return (
+      <div className="min-h-screen bg-brand-light flex items-center justify-center">
+        <Loader2 className="w-8 h-8 animate-spin text-brand-orange" />
+      </div>
+    );
+  }
 
   if (!project) {
     return (
@@ -39,8 +97,7 @@ function ProjectPage() {
     );
   }
 
-  const otherProjects = getOtherProjects(project.slug);
-  const progressPercent = Math.min(Math.round((project.raisedAmount / project.goalAmount) * 100), 100);
+  const progressPercent = Math.min(Math.round(((project.current_amount || 0) / (project.goal_amount || 1)) * 100), 100);
 
   return (
     <main className="min-h-screen selection:bg-brand-orange selection:text-white bg-brand-light relative">
