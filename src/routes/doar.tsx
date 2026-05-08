@@ -141,22 +141,6 @@ function DoarPage() {
           <h1 className="text-2xl sm:text-3xl font-black text-[#0a1628]">Faça uma Doação Agora</h1>
           <p className="text-slate-500 mt-1">Sua doação transforma vidas!</p>
 
-          {/* Progress */}
-          <div className="mt-6">
-            <p className="text-sm font-semibold text-slate-700">
-              Ajude a alcançar a meta de {brl(META)}
-            </p>
-            <div className="h-3 bg-slate-100 rounded-full mt-2 overflow-hidden">
-              <div
-                className="h-full bg-gradient-to-r from-[#e8440c] to-amber-400 transition-all"
-                style={{ width: `${progress}%` }}
-              />
-            </div>
-            <p className="text-xs text-slate-500 mt-1">
-              {brl(raised)} arrecadados de {brl(META)}
-            </p>
-          </div>
-
           {/* Type */}
           <Section title="SELECIONE TIPO DA DOAÇÃO">
             <div className="grid grid-cols-2 gap-3">
