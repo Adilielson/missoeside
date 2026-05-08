@@ -11,6 +11,7 @@
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as SuperadminRouteImport } from './routes/superadmin'
 import { Route as DoarRouteImport } from './routes/doar'
+import { Route as AdminRouteImport } from './routes/admin'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as ProjetoSlugRouteImport } from './routes/projeto.$slug'
 
@@ -22,6 +23,11 @@ const SuperadminRoute = SuperadminRouteImport.update({
 const DoarRoute = DoarRouteImport.update({
   id: '/doar',
   path: '/doar',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AdminRoute = AdminRouteImport.update({
+  id: '/admin',
+  path: '/admin',
   getParentRoute: () => rootRouteImport,
 } as any)
 const IndexRoute = IndexRouteImport.update({
@@ -37,12 +43,14 @@ const ProjetoSlugRoute = ProjetoSlugRouteImport.update({
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
+  '/admin': typeof AdminRoute
   '/doar': typeof DoarRoute
   '/superadmin': typeof SuperadminRoute
   '/projeto/$slug': typeof ProjetoSlugRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
+  '/admin': typeof AdminRoute
   '/doar': typeof DoarRoute
   '/superadmin': typeof SuperadminRoute
   '/projeto/$slug': typeof ProjetoSlugRoute
@@ -50,20 +58,22 @@ export interface FileRoutesByTo {
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
+  '/admin': typeof AdminRoute
   '/doar': typeof DoarRoute
   '/superadmin': typeof SuperadminRoute
   '/projeto/$slug': typeof ProjetoSlugRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/' | '/doar' | '/superadmin' | '/projeto/$slug'
+  fullPaths: '/' | '/admin' | '/doar' | '/superadmin' | '/projeto/$slug'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/doar' | '/superadmin' | '/projeto/$slug'
-  id: '__root__' | '/' | '/doar' | '/superadmin' | '/projeto/$slug'
+  to: '/' | '/admin' | '/doar' | '/superadmin' | '/projeto/$slug'
+  id: '__root__' | '/' | '/admin' | '/doar' | '/superadmin' | '/projeto/$slug'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
+  AdminRoute: typeof AdminRoute
   DoarRoute: typeof DoarRoute
   SuperadminRoute: typeof SuperadminRoute
   ProjetoSlugRoute: typeof ProjetoSlugRoute
@@ -85,6 +95,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof DoarRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/admin': {
+      id: '/admin'
+      path: '/admin'
+      fullPath: '/admin'
+      preLoaderRoute: typeof AdminRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/': {
       id: '/'
       path: '/'
@@ -104,6 +121,7 @@ declare module '@tanstack/react-router' {
 
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
+  AdminRoute: AdminRoute,
   DoarRoute: DoarRoute,
   SuperadminRoute: SuperadminRoute,
   ProjetoSlugRoute: ProjetoSlugRoute,
