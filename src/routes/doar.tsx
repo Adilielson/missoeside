@@ -51,6 +51,7 @@ function DoarPage() {
   const [email, setEmail] = useState("");
   const [cpf, setCpf] = useState("");
   const [birth, setBirth] = useState("");
+  const [isAnonymous, setIsAnonymous] = useState(false);
 
   // card
   const [cardNumber, setCardNumber] = useState("");
@@ -106,10 +107,11 @@ function DoarPage() {
       }
       const { data, error } = await supabase.functions.invoke("create-donation", {
         body: {
-          donor_name: name,
+          donor_name: isAnonymous ? "Doador Anônimo" : name,
           donor_email: email,
           donor_phone: phone,
           donor_cpf: cpf,
+          is_anonymous: isAnonymous,
           donor_birthdate: birth,
           amount: finalAmount,
           type,
@@ -216,6 +218,15 @@ function DoarPage() {
               <Input placeholder="Email" type="email" value={email} onChange={(e) => setEmail(e.target.value)} className="h-12 bg-white/5 border-white/10 text-white placeholder:text-white/40" />
               <Input placeholder="CPF/CNPJ*" value={cpf} onChange={(e) => setCpf(e.target.value)} className="h-12 bg-white/5 border-white/10 text-white placeholder:text-white/40" />
             </div>
+            <label className="flex items-center gap-2 mt-4 text-sm text-white/70 cursor-pointer bg-white/5 p-3 rounded-xl border border-white/5 hover:border-white/10 transition-colors">
+              <input
+                type="checkbox"
+                checked={isAnonymous}
+                onChange={(e) => setIsAnonymous(e.target.checked)}
+                className="w-4 h-4 accent-brand-orange rounded"
+              />
+              <span className="font-medium">Quero que minha doação seja anônima no site</span>
+            </label>
           </Section>
 
           {/* Method */}
