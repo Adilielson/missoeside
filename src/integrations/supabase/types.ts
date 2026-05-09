@@ -29,6 +29,7 @@ export type Database = {
           donor_phone: string | null
           email_sent: boolean | null
           id: string
+          is_anonymous: boolean | null
           notified_at: string | null
           paid_at: string | null
           payment_method: Database["public"]["Enums"]["payment_method"]
@@ -54,6 +55,7 @@ export type Database = {
           donor_phone?: string | null
           email_sent?: boolean | null
           id?: string
+          is_anonymous?: boolean | null
           notified_at?: string | null
           paid_at?: string | null
           payment_method: Database["public"]["Enums"]["payment_method"]
@@ -79,6 +81,7 @@ export type Database = {
           donor_phone?: string | null
           email_sent?: boolean | null
           id?: string
+          is_anonymous?: boolean | null
           notified_at?: string | null
           paid_at?: string | null
           payment_method?: Database["public"]["Enums"]["payment_method"]

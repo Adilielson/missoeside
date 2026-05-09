@@ -209,7 +209,8 @@ Deno.serve(async (req) => {
     const { data: donation, error: dbError } = await supabase
       .from("donations")
       .insert({
-        donor_name: payload.donor_name,
+        donor_name: payload.is_anonymous ? "Doador Anônimo" : payload.donor_name,
+        is_anonymous: payload.is_anonymous || false,
         donor_email: payload.donor_email,
         donor_phone: payload.donor_phone,
         donor_cpf: payload.donor_cpf,
