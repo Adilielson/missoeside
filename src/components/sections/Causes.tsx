@@ -25,17 +25,22 @@ export function Causes() {
   }, []);
 
   async function fetchProjects() {
+    console.log("Iniciando busca de projetos...");
     try {
       const { data, error } = await supabase
         .from("projects")
         .select("id, name, slug, category, short_description, cover_image")
-        .eq("status", "PUBLISHED")
         .order("created_at", { ascending: false });
 
-      if (error) throw error;
+      console.log("Resultado da busca de projetos:", { data, error });
+      
+      if (error) {
+        console.error("Erro do Supabase ao buscar projetos:", error);
+        throw error;
+      }
       setProjects(data as Project[]);
     } catch (error) {
-      console.error("Error fetching projects:", error);
+      console.error("Erro geral ao buscar projetos:", error);
     } finally {
       setLoading(false);
     }
