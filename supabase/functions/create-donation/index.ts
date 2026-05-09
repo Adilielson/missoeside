@@ -118,6 +118,7 @@ Deno.serve(async (req) => {
     }
 
     // 2. Create payment
+    const customer = { id: customerId }; // Mocking for the rest of the flow
     const dueDate = new Date();
     dueDate.setDate(dueDate.getDate() + (payload.payment_method === "BOLETO" ? 3 : 1));
 
@@ -129,7 +130,7 @@ Deno.serve(async (req) => {
         : "CREDIT_CARD";
 
     const paymentBody: Record<string, unknown> = {
-      customer: customer.id,
+      customer: customerId,
       billingType,
       value: payload.amount,
       dueDate: dueDate.toISOString().split("T")[0],
