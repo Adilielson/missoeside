@@ -163,17 +163,35 @@ Deno.serve(async (req) => {
       delete paymentBody.dueDate;
     }
 
+    console.log(`Criando ${payload.type === "MONTHLY" ? "assinatura" : "pagamento"} no Asaas...`);
     const payRes = await fetch(`${baseUrl}${endpoint}`, {
       method: "POST",
       headers: { access_token: apiKey, "Content-Type": "application/json" },
       body: JSON.stringify(paymentBody),
     });
+    
     const payment = await payRes.json();
     if (!payRes.ok) {
-      return new Response(JSON.stringify({ error: "Erro ao criar pagamento", details: payment }), {
+      console.error("Erro ao criar pagamento/assinatura no Asaas:", payment);
+      return new Response(JSON.stringify({ error: "Erro ao criar pagamento no Asaas", details: payment }), {
         status: 400,
         headers: { ...corsHeaders, "Content-Type": "application/json" },
       });
+    }
+
+    let actualPaymentId = payment.id;
+
+    // Se for assinatura, precisamos pegar o ID do primeiro pagamento para gerar o PIX
+    if (payload.type === "MONTHLY") {
+      console.log(`Buscando pagamentos da assinatura ${payment.id}...`);
+      const subPaymentsRes = await fetch(`${baseUrl}/subscriptions/${payment.id}/payments`, {
+        headers: { access_token: apiKey },
+      });
+      const subPayments = await subPaymentsRes.json();
+      if (subPaymentsRes.ok && subPayments.data && subPayments.data.length > 0) {
+        actualPaymentId = subPayments.data[0].id;
+        console.log(`Primeiro pagamento da assinatura: ${actualPaymentId}`);
+      }
     }
 
     // 3. Get PIX QR if applicable
@@ -182,8 +200,11 @@ Deno.serve(async (req) => {
     let boletoUrl: string | null = null;
 
     if (billingType === "PIX") {
-      console.log(`Buscando QR Code para pagamento ${payment.id}...`);
-      const qrRes = await fetch(`${baseUrl}/payments/${payment.id}/pixQrCode`, {
+      console.log(`Buscando QR Code para pagamento ${actualPaymentId}...`);
+      // Pequeno delay para garantir que o Asaas processou a cobrança (comum em sandbox)
+      await new Promise(resolve => setTimeout(resolve, 1000));
+      
+      const qrRes = await fetch(`${baseUrl}/payments/${actualPaymentId}/pixQrCode`, {
         headers: { access_token: apiKey },
       });
       
@@ -195,6 +216,15 @@ Deno.serve(async (req) => {
         pixPayload = qrData.payload ?? null;
       } else {
         console.error("Erro ao buscar QR Code:", qrData);
+        if (qrData.errors?.[0]?.code === "invalid_action") {
+          return new Response(
+            JSON.stringify({ 
+              error: "O Asaas retornou que esta conta não pode gerar PIX no momento. Verifique se você possui uma chave PIX cadastrada no painel do Asaas (Sandbox/Produção).",
+              details: qrData 
+            }),
+            { status: 400, headers: { ...corsHeaders, "Content-Type": "application/json" } }
+          );
+        }
       }
     }
 

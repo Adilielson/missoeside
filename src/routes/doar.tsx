@@ -107,7 +107,7 @@ function DoarPage() {
       }
       const { data, error } = await supabase.functions.invoke("create-donation", {
         body: {
-          donor_name: isAnonymous ? "Doador Anônimo" : name,
+          donor_name: name, // Envia o nome real para o processamento interno/Asaas
           donor_email: email,
           donor_phone: phone,
           donor_cpf: cpf,
