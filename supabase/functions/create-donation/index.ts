@@ -216,7 +216,15 @@ Deno.serve(async (req) => {
         pixPayload = qrData.payload ?? null;
       } else {
         console.error("Erro ao buscar QR Code:", qrData);
-        // Fallback: se falhar o QR Code direto, tentamos retornar o invoiceUrl
+        if (qrData.errors?.[0]?.code === "invalid_action") {
+          return new Response(
+            JSON.stringify({ 
+              error: "O Asaas retornou que esta conta não pode gerar PIX no momento. Verifique se você possui uma chave PIX cadastrada no painel do Asaas (Sandbox/Produção).",
+              details: qrData 
+            }),
+            { status: 400, headers: { ...corsHeaders, "Content-Type": "application/json" } }
+          );
+        }
       }
     }
 
