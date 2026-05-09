@@ -150,7 +150,7 @@ Deno.serve(async (req) => {
         name: payload.donor_name,
         email: payload.donor_email,
         cpfCnpj: payload.donor_cpf?.replace(/\D/g, ""),
-        postalCode: "00000000",
+        postalCode: payload.donor_postal_code?.replace(/\D/g, "") || "00000000",
         addressNumber: "0",
         phone: payload.donor_phone?.replace(/\D/g, ""),
       };
