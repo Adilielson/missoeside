@@ -77,25 +77,44 @@ Deno.serve(async (req) => {
     }
 
     // 1. Create or fetch customer
-    const customerRes = await fetch(`${baseUrl}/customers`, {
-      method: "POST",
-      headers: {
-        access_token: apiKey,
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({
-        name: payload.donor_name,
-        email: payload.donor_email,
-        mobilePhone: payload.donor_phone?.replace(/\D/g, ""),
-        cpfCnpj: payload.donor_cpf?.replace(/\D/g, ""),
-      }),
-    });
-    const customer = await customerRes.json();
-    if (!customerRes.ok) {
-      return new Response(JSON.stringify({ error: "Erro ao criar cliente Asaas", details: customer }), {
-        status: 400,
-        headers: { ...corsHeaders, "Content-Type": "application/json" },
+    const cpfCnpj = payload.donor_cpf?.replace(/\D/g, "");
+    
+    // Asaas sandbox (e às vezes produção) pode rejeitar CPFs repetidos se não for feito o tratamento de busca.
+    // Primeiro tentamos buscar o cliente pelo CPF
+    let customerId = null;
+    if (cpfCnpj) {
+      const searchRes = await fetch(`${baseUrl}/customers?cpfCnpj=${cpfCnpj}`, {
+        headers: { access_token: apiKey }
       });
+      const searchData = await searchRes.json();
+      if (searchRes.ok && searchData.data && searchData.data.length > 0) {
+        customerId = searchData.data[0].id;
+      }
+    }
+
+    if (!customerId) {
+      const customerRes = await fetch(`${baseUrl}/customers`, {
+        method: "POST",
+        headers: {
+          access_token: apiKey,
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          name: payload.donor_name,
+          email: payload.donor_email,
+          mobilePhone: payload.donor_phone?.replace(/\D/g, ""),
+          cpfCnpj: cpfCnpj,
+        }),
+      });
+      const customer = await customerRes.json();
+      if (!customerRes.ok) {
+        console.error("Erro ao criar cliente Asaas:", customer);
+        return new Response(JSON.stringify({ error: "Erro ao criar cliente Asaas", details: customer }), {
+          status: 400,
+          headers: { ...corsHeaders, "Content-Type": "application/json" },
+        });
+      }
+      customerId = customer.id;
     }
 
     // 2. Create payment
