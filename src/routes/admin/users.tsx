@@ -61,8 +61,14 @@ function UsersPage() {
   const [loading, setLoading] = useState(true);
   const [search, setSearch] = useState("");
   const [isEditOpen, setIsEditOpen] = useState(false);
+  const [isCreateOpen, setIsCreateOpen] = useState(false);
   const [editingUser, setEditingUser] = useState<UserProfile | null>(null);
   const [saving, setSaving] = useState(false);
+  const [creating, setCreating] = useState(false);
+  const [newUserEmail, setNewUserEmail] = useState("");
+  const [newUserFullName, setNewUserFullName] = useState("");
+  const [newUserPassword, setNewUserPassword] = useState("");
+  const [newUserRole, setNewUserRole] = useState<"admin" | "editor" | null>("editor");
   const [currentUserRole, setCurrentUserRole] = useState<string | null>(null);
 
   useEffect(() => {
@@ -128,6 +134,82 @@ function UsersPage() {
     }
   }
 
+  async function handleCreateUser(e: React.FormEvent) {
+    e.preventDefault();
+    if (currentUserRole !== 'admin') {
+      toast.error("Apenas administradores podem criar usuários.");
+      return;
+    }
+    
+    setCreating(true);
+    try {
+      // 1. Criar usuário no Auth do Supabase via Edge Function ou API (se permitido pela configuração)
+      // Como não temos uma edge function de admin setada agora, vamos usar o signUp
+      // Mas em um cenário real de Admin, o ideal é usar a Admin API do Supabase (que requer service_role key)
+      // ou uma Edge Function. Vamos simular/usar o que é possível pelo cliente.
+      
+      const { data, error: signUpError } = await supabase.auth.signUp({
+        email: newUserEmail,
+        password: newUserPassword,
+        options: {
+          data: {
+            full_name: newUserFullName,
+          }
+        }
+      });
+
+      if (signUpError) throw signUpError;
+      
+      if (data.user) {
+        // 2. Atualizar o profile com o cargo selecionado
+        const { error: profileError } = await supabase
+          .from("profiles")
+          .update({ 
+            role: newUserRole,
+            full_name: newUserFullName 
+          })
+          .eq("id", data.user.id);
+          
+        if (profileError) throw profileError;
+        
+        toast.success("Usuário criado com sucesso!");
+        setIsCreateOpen(false);
+        setNewUserEmail("");
+        setNewUserFullName("");
+        setNewUserPassword("");
+        fetchUsers();
+      }
+    } catch (error: any) {
+      toast.error("Erro ao criar usuário: " + error.message);
+    } finally {
+      setCreating(false);
+    }
+  }
+
+  async function handleDeleteUser(userId: string) {
+    if (currentUserRole !== 'admin') {
+      toast.error("Apenas administradores podem excluir usuários.");
+      return;
+    }
+
+    if (!confirm("Tem certeza que deseja remover este usuário? Esta ação não pode ser desfeita no Auth.")) return;
+
+    try {
+      // Nota: Excluir do auth requer privilégios de admin. 
+      // Se RLS permitir, deletamos o profile.
+      const { error } = await supabase
+        .from("profiles")
+        .delete()
+        .eq("id", userId);
+
+      if (error) throw error;
+      toast.success("Usuário removido da lista de perfis.");
+      fetchUsers();
+    } catch (error: any) {
+      toast.error("Erro ao remover: " + error.message);
+    }
+  }
+
   const filteredUsers = users.filter(u => 
     u.email.toLowerCase().includes(search.toLowerCase()) ||
     (u.full_name || "").toLowerCase().includes(search.toLowerCase())
@@ -140,6 +222,13 @@ function UsersPage() {
           <h2 className="text-3xl font-black tracking-tight text-white">Gestão de Usuários</h2>
           <p className="text-white/50 text-sm">Gerencie os acessos e permissões do sistema.</p>
         </div>
+        <Button 
+          onClick={() => setIsCreateOpen(true)}
+          disabled={currentUserRole !== 'admin'}
+          className="bg-[#e8440c] hover:bg-[#c93a09] font-bold"
+        >
+          <UserPlus className="w-4 h-4 mr-2" /> Novo Usuário
+        </Button>
       </div>
 
       <div className="flex items-center gap-2 bg-white/[0.03] border border-white/10 rounded-xl px-4 h-12">
@@ -226,6 +315,15 @@ function UsersPage() {
                     >
                       <UserCog className="w-4 h-4" />
                       Gerenciar
+                    </Button>
+                    <Button 
+                      variant="ghost" 
+                      size="sm" 
+                      onClick={() => handleDeleteUser(u.id)}
+                      disabled={currentUserRole !== 'admin'}
+                      className="text-white/40 hover:text-red-400 hover:bg-red-400/10"
+                    >
+                      <Trash2 className="w-4 h-4" />
                     </Button>
                   </TableCell>
                 </TableRow>
@@ -334,6 +432,85 @@ function UsersPage() {
               Fechar
             </Button>
           </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
+      {/* Dialog para Novo Usuário */}
+      <Dialog open={isCreateOpen} onOpenChange={setIsCreateOpen}>
+        <DialogContent className="bg-[#0a1628] border-white/10 text-white sm:max-w-md">
+          <DialogHeader>
+            <DialogTitle className="text-2xl font-black">Cadastrar Novo Usuário</DialogTitle>
+          </DialogHeader>
+          
+          <form onSubmit={handleCreateUser} className="space-y-4 py-4">
+            <div className="space-y-2">
+              <Label className="text-xs font-bold text-white/50 tracking-widest uppercase">Nome Completo</Label>
+              <Input 
+                value={newUserFullName}
+                onChange={e => setNewUserFullName(e.target.value)}
+                placeholder="Ex: João Silva"
+                className="bg-white/5 border-white/10"
+                required
+              />
+            </div>
+
+            <div className="space-y-2">
+              <Label className="text-xs font-bold text-white/50 tracking-widest uppercase">Email</Label>
+              <Input 
+                type="email"
+                value={newUserEmail}
+                onChange={e => setNewUserEmail(e.target.value)}
+                placeholder="email@exemplo.com"
+                className="bg-white/5 border-white/10"
+                required
+              />
+            </div>
+
+            <div className="space-y-2">
+              <Label className="text-xs font-bold text-white/50 tracking-widest uppercase">Senha Inicial</Label>
+              <Input 
+                type="password"
+                value={newUserPassword}
+                onChange={e => setNewUserPassword(e.target.value)}
+                placeholder="••••••••"
+                className="bg-white/5 border-white/10"
+                required
+              />
+            </div>
+
+            <div className="space-y-2">
+              <Label className="text-xs font-bold text-white/50 tracking-widest uppercase">Cargo</Label>
+              <Select value={newUserRole || "null"} onValueChange={(val) => setNewUserRole(val === "null" ? null : val as any)}>
+                <SelectTrigger className="bg-white/5 border-white/10">
+                  <SelectValue placeholder="Selecione um cargo" />
+                </SelectTrigger>
+                <SelectContent className="bg-[#0a1628] border-white/10 text-white">
+                  <SelectItem value="null">Usuário Comum</SelectItem>
+                  <SelectItem value="editor">Editor de Projetos</SelectItem>
+                  <SelectItem value="admin">Administrador</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+
+            <DialogFooter className="pt-4">
+              <Button 
+                type="button" 
+                variant="ghost" 
+                onClick={() => setIsCreateOpen(false)}
+                className="text-white/50 hover:text-white"
+              >
+                Cancelar
+              </Button>
+              <Button 
+                type="submit" 
+                disabled={creating}
+                className="bg-[#e8440c] hover:bg-[#c93a09] font-bold"
+              >
+                {creating ? <Loader2 className="w-4 h-4 animate-spin mr-2" /> : null}
+                Criar Usuário
+              </Button>
+            </DialogFooter>
+          </form>
         </DialogContent>
       </Dialog>
     </div>
