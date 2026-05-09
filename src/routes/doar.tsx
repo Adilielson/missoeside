@@ -1,4 +1,4 @@
-import { createFileRoute, Link } from "@tanstack/react-router";
+import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
 import { Heart, Loader2, Lock, QrCode, CreditCard, FileText, Copy, Check } from "lucide-react";
 import { toast } from "sonner";
@@ -32,6 +32,7 @@ function brl(v: number) {
 }
 
 function DoarPage() {
+  const navigate = useNavigate();
   const search = Route.useSearch() as { project?: string };
   const projectSlug = search.project;
 
@@ -141,8 +142,16 @@ function DoarPage() {
         setPixData({ qr: data.pix_qrcode, payload: data.pix_payload });
       } else if (method === "BOLETO" && data.boleto_url) {
         window.open(data.boleto_url, "_blank");
+        navigate({ 
+          to: "/obrigado", 
+          search: { name: name, project: projectData?.name || "IDE Missões" } 
+        });
       } else if (method === "CREDIT_CARD") {
         toast.success("Pagamento processado com sucesso!");
+        navigate({ 
+          to: "/obrigado", 
+          search: { name: name, project: projectData?.name || "IDE Missões" } 
+        });
       }
     } catch (e: any) {
       toast.error(e.message || "Erro ao processar doação.");
