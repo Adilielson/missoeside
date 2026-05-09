@@ -30,6 +30,7 @@ export function Causes() {
       const { data, error } = await supabase
         .from("projects")
         .select("id, name, slug, category, short_description, cover_image")
+        .eq("status", "PUBLISHED")
         .order("created_at", { ascending: false });
 
       console.log("Resultado da busca de projetos:", { data, error });
