@@ -166,8 +166,9 @@ function PostsPage() {
         if (error) throw error;
         toast.success("Post criado com sucesso!");
       }
-      setIsFormOpen(false);
       await fetchPosts();
+      setIsFormOpen(false);
+      setEditingPost(null);
     } catch (error: any) {
       toast.error("Erro ao salvar: " + error.message);
     } finally {
