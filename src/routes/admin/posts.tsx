@@ -343,6 +343,7 @@ function PostsPage() {
                         variant="ghost" 
                         size="icon" 
                         onClick={() => handleOpenForm(p)}
+                        id={`edit-post-${p.id}`}
                         className="text-white/40 hover:text-white hover:bg-white/5"
                       >
                         <Edit2 className="w-4 h-4" />
