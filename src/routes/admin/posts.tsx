@@ -589,4 +589,3 @@ function PostsPage() {
     </div>
   );
 }
-}
