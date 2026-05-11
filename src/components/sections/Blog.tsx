@@ -24,6 +24,21 @@ const fetchPosts = async () => {
 };
 
 export function Blog() {
+  const { data: posts, isLoading } = useQuery({
+    queryKey: ["posts-home"],
+    queryFn: fetchPosts,
+  });
+
+  if (isLoading) {
+    return (
+      <section id="blog" className="py-16 md:py-24 bg-white overflow-hidden">
+        <div className="max-w-7xl mx-auto px-5 sm:px-6 text-center">
+          <p className="text-brand-dark/60">Carregando blog...</p>
+        </div>
+      </section>
+    );
+  }
+
   return (
     <section id="blog" className="py-16 md:py-24 bg-white overflow-hidden">
       <div className="max-w-7xl mx-auto px-5 sm:px-6">
@@ -46,43 +61,51 @@ export function Blog() {
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 sm:gap-8">
-          {posts.map((post, index) => (
-            <motion.div
-              key={index}
-              initial={{ opacity: 0, y: 30 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true }}
-              transition={{ delay: index * 0.1 }}
-              className="group cursor-pointer"
-            >
-              <div className="relative aspect-[4/3] rounded-[28px] sm:rounded-[40px] overflow-hidden mb-6">
-                <img 
-                  src={post.image} 
-                  alt={post.title} 
-                  className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110"
-                />
-                <div className="absolute top-6 left-6 bg-white rounded-2xl p-3 text-center min-w-[60px] shadow-xl">
-                  <p className="text-xl font-black text-brand-dark leading-none">{post.date}</p>
-                  <p className="text-[10px] font-bold text-brand-orange tracking-widest uppercase">{post.month}</p>
-                </div>
-              </div>
-              
-              <div className="flex items-center gap-4 text-xs font-bold uppercase tracking-widest text-brand-orange mb-4">
-                <span>Por {post.author}</span>
-                <span className="w-1 h-1 bg-brand-dark/20 rounded-full" />
-                <span>{post.category}</span>
-              </div>
+          {posts?.map((post, index) => {
+            const date = post.published_at ? new Date(post.published_at) : new Date(post.created_at);
+            const day = format(date, "dd");
+            const month = format(date, "MMM", { locale: ptBR }).toUpperCase().replace(".", "");
 
-              <h3 className="text-2xl font-black text-brand-dark mb-4 group-hover:text-brand-orange transition-colors line-clamp-2">
-                {post.title}
-              </h3>
+            return (
+              <motion.div
+                key={post.id}
+                initial={{ opacity: 0, y: 30 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true }}
+                transition={{ delay: index * 0.1 }}
+                className="group cursor-pointer"
+              >
+                <Link to="/blog/$slug" params={{ slug: post.slug }}>
+                  <div className="relative aspect-[4/3] rounded-[28px] sm:rounded-[40px] overflow-hidden mb-6">
+                    <img 
+                      src={post.cover_image || "https://images.unsplash.com/photo-1516627145497-ae6968895b74?q=80&w=2040&auto=format&fit=crop"} 
+                      alt={post.title} 
+                      className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110"
+                    />
+                    <div className="absolute top-6 left-6 bg-white rounded-2xl p-3 text-center min-w-[60px] shadow-xl">
+                      <p className="text-xl font-black text-brand-dark leading-none">{day}</p>
+                      <p className="text-[10px] font-bold text-brand-orange tracking-widest uppercase">{month}</p>
+                    </div>
+                  </div>
+                  
+                  <div className="flex items-center gap-4 text-xs font-bold uppercase tracking-widest text-brand-orange mb-4">
+                    <span>Por {Array.isArray(post.author) ? post.author[0]?.full_name : (post.author as any)?.full_name || "IDE Missões"}</span>
+                    <span className="w-1 h-1 bg-brand-dark/20 rounded-full" />
+                    <span>{post.category}</span>
+                  </div>
 
-              <div className="flex items-center gap-2 text-brand-dark/40 font-bold text-sm group-hover:text-brand-dark transition-colors">
-                <span>Leia Mais</span>
-                <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
-              </div>
-            </motion.div>
-          ))}
+                  <h3 className="text-2xl font-black text-brand-dark mb-4 group-hover:text-brand-orange transition-colors line-clamp-2">
+                    {post.title}
+                  </h3>
+
+                  <div className="flex items-center gap-2 text-brand-dark/40 font-bold text-sm group-hover:text-brand-dark transition-colors">
+                    <span>Leia Mais</span>
+                    <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
+                  </div>
+                </Link>
+              </motion.div>
+            );
+          })}
         </div>
       </div>
     </section>
