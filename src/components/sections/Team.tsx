@@ -1,34 +1,35 @@
 import { motion } from "framer-motion";
 import { Users } from "lucide-react";
+import { Link } from "@tanstack/react-router";
+import { useQuery } from "@tanstack/react-query";
 import { SectionTag } from "../SectionTag";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
+import { supabase } from "@/integrations/supabase/client";
 
-const team = [
-  {
-    name: "Pr. Ricardo Santos",
-    role: "Diretor Geral",
-    image: "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?q=80&w=1974&auto=format&fit=crop",
-  },
-  {
-    name: "Ana Oliveira",
-    role: "Coordenadora de Campo",
-    image: "https://images.unsplash.com/photo-1494790108377-be9c29b29330?q=80&w=1974&auto=format&fit=crop",
-    featured: true,
-  },
-  {
-    name: "Marcos Lima",
-    role: "Logística Missionária",
-    image: "https://images.unsplash.com/photo-1500648767791-00dcc994a43e?q=80&w=1974&auto=format&fit=crop",
-  },
-  {
-    name: "Sarah Meirelles",
-    role: "Relacionamento e Doações",
-    image: "https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?q=80&w=1976&auto=format&fit=crop",
-  },
-];
+type TeamMember = {
+  id: string;
+  name: string;
+  role: string;
+  slug: string;
+  image_url: string | null;
+  featured: boolean;
+};
 
 export function Team() {
+  const { data: team = [] } = useQuery({
+    queryKey: ["team-members", "home"],
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from("team_members")
+        .select("id,name,role,slug,image_url,featured")
+        .eq("status", "PUBLISHED")
+        .order("display_order", { ascending: true });
+      if (error) throw error;
+      return data as TeamMember[];
+    },
+  });
+
   return (
     <section className="py-16 md:py-24 bg-brand-light/50 overflow-hidden">
       <div className="max-w-7xl mx-auto px-5 sm:px-6">
@@ -40,15 +41,17 @@ export function Team() {
               <span className="text-brand-orange">com a Chamada</span>
             </h2>
           </div>
-          <Button className="bg-brand-orange hover:bg-brand-burgundy text-white px-8 py-6 rounded-full self-start md:self-end transition-all">
-            Junte-se à Equipe
-          </Button>
+          <Link to="/equipe" className="self-start md:self-end">
+            <Button className="bg-brand-orange hover:bg-brand-burgundy text-white px-8 py-6 rounded-full transition-all">
+              Conheça a Equipe
+            </Button>
+          </Link>
         </div>
 
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 sm:gap-8">
           {team.map((member, index) => (
             <motion.div
-              key={index}
+              key={member.id}
               initial={{ opacity: 0, y: 30 }}
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true }}
@@ -58,25 +61,19 @@ export function Team() {
                 member.featured && "lg:-mt-8 shadow-xl"
               )}
             >
-              <div className="aspect-square rounded-[32px] overflow-hidden mb-6">
-                <img 
-                  src={member.image} 
-                  alt={member.name} 
-                  className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110"
-                />
-              </div>
-              <h3 className="text-2xl font-black text-brand-dark mb-2">{member.name}</h3>
-              <p className="text-sm font-bold uppercase tracking-widest text-brand-orange">{member.role}</p>
-              
-              <div className="absolute -bottom-4 left-1/2 -translate-x-1/2 flex gap-3 opacity-0 group-hover:opacity-100 transition-all duration-300 translate-y-2 group-hover:translate-y-0">
-                <button className="w-10 h-10 rounded-full bg-brand-dark text-white flex items-center justify-center hover:bg-brand-orange transition-colors">
-                  {/* Social icon placeholder */}
-                  <span className="text-xs font-bold">In</span>
-                </button>
-                <button className="w-10 h-10 rounded-full bg-brand-dark text-white flex items-center justify-center hover:bg-brand-orange transition-colors">
-                  <span className="text-xs font-bold">Ig</span>
-                </button>
-              </div>
+              <Link to="/equipe/$slug" params={{ slug: member.slug }} className="block">
+                <div className="aspect-square rounded-[32px] overflow-hidden mb-6 bg-brand-light">
+                  {member.image_url && (
+                    <img
+                      src={member.image_url}
+                      alt={member.name}
+                      className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110"
+                    />
+                  )}
+                </div>
+                <h3 className="text-2xl font-black text-brand-dark mb-2">{member.name}</h3>
+                <p className="text-sm font-bold uppercase tracking-widest text-brand-orange">{member.role}</p>
+              </Link>
             </motion.div>
           ))}
         </div>
