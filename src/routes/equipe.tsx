@@ -56,7 +56,7 @@ function EquipePage() {
               <span className="text-brand-orange">com a Chamada</span>
             </h1>
             <p className="text-brand-dark/60 text-lg mt-6 max-w-2xl">
-              Conheça quem conduz a missão do IDE — pessoas dedicadas a servir, liderar e fazer o evangelho avançar.
+              Conheça quem conduz a missão do IDE. Pessoas dedicadas a servir, liderar e fazer o evangelho avançar.
             </p>
           </div>
 
