@@ -35,8 +35,8 @@ export function Navbar({ dark = false }: { dark?: boolean }) {
       className={cn(
         "fixed top-0 left-0 right-0 z-50 transition-all duration-300 px-6 py-4",
         isScrolled 
-          ? "bg-brand-dark/80 backdrop-blur-md border-b border-white/10 py-3" 
-          : dark ? "bg-brand-dark/95 border-b border-white/5" : "bg-transparent"
+          ? "bg-brand-dark/95 backdrop-blur-lg border-b border-white/10 py-3 shadow-xl" 
+          : dark ? "bg-brand-dark border-b border-white/5" : "bg-white/90 backdrop-blur-md border-b border-brand-dark/5 shadow-sm"
       )}
     >
       <div className="max-w-7xl mx-auto flex items-center justify-between">
@@ -50,8 +50,8 @@ export function Navbar({ dark = false }: { dark?: boolean }) {
                 to={item.href.startsWith("/") ? item.href : undefined}
                 hash={!item.href.startsWith("/") ? item.href.replace("#", "") : undefined}
                 className={cn(
-                  "text-sm font-medium transition-colors flex items-center gap-1",
-                  isScrolled || dark ? "text-white/90 hover:text-brand-orange" : "text-brand-dark hover:text-brand-orange"
+                  "text-sm font-semibold transition-colors flex items-center gap-1",
+                  isScrolled || dark ? "text-white hover:text-brand-orange" : "text-brand-dark hover:text-brand-orange"
                 )}
               >
                 {item.name}
@@ -69,7 +69,7 @@ export function Navbar({ dark = false }: { dark?: boolean }) {
         <div className="flex items-center gap-4">
           <button className={cn(
             "hidden sm:flex p-2 transition-colors",
-            isScrolled || dark ? "text-white/80 hover:text-brand-orange" : "text-brand-dark hover:text-brand-orange"
+            isScrolled || dark ? "text-white hover:text-brand-orange" : "text-brand-dark hover:text-brand-orange"
           )}>
             <Search className="w-5 h-5" />
           </button>
