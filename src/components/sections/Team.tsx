@@ -1,7 +1,8 @@
 import { motion } from "framer-motion";
-import { Users } from "lucide-react";
+import { Users, ArrowLeft, ArrowRight } from "lucide-react";
 import { Link } from "@tanstack/react-router";
 import { useQuery } from "@tanstack/react-query";
+import { useRef } from "react";
 import { SectionTag } from "../SectionTag";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
@@ -17,6 +18,8 @@ type TeamMember = {
 };
 
 export function Team() {
+  const scrollRef = useRef<HTMLDivElement>(null);
+  
   const { data: team = [] } = useQuery({
     queryKey: ["team-members", "home"],
     queryFn: async () => {
@@ -30,6 +33,14 @@ export function Team() {
     },
   });
 
+  const scroll = (direction: "left" | "right") => {
+    if (scrollRef.current) {
+      const { scrollLeft, clientWidth } = scrollRef.current;
+      const scrollTo = direction === "left" ? scrollLeft - clientWidth : scrollLeft + clientWidth;
+      scrollRef.current.scrollTo({ left: scrollTo, behavior: "smooth" });
+    }
+  };
+
   return (
     <section className="py-16 md:py-24 bg-brand-light/50 overflow-hidden">
       <div className="max-w-7xl mx-auto px-5 sm:px-6">
@@ -41,14 +52,34 @@ export function Team() {
               <span className="text-brand-orange">com a Chamada</span>
             </h2>
           </div>
-          <Link to="/equipe" className="self-start md:self-end">
-            <Button className="bg-brand-orange hover:bg-brand-burgundy text-white px-8 py-6 rounded-full transition-all">
-              Conheça a Equipe
-            </Button>
-          </Link>
+          <div className="flex items-center gap-4 self-start md:self-end">
+            <div className="flex gap-2 mr-4">
+              <button 
+                onClick={() => scroll("left")}
+                className="w-12 h-12 rounded-full border border-brand-orange/20 flex items-center justify-center hover:bg-brand-orange hover:text-white transition-all text-brand-orange"
+              >
+                <ArrowLeft className="w-5 h-5" />
+              </button>
+              <button 
+                onClick={() => scroll("right")}
+                className="w-12 h-12 rounded-full border border-brand-orange/20 flex items-center justify-center hover:bg-brand-orange hover:text-white transition-all text-brand-orange"
+              >
+                <ArrowRight className="w-5 h-5" />
+              </button>
+            </div>
+            <Link to="/equipe">
+              <Button className="bg-brand-orange hover:bg-brand-burgundy text-white px-8 py-6 rounded-full transition-all">
+                Conheça a Equipe
+              </Button>
+            </Link>
+          </div>
         </div>
 
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 sm:gap-8">
+        <div 
+          ref={scrollRef}
+          className="flex gap-6 sm:gap-8 overflow-x-auto pb-10 snap-x snap-mandatory scrollbar-hide no-scrollbar"
+          style={{ msOverflowStyle: 'none', scrollbarWidth: 'none' }}
+        >
           {team.map((member, index) => (
             <motion.div
               key={member.id}
@@ -57,8 +88,8 @@ export function Team() {
               viewport={{ once: true }}
               transition={{ delay: index * 0.1 }}
               className={cn(
-                "group relative bg-white rounded-[40px] p-4 pb-10 text-center transition-all duration-500 hover:shadow-2xl hover:shadow-brand-orange/10",
-                member.featured && "lg:-mt-8 shadow-xl"
+                "group relative bg-white rounded-[40px] p-4 pb-10 text-center transition-all duration-500 hover:shadow-2xl hover:shadow-brand-orange/10 snap-start min-w-[280px] sm:min-w-[300px]",
+                member.featured && "shadow-xl border border-brand-orange/10"
               )}
             >
               <Link to="/equipe/$slug" params={{ slug: member.slug }} className="block">
