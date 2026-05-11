@@ -183,6 +183,13 @@ function PostPage() {
                         <blockquote className="border-l-4 border-brand-orange pl-6 py-2 italic my-10 bg-brand-light/50 rounded-r-2xl" {...props} />
                       ),
                       strong: ({node, ...props}) => <strong className="font-black text-brand-dark" {...props} />,
+                      img: ({node, ...props}) => (
+                        <img 
+                          className="w-full rounded-[32px] my-10 shadow-lg border border-brand-orange/5" 
+                          loading="lazy"
+                          {...props} 
+                        />
+                      ),
                     }}
                   >
                     {post.content || ""}
