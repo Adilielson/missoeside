@@ -426,7 +426,11 @@ function PostsPage() {
                 </div>
                 <Textarea 
                   value={formData.content || ""} 
-                  onChange={e => setFormData({...formData, content: e.target.value})}
+                  onChange={e => {
+                    const newContent = e.target.value;
+                    console.log("Textarea onChange. New length:", newContent.length);
+                    setFormData(prev => ({ ...prev, content: newContent }));
+                  }}
                   placeholder="Escreva seu artigo aqui... Use Markdown para formatação (ex: # Título, **Negrito**)"
                   className="bg-white/5 border-white/10 resize-none h-[400px] font-sans leading-relaxed p-6"
                 />
