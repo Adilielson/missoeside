@@ -110,8 +110,8 @@ export function About() {
           </div>
 
           <div className="flex flex-wrap items-center gap-8">
-            <Button className="bg-brand-orange hover:bg-brand-burgundy text-white px-8 py-6 rounded-full transition-all">
-              Explorar Mais
+            <Button asChild className="bg-brand-orange hover:bg-brand-burgundy text-white px-8 py-6 rounded-full transition-all">
+              <Link to="/sobre">Explorar Mais</Link>
             </Button>
             
             <div className="flex items-center gap-3">
