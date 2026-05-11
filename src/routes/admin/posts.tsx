@@ -122,6 +122,7 @@ function PostsPage() {
 
   async function handleSave(e: React.FormEvent) {
     e.preventDefault();
+    console.log("HandleSave triggered. Current content in formData:", formData.content);
     setSaving(true);
     try {
       if (!formData.title || !formData.slug) {
