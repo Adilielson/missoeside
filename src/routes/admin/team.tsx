@@ -86,6 +86,7 @@ function TeamAdminPage() {
   const [isFormOpen, setIsFormOpen] = useState(false);
   const [editing, setEditing] = useState<TeamMember | null>(null);
   const [saving, setSaving] = useState(false);
+  const [uploading, setUploading] = useState(false);
   const [formData, setFormData] = useState<Partial<TeamMember>>(empty);
   const [specialtiesInput, setSpecialtiesInput] = useState("");
 
