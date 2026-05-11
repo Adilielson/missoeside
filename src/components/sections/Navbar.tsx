@@ -49,7 +49,10 @@ export function Navbar({ dark = false }: { dark?: boolean }) {
               <Link
                 to={item.href.startsWith("/") ? item.href : undefined}
                 hash={!item.href.startsWith("/") ? item.href.replace("#", "") : undefined}
-                className="text-white/90 hover:text-brand-orange text-sm font-medium transition-colors flex items-center gap-1"
+                className={cn(
+                  "text-sm font-medium transition-colors flex items-center gap-1",
+                  isScrolled || dark ? "text-white/90 hover:text-brand-orange" : "text-brand-dark hover:text-brand-orange"
+                )}
               >
                 {item.name}
                 {["Projetos", "Doações"].includes(item.name) && (
