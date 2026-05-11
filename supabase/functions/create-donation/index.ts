@@ -237,6 +237,24 @@ Deno.serve(async (req) => {
     // 4. Project Name already fetched at step 0
 
 
+    // Para cartão, o Asaas retorna o status final na hora (CONFIRMED/RECEIVED/AUTHORIZED)
+    let initialStatus = "PENDING";
+    if (billingType === "CREDIT_CARD") {
+      const asaasStatus = (payment.status || "").toUpperCase();
+      if (["CONFIRMED", "RECEIVED", "RECEIVED_IN_CASH"].includes(asaasStatus)) {
+        initialStatus = "CONFIRMED";
+      } else if (asaasStatus === "PENDING" || asaasStatus === "AWAITING_RISK_ANALYSIS") {
+        initialStatus = "PENDING";
+      } else {
+        // FAILED, REFUSED, etc. — devolve erro pro frontend
+        console.error("Cartão recusado pelo Asaas:", payment);
+        return new Response(JSON.stringify({
+          error: payment.errors?.[0]?.description || `Pagamento não autorizado (status: ${asaasStatus || "desconhecido"})`,
+          details: payment,
+        }), { status: 400, headers: { ...corsHeaders, "Content-Type": "application/json" } });
+      }
+    }
+
     // 5. Save donation
     const { data: donation, error: dbError } = await supabase
       .from("donations")
@@ -249,7 +267,7 @@ Deno.serve(async (req) => {
         amount: payload.amount,
         type: payload.type,
         payment_method: payload.payment_method,
-        status: "PENDING",
+        status: initialStatus,
         asaas_id: payment.id,
         asaas_customer: customer.id,
         asaas_link: payment.invoiceUrl ?? null,

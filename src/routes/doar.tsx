@@ -153,14 +153,20 @@ function DoarPage() {
           search: { name: name, project: projectData?.name || "IDE Missões" } 
         });
       } else if (method === "CREDIT_CARD") {
-        // Para cartão, o create-donation já retorna se foi autorizado ou não (o Asaas processa síncrono)
-        // Mas vamos fazer um pequeno polling caso o status demore a refletir no banco
-        setCheckingStatus(true);
-        const donationId = data.donation?.id;
-        if (donationId) {
-          toast.info("Processando pagamento...");
-          // Iniciar polling curto para cartão
-          checkDonationStatus(donationId);
+        const status = (data.donation?.status || "").toUpperCase();
+        if (status === "CONFIRMED" || status === "RECEIVED") {
+          toast.success("Pagamento aprovado!");
+          navigate({
+            to: "/obrigado",
+            search: { name, project: projectData?.name || "IDE Missões" },
+          });
+        } else {
+          setCheckingStatus(true);
+          const donationId = data.donation?.id;
+          if (donationId) {
+            toast.info("Pagamento em análise. Aguardando confirmação...");
+            checkDonationStatus(donationId);
+          }
         }
       }
     } catch (e: any) {
