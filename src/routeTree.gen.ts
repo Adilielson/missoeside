@@ -19,6 +19,8 @@ import { Route as DoarRouteImport } from './routes/doar'
 import { Route as BlogRouteImport } from './routes/blog'
 import { Route as AdminRouteImport } from './routes/admin'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as EquipeIndexRouteImport } from './routes/equipe.index'
+import { Route as BlogIndexRouteImport } from './routes/blog.index'
 import { Route as AdminIndexRouteImport } from './routes/admin/index'
 import { Route as ProjetoSlugRouteImport } from './routes/projeto.$slug'
 import { Route as EventoSlugRouteImport } from './routes/evento.$slug'
@@ -80,6 +82,16 @@ const IndexRoute = IndexRouteImport.update({
   id: '/',
   path: '/',
   getParentRoute: () => rootRouteImport,
+} as any)
+const EquipeIndexRoute = EquipeIndexRouteImport.update({
+  id: '/',
+  path: '/',
+  getParentRoute: () => EquipeRoute,
+} as any)
+const BlogIndexRoute = BlogIndexRouteImport.update({
+  id: '/',
+  path: '/',
+  getParentRoute: () => BlogRoute,
 } as any)
 const AdminIndexRoute = AdminIndexRouteImport.update({
   id: '/',
@@ -159,12 +171,12 @@ export interface FileRoutesByFullPath {
   '/evento/$slug': typeof EventoSlugRoute
   '/projeto/$slug': typeof ProjetoSlugRoute
   '/admin/': typeof AdminIndexRoute
+  '/blog/': typeof BlogIndexRoute
+  '/equipe/': typeof EquipeIndexRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
-  '/blog': typeof BlogRouteWithChildren
   '/doar': typeof DoarRoute
-  '/equipe': typeof EquipeRouteWithChildren
   '/eventos': typeof EventosRoute
   '/nossos-projetos': typeof NossosProjetosRoute
   '/obrigado': typeof ObrigadoRoute
@@ -181,6 +193,8 @@ export interface FileRoutesByTo {
   '/evento/$slug': typeof EventoSlugRoute
   '/projeto/$slug': typeof ProjetoSlugRoute
   '/admin': typeof AdminIndexRoute
+  '/blog': typeof BlogIndexRoute
+  '/equipe': typeof EquipeIndexRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -205,6 +219,8 @@ export interface FileRoutesById {
   '/evento/$slug': typeof EventoSlugRoute
   '/projeto/$slug': typeof ProjetoSlugRoute
   '/admin/': typeof AdminIndexRoute
+  '/blog/': typeof BlogIndexRoute
+  '/equipe/': typeof EquipeIndexRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -230,12 +246,12 @@ export interface FileRouteTypes {
     | '/evento/$slug'
     | '/projeto/$slug'
     | '/admin/'
+    | '/blog/'
+    | '/equipe/'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
-    | '/blog'
     | '/doar'
-    | '/equipe'
     | '/eventos'
     | '/nossos-projetos'
     | '/obrigado'
@@ -252,6 +268,8 @@ export interface FileRouteTypes {
     | '/evento/$slug'
     | '/projeto/$slug'
     | '/admin'
+    | '/blog'
+    | '/equipe'
   id:
     | '__root__'
     | '/'
@@ -275,6 +293,8 @@ export interface FileRouteTypes {
     | '/evento/$slug'
     | '/projeto/$slug'
     | '/admin/'
+    | '/blog/'
+    | '/equipe/'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -363,6 +383,20 @@ declare module '@tanstack/react-router' {
       fullPath: '/'
       preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
+    }
+    '/equipe/': {
+      id: '/equipe/'
+      path: '/'
+      fullPath: '/equipe/'
+      preLoaderRoute: typeof EquipeIndexRouteImport
+      parentRoute: typeof EquipeRoute
+    }
+    '/blog/': {
+      id: '/blog/'
+      path: '/'
+      fullPath: '/blog/'
+      preLoaderRoute: typeof BlogIndexRouteImport
+      parentRoute: typeof BlogRoute
     }
     '/admin/': {
       id: '/admin/'
@@ -468,20 +502,24 @@ const AdminRouteWithChildren = AdminRoute._addFileChildren(AdminRouteChildren)
 
 interface BlogRouteChildren {
   BlogSlugRoute: typeof BlogSlugRoute
+  BlogIndexRoute: typeof BlogIndexRoute
 }
 
 const BlogRouteChildren: BlogRouteChildren = {
   BlogSlugRoute: BlogSlugRoute,
+  BlogIndexRoute: BlogIndexRoute,
 }
 
 const BlogRouteWithChildren = BlogRoute._addFileChildren(BlogRouteChildren)
 
 interface EquipeRouteChildren {
   EquipeSlugRoute: typeof EquipeSlugRoute
+  EquipeIndexRoute: typeof EquipeIndexRoute
 }
 
 const EquipeRouteChildren: EquipeRouteChildren = {
   EquipeSlugRoute: EquipeSlugRoute,
+  EquipeIndexRoute: EquipeIndexRoute,
 }
 
 const EquipeRouteWithChildren =

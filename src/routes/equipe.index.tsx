@@ -7,7 +7,7 @@ import { SectionTag } from "@/components/SectionTag";
 import { supabase } from "@/integrations/supabase/client";
 import { cn } from "@/lib/utils";
 
-export const Route = createFileRoute("/equipe")({
+export const Route = createFileRoute("/equipe/")({
   head: () => ({
     meta: [
       { title: "Nossa Equipe — IDE Missões" },
