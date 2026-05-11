@@ -19,6 +19,7 @@ import { Route as AdminIndexRouteImport } from './routes/admin/index'
 import { Route as ProjetoSlugRouteImport } from './routes/projeto.$slug'
 import { Route as AdminUsersRouteImport } from './routes/admin/users'
 import { Route as AdminProjectsRouteImport } from './routes/admin/projects'
+import { Route as AdminPostsRouteImport } from './routes/admin/posts'
 import { Route as AdminLoginRouteImport } from './routes/admin/login'
 import { Route as AdminEventsRouteImport } from './routes/admin/events'
 
@@ -72,6 +73,11 @@ const AdminProjectsRoute = AdminProjectsRouteImport.update({
   path: '/projects',
   getParentRoute: () => AdminRoute,
 } as any)
+const AdminPostsRoute = AdminPostsRouteImport.update({
+  id: '/posts',
+  path: '/posts',
+  getParentRoute: () => AdminRoute,
+} as any)
 const AdminLoginRoute = AdminLoginRouteImport.update({
   id: '/login',
   path: '/login',
@@ -92,6 +98,7 @@ export interface FileRoutesByFullPath {
   '/superadmin': typeof SuperadminRoute
   '/admin/events': typeof AdminEventsRoute
   '/admin/login': typeof AdminLoginRoute
+  '/admin/posts': typeof AdminPostsRoute
   '/admin/projects': typeof AdminProjectsRoute
   '/admin/users': typeof AdminUsersRoute
   '/projeto/$slug': typeof ProjetoSlugRoute
@@ -105,6 +112,7 @@ export interface FileRoutesByTo {
   '/superadmin': typeof SuperadminRoute
   '/admin/events': typeof AdminEventsRoute
   '/admin/login': typeof AdminLoginRoute
+  '/admin/posts': typeof AdminPostsRoute
   '/admin/projects': typeof AdminProjectsRoute
   '/admin/users': typeof AdminUsersRoute
   '/projeto/$slug': typeof ProjetoSlugRoute
@@ -120,6 +128,7 @@ export interface FileRoutesById {
   '/superadmin': typeof SuperadminRoute
   '/admin/events': typeof AdminEventsRoute
   '/admin/login': typeof AdminLoginRoute
+  '/admin/posts': typeof AdminPostsRoute
   '/admin/projects': typeof AdminProjectsRoute
   '/admin/users': typeof AdminUsersRoute
   '/projeto/$slug': typeof ProjetoSlugRoute
@@ -136,6 +145,7 @@ export interface FileRouteTypes {
     | '/superadmin'
     | '/admin/events'
     | '/admin/login'
+    | '/admin/posts'
     | '/admin/projects'
     | '/admin/users'
     | '/projeto/$slug'
@@ -149,6 +159,7 @@ export interface FileRouteTypes {
     | '/superadmin'
     | '/admin/events'
     | '/admin/login'
+    | '/admin/posts'
     | '/admin/projects'
     | '/admin/users'
     | '/projeto/$slug'
@@ -163,6 +174,7 @@ export interface FileRouteTypes {
     | '/superadmin'
     | '/admin/events'
     | '/admin/login'
+    | '/admin/posts'
     | '/admin/projects'
     | '/admin/users'
     | '/projeto/$slug'
@@ -251,6 +263,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AdminProjectsRouteImport
       parentRoute: typeof AdminRoute
     }
+    '/admin/posts': {
+      id: '/admin/posts'
+      path: '/posts'
+      fullPath: '/admin/posts'
+      preLoaderRoute: typeof AdminPostsRouteImport
+      parentRoute: typeof AdminRoute
+    }
     '/admin/login': {
       id: '/admin/login'
       path: '/login'
@@ -271,6 +290,7 @@ declare module '@tanstack/react-router' {
 interface AdminRouteChildren {
   AdminEventsRoute: typeof AdminEventsRoute
   AdminLoginRoute: typeof AdminLoginRoute
+  AdminPostsRoute: typeof AdminPostsRoute
   AdminProjectsRoute: typeof AdminProjectsRoute
   AdminUsersRoute: typeof AdminUsersRoute
   AdminIndexRoute: typeof AdminIndexRoute
@@ -279,6 +299,7 @@ interface AdminRouteChildren {
 const AdminRouteChildren: AdminRouteChildren = {
   AdminEventsRoute: AdminEventsRoute,
   AdminLoginRoute: AdminLoginRoute,
+  AdminPostsRoute: AdminPostsRoute,
   AdminProjectsRoute: AdminProjectsRoute,
   AdminUsersRoute: AdminUsersRoute,
   AdminIndexRoute: AdminIndexRoute,
