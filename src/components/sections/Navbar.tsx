@@ -36,7 +36,7 @@ export function Navbar({ dark = false }: { dark?: boolean }) {
         "fixed top-0 left-0 right-0 z-50 transition-all duration-300 px-6 py-4",
         isScrolled 
           ? "bg-brand-dark/95 backdrop-blur-md border-b border-white/10 py-3 shadow-xl" 
-          : dark ? "bg-brand-dark border-b border-white/5" : "bg-gradient-to-r from-brand-orange/10 via-brand-orange/5 to-transparent backdrop-blur-sm"
+          : dark ? "bg-brand-dark border-b border-white/5" : "bg-gradient-to-r from-brand-orange/50 via-brand-orange/20 to-transparent backdrop-blur-sm"
       )}
     >
       <div className="max-w-7xl mx-auto flex items-center justify-between">
