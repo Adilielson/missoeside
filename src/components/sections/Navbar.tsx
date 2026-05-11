@@ -8,7 +8,7 @@ import { Link } from "@tanstack/react-router";
 
 const menuItems = [
   { name: "Início", href: "/" },
-  { name: "Sobre", href: "#sobre" },
+  { name: "Sobre", href: "/sobre" },
   { name: "Projetos", href: "/nossos-projetos" },
   { name: "Eventos", href: "/eventos" },
   { name: "Blog", href: "/blog" },
