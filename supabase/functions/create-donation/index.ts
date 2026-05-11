@@ -173,7 +173,8 @@ Deno.serve(async (req) => {
     const payment = await payRes.json();
     if (!payRes.ok) {
       console.error("Erro ao criar pagamento/assinatura no Asaas:", payment);
-      return new Response(JSON.stringify({ error: "Erro ao criar pagamento no Asaas", details: payment }), {
+      const errorMsg = payment.errors?.[0]?.description || "Erro ao criar pagamento no Asaas";
+      return new Response(JSON.stringify({ error: errorMsg, details: payment }), {
         status: 400,
         headers: { ...corsHeaders, "Content-Type": "application/json" },
       });
