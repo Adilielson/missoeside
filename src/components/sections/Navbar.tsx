@@ -10,9 +10,8 @@ const menuItems = [
   { name: "Início", href: "/" },
   { name: "Sobre", href: "#sobre" },
   { name: "Projetos", href: "/nossos-projetos" },
-  { name: "Doações", href: "/nossos-projetos" },
-  { name: "Eventos", href: "#eventos" },
-  { name: "Blog", href: "#blog" },
+  { name: "Eventos", href: "/eventos" },
+  { name: "Blog", href: "/blog" },
   { name: "Contato", href: "#contato" },
 ];
 
