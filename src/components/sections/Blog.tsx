@@ -2,33 +2,26 @@ import { motion } from "framer-motion";
 import { ArrowRight, ArrowLeft, Calendar } from "lucide-react";
 import { SectionTag } from "../SectionTag";
 import { Button } from "@/components/ui/button";
+import { useQuery } from "@tanstack/react-query";
+import { supabase } from "@/integrations/supabase/client";
+import { format } from "date-fns";
+import { ptBR } from "date-fns/locale";
+import { Link } from "@tanstack/react-router";
 
-const posts = [
-  {
-    title: "5 Maneiras de Apoiar Missões Sem Sair de Casa",
-    author: "Ricardo Santos",
-    category: "Engajamento",
-    date: "10",
-    month: "ABR",
-    image: "https://images.unsplash.com/photo-1516627145497-ae6968895b74?q=80&w=2040&auto=format&fit=crop",
-  },
-  {
-    title: "O Impacto da Educação no Futuro das Nações",
-    author: "Ana Oliveira",
-    category: "Educação",
-    date: "15",
-    month: "MAR",
-    image: "https://images.unsplash.com/photo-1503676260728-1c00da094a0b?q=80&w=2022&auto=format&fit=crop",
-  },
-  {
-    title: "Relato de Campo: 30 Dias Servindo na Amazônia",
-    author: "Marcos Lima",
-    category: "Campo",
-    date: "02",
-    month: "FEV",
-    image: "https://images.unsplash.com/photo-1441974231531-c6227db76b6e?q=80&w=2071&auto=format&fit=crop",
-  },
-];
+const fetchPosts = async () => {
+  const { data, error } = await supabase
+    .from("posts")
+    .select(`
+      *,
+      author:profiles(full_name)
+    `)
+    .eq("status", "PUBLISHED")
+    .order("published_at", { ascending: false })
+    .limit(3);
+  
+  if (error) throw error;
+  return data;
+};
 
 export function Blog() {
   return (
