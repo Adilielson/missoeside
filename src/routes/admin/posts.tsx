@@ -391,12 +391,15 @@ function PostsPage() {
               </div>
 
               <div className="space-y-2">
-                <Label className="text-xs font-bold text-white/50 tracking-widest uppercase">Conteúdo</Label>
+                <div className="flex items-center justify-between">
+                  <Label className="text-xs font-bold text-white/50 tracking-widest uppercase">Conteúdo</Label>
+                  <span className="text-[10px] text-white/30 uppercase font-bold tracking-widest">Aceita Markdown</span>
+                </div>
                 <Textarea 
                   value={formData.content || ""} 
                   onChange={e => setFormData({...formData, content: e.target.value})}
-                  placeholder="O texto completo do artigo (aceita HTML básico ou Markdown)..."
-                  className="bg-white/5 border-white/10 resize-none h-64"
+                  placeholder="Escreva seu artigo aqui... Use Markdown para formatação (ex: # Título, **Negrito**)"
+                  className="bg-white/5 border-white/10 resize-none h-[400px] font-sans leading-relaxed p-6"
                 />
               </div>
             </div>
