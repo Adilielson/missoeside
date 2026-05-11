@@ -164,6 +164,9 @@ function DoarPage() {
       }
     } catch (e: any) {
       toast.error(e.message || "Erro ao processar doação.");
+    } finally {
+      setLoading(false);
+    }
   }
 
   async function checkDonationStatus(id: string) {
@@ -427,7 +430,14 @@ function DoarPage() {
                   variant="outline"
                   className="w-full mt-2 border-brand-orange text-brand-orange hover:bg-brand-orange/5"
                 >
-                  Já paguei / Ver confirmação
+                  {checkingStatus ? (
+                    <span className="flex items-center gap-2">
+                      <Loader2 className="w-4 h-4 animate-spin" />
+                      Aguardando confirmação...
+                    </span>
+                  ) : (
+                    "Já paguei / Ver confirmação"
+                  )}
                 </Button>
               </>
             )}
