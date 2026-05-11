@@ -19,6 +19,7 @@ import { Route as AdminRouteImport } from './routes/admin'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as AdminIndexRouteImport } from './routes/admin/index'
 import { Route as ProjetoSlugRouteImport } from './routes/projeto.$slug'
+import { Route as EventoSlugRouteImport } from './routes/evento.$slug'
 import { Route as AdminUsersRouteImport } from './routes/admin/users'
 import { Route as AdminProjectsRouteImport } from './routes/admin/projects'
 import { Route as AdminPostsRouteImport } from './routes/admin/posts'
@@ -75,6 +76,11 @@ const ProjetoSlugRoute = ProjetoSlugRouteImport.update({
   path: '/projeto/$slug',
   getParentRoute: () => rootRouteImport,
 } as any)
+const EventoSlugRoute = EventoSlugRouteImport.update({
+  id: '/evento/$slug',
+  path: '/evento/$slug',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const AdminUsersRoute = AdminUsersRouteImport.update({
   id: '/users',
   path: '/users',
@@ -115,6 +121,7 @@ export interface FileRoutesByFullPath {
   '/admin/posts': typeof AdminPostsRoute
   '/admin/projects': typeof AdminProjectsRoute
   '/admin/users': typeof AdminUsersRoute
+  '/evento/$slug': typeof EventoSlugRoute
   '/projeto/$slug': typeof ProjetoSlugRoute
   '/admin/': typeof AdminIndexRoute
 }
@@ -131,6 +138,7 @@ export interface FileRoutesByTo {
   '/admin/posts': typeof AdminPostsRoute
   '/admin/projects': typeof AdminProjectsRoute
   '/admin/users': typeof AdminUsersRoute
+  '/evento/$slug': typeof EventoSlugRoute
   '/projeto/$slug': typeof ProjetoSlugRoute
   '/admin': typeof AdminIndexRoute
 }
@@ -149,6 +157,7 @@ export interface FileRoutesById {
   '/admin/posts': typeof AdminPostsRoute
   '/admin/projects': typeof AdminProjectsRoute
   '/admin/users': typeof AdminUsersRoute
+  '/evento/$slug': typeof EventoSlugRoute
   '/projeto/$slug': typeof ProjetoSlugRoute
   '/admin/': typeof AdminIndexRoute
 }
@@ -168,6 +177,7 @@ export interface FileRouteTypes {
     | '/admin/posts'
     | '/admin/projects'
     | '/admin/users'
+    | '/evento/$slug'
     | '/projeto/$slug'
     | '/admin/'
   fileRoutesByTo: FileRoutesByTo
@@ -184,6 +194,7 @@ export interface FileRouteTypes {
     | '/admin/posts'
     | '/admin/projects'
     | '/admin/users'
+    | '/evento/$slug'
     | '/projeto/$slug'
     | '/admin'
   id:
@@ -201,6 +212,7 @@ export interface FileRouteTypes {
     | '/admin/posts'
     | '/admin/projects'
     | '/admin/users'
+    | '/evento/$slug'
     | '/projeto/$slug'
     | '/admin/'
   fileRoutesById: FileRoutesById
@@ -214,6 +226,7 @@ export interface RootRouteChildren {
   NossosProjetosRoute: typeof NossosProjetosRoute
   ObrigadoRoute: typeof ObrigadoRoute
   SuperadminRoute: typeof SuperadminRoute
+  EventoSlugRoute: typeof EventoSlugRoute
   ProjetoSlugRoute: typeof ProjetoSlugRoute
 }
 
@@ -289,6 +302,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ProjetoSlugRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/evento/$slug': {
+      id: '/evento/$slug'
+      path: '/evento/$slug'
+      fullPath: '/evento/$slug'
+      preLoaderRoute: typeof EventoSlugRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/admin/users': {
       id: '/admin/users'
       path: '/users'
@@ -356,6 +376,7 @@ const rootRouteChildren: RootRouteChildren = {
   NossosProjetosRoute: NossosProjetosRoute,
   ObrigadoRoute: ObrigadoRoute,
   SuperadminRoute: SuperadminRoute,
+  EventoSlugRoute: EventoSlugRoute,
   ProjetoSlugRoute: ProjetoSlugRoute,
 }
 export const routeTree = rootRouteImport
