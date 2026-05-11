@@ -98,8 +98,12 @@ function PostsPage() {
 
   function handleOpenForm(post?: Post) {
     if (post) {
+      console.log("Opening form for editing post:", post);
       setEditingPost(post);
-      setFormData(post);
+      setFormData({
+        ...post,
+        content: post.content || ""
+      });
     } else {
       setEditingPost(null);
       setFormData({
