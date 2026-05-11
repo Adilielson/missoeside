@@ -61,8 +61,8 @@ function DoarPage() {
   const [cardCvv, setCardCvv] = useState("");
 
   // result modals
-  const [pixData, setPixData] = useState<{ qr: string | null; payload: string | null } | null>(null);
-  const [copied, setCopied] = useState(false);
+  const [pixData, setPixData] = useState<{ qr: string | null; payload: string | null; donationId?: string } | null>(null);
+  const [checkingStatus, setCheckingStatus] = useState(false);
 
   useEffect(() => {
     (async () => {
@@ -139,7 +139,12 @@ function DoarPage() {
       toast.success("Doação registrada! Obrigado 💛");
 
       if (method === "PIX") {
-        setPixData({ qr: data.pix_qrcode, payload: data.pix_payload });
+        setPixData({ 
+          qr: data.pix_qrcode, 
+          payload: data.pix_payload, 
+          donationId: data.donation?.id 
+        });
+        setCheckingStatus(true);
       } else if (method === "BOLETO" && data.boleto_url) {
         window.open(data.boleto_url, "_blank");
         navigate({ 
@@ -147,18 +152,61 @@ function DoarPage() {
           search: { name: name, project: projectData?.name || "IDE Missões" } 
         });
       } else if (method === "CREDIT_CARD") {
-        toast.success("Pagamento processado com sucesso!");
-        navigate({ 
-          to: "/obrigado", 
-          search: { name: name, project: projectData?.name || "IDE Missões" } 
-        });
+        // Para cartão, o create-donation já retorna se foi autorizado ou não (o Asaas processa síncrono)
+        // Mas vamos fazer um pequeno polling caso o status demore a refletir no banco
+        setCheckingStatus(true);
+        const donationId = data.donation?.id;
+        if (donationId) {
+          toast.info("Processando pagamento...");
+          // Iniciar polling curto para cartão
+          checkDonationStatus(donationId);
+        }
       }
     } catch (e: any) {
       toast.error(e.message || "Erro ao processar doação.");
-    } finally {
-      setLoading(false);
-    }
   }
+
+  async function checkDonationStatus(id: string) {
+    const interval = setInterval(async () => {
+      try {
+        const { data, error } = await supabase
+          .from("donations")
+          .select("status")
+          .eq("id", id)
+          .single();
+
+        if (error) throw error;
+
+        if (data?.status === "CONFIRMED" || data?.status === "RECEIVED") {
+          clearInterval(interval);
+          setCheckingStatus(false);
+          setPixData(null);
+          toast.success("Pagamento confirmado! Redirecionando...");
+          navigate({ 
+            to: "/obrigado", 
+            search: { name, project: projectData?.name || "IDE Missões" } 
+          });
+        }
+      } catch (err) {
+        console.error("Erro ao checar status:", err);
+      }
+    }, 4000);
+
+    // Limite de 10 minutos para o polling
+    setTimeout(() => {
+      clearInterval(interval);
+      setCheckingStatus(false);
+    }, 600000);
+
+    return () => clearInterval(interval);
+  }
+
+  useEffect(() => {
+    if (pixData?.donationId) {
+      checkDonationStatus(pixData.donationId);
+    }
+  }, [pixData?.donationId]);
+
 
   function copyPix() {
     if (pixData?.payload) {
