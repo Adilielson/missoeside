@@ -417,6 +417,63 @@ export type Database = {
         }
         Relationships: []
       }
+      team_members: {
+        Row: {
+          area: string
+          created_at: string
+          display_order: number
+          featured: boolean
+          full_bio: string | null
+          id: string
+          image_url: string | null
+          instagram_url: string | null
+          linkedin_url: string | null
+          name: string
+          role: string
+          short_bio: string | null
+          slug: string
+          specialties: string[]
+          status: string
+          updated_at: string
+        }
+        Insert: {
+          area: string
+          created_at?: string
+          display_order?: number
+          featured?: boolean
+          full_bio?: string | null
+          id?: string
+          image_url?: string | null
+          instagram_url?: string | null
+          linkedin_url?: string | null
+          name: string
+          role: string
+          short_bio?: string | null
+          slug: string
+          specialties?: string[]
+          status?: string
+          updated_at?: string
+        }
+        Update: {
+          area?: string
+          created_at?: string
+          display_order?: number
+          featured?: boolean
+          full_bio?: string | null
+          id?: string
+          image_url?: string | null
+          instagram_url?: string | null
+          linkedin_url?: string | null
+          name?: string
+          role?: string
+          short_bio?: string | null
+          slug?: string
+          specialties?: string[]
+          status?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never

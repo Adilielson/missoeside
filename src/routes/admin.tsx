@@ -10,7 +10,8 @@ import {
   Shield,
   Loader2,
   Calendar,
-  FileText
+  FileText,
+  UserCircle
 } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { cn } from "@/lib/utils";
@@ -91,6 +92,7 @@ function AdminLayout() {
     { label: "Projetos / Missões", icon: Briefcase, path: "/admin/projects" },
     { label: "Eventos", icon: Calendar, path: "/admin/events" },
     { label: "Blog", icon: FileText, path: "/admin/posts" },
+    { label: "Equipe", icon: UserCircle, path: "/admin/team" },
     { label: "Usuários", icon: Users, path: "/admin/users" },
   ];
 
