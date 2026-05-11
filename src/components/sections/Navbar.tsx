@@ -69,7 +69,7 @@ export function Navbar({ dark = false }: { dark?: boolean }) {
         <div className="flex items-center gap-4">
           <button className={cn(
             "hidden sm:flex p-2 transition-colors",
-            isScrolled || dark ? "text-white/80 hover:text-brand-orange" : "text-brand-dark hover:text-brand-orange"
+            isScrolled || dark ? "text-white hover:text-brand-orange" : "text-brand-dark hover:text-brand-orange"
           )}>
             <Search className="w-5 h-5" />
           </button>
