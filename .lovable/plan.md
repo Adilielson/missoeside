@@ -1,24 +1,24 @@
-### Objetivo
-Transformar a página de checkout em uma experiência dinâmica vinculada a um projeto específico, permitindo que os doadores vejam os detalhes do projeto que estão apoiando e garantindo que o sistema registre para onde a verba será destinada.
+Para garantir que o doador só seja redirecionado após a confirmação do pagamento, especialmente no PIX e Cartão de Crédito, vamos implementar as seguintes melhorias:
 
-### O que será feito:
+### 1. Novo Webhook para Confirmação Real
+Como estamos usando o Sandbox do Asaas, o sistema precisa de um "recebedor" de notificações para saber quando o pagamento foi confirmado de fato no Asaas.
+- Criar a Edge Function `asaas-webhook` para processar eventos como `PAYMENT_RECEIVED` e `PAYMENT_CONFIRMED`.
+- Ao receber a confirmação, o status da doação no banco de dados será atualizado de `PENDING` para `CONFIRMED`.
 
-**1. Alteração no Link de Apoio**
-- No card do projeto e na página de detalhes do projeto, o botão "Apoiar agora" deixará de ser um simples alerta ou link genérico e passará a redirecionar para `/doar?project={slug}`.
+### 2. Polling de Status no Frontend
+No PIX e Cartão, o usuário fica em uma tela de espera.
+- Implementar uma lógica de "busca automática" (polling) na página de doação.
+- O frontend perguntará ao banco de dados a cada 3-5 segundos: "Esta doação já foi confirmada?".
+- Assim que o status mudar para `CONFIRMED` (via webhook), o sistema redireciona automaticamente para a página de obrigado.
 
-**2. Dinamismo na Página de Checkout (`/doar`)**
-- A página irá capturar o `slug` do projeto via URL.
-- Se houver um projeto selecionado, os dados (imagem, nome e descrição curta) serão exibidos no lado direito da tela, substituindo o conteúdo estático atual.
-- Se não houver projeto na URL, a página manterá o comportamento padrão (doação geral).
+### 3. Simulação no Sandbox
+Para testar no Sandbox do Asaas:
+- No caso do Cartão, o Asaas costuma confirmar quase instantaneamente se os dados forem válidos.
+- No caso do PIX, você pode usar o simulador do Asaas ou simplesmente atualizar o status manualmente no banco de dados para testar o redirecionamento automático que vamos criar.
 
-**3. Persistência do Vínculo**
-- Ao finalizar a doação, o `slug` ou `id` do projeto será enviado para a Edge Function `create-donation`.
-- Esse valor será salvo no campo `campaign` da tabela `donations`, permitindo que você saiba exatamente para qual projeto cada doação foi destinada no seu painel.
+### Detalhes Técnicos
+- Criação da tabela de logs de webhook (opcional, para depuração).
+- Atualização da função `create-donation` para retornar o ID da doação criado para o frontend.
+- Modificação no `doar.tsx` para incluir o loop de verificação após gerar o PIX ou processar o Cartão.
 
-**4. Feedback visual pós-doação**
-- Adição de uma mensagem ou detalhe no checkout informando que a verba está sendo destinada ao projeto em questão.
-
-### Detalhes técnicos (para referência):
-- Uso de `useSearchParams` do TanStack Router para capturar o projeto.
-- Busca dinâmica no Supabase para carregar os dados do projeto no lado direito do checkout.
-- Atualização da chamada da função `create-donation` para incluir o campo `campaign`.
+Deseja que eu comece criando o Webhook e a lógica de verificação?
