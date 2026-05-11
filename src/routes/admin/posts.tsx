@@ -452,7 +452,6 @@ function PostsPage() {
                       </span>
                     )}
                   </div>
-                  </div>
                 </div>
                 <Textarea 
                   value={formData.content || ""} 
