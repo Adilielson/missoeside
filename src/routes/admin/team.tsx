@@ -5,8 +5,10 @@ import {
   Search,
   Edit2,
   Trash2,
-  CheckCircle2,
-  XCircle,
+  Eye, 
+  CheckCircle2, 
+  XCircle, 
+  Upload,
   Loader2,
   Image as ImageIcon,
 } from "lucide-react";
