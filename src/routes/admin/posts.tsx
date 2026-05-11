@@ -122,6 +122,7 @@ function PostsPage() {
 
   async function handleSave(e: React.FormEvent) {
     e.preventDefault();
+    console.log("HandleSave triggered. Current content in formData:", formData.content);
     setSaving(true);
     try {
       if (!formData.title || !formData.slug) {
@@ -137,17 +138,24 @@ function PostsPage() {
         tags: formData.tags || [],
         status: formData.status,
         cover_image: formData.cover_image,
-        published_at: formData.status === "PUBLISHED" ? new Date().toISOString() : (editingPost?.published_at || null),
+        updated_at: new Date().toISOString(),
       };
+
+      console.log("Saving post ID:", editingPost?.id);
+      console.log("Payload content length:", payload.content?.length);
 
       if (editingPost) {
         const { data, error } = await supabase
           .from("posts")
           .update(payload)
-          .eq("id", editingPost.id)
+          .match({ id: editingPost.id })
           .select();
         
-        if (error) throw error;
+        if (error) {
+          console.error("Supabase Update Error:", error);
+          throw error;
+        }
+        console.log("Update success, returned data:", data);
         toast.success("Post atualizado com sucesso!");
       } else {
         const { data: { user } } = await supabase.auth.getUser();
@@ -159,8 +167,9 @@ function PostsPage() {
         if (error) throw error;
         toast.success("Post criado com sucesso!");
       }
-      setIsFormOpen(false);
       await fetchPosts();
+      setIsFormOpen(false);
+      setEditingPost(null);
     } catch (error: any) {
       toast.error("Erro ao salvar: " + error.message);
     } finally {
@@ -335,6 +344,7 @@ function PostsPage() {
                         variant="ghost" 
                         size="icon" 
                         onClick={() => handleOpenForm(p)}
+                        id={`edit-post-${p.id}`}
                         className="text-white/40 hover:text-white hover:bg-white/5"
                       >
                         <Edit2 className="w-4 h-4" />
@@ -416,7 +426,11 @@ function PostsPage() {
                 </div>
                 <Textarea 
                   value={formData.content || ""} 
-                  onChange={e => setFormData({...formData, content: e.target.value})}
+                  onChange={e => {
+                    const newContent = e.target.value;
+                    console.log("Textarea onChange. New length:", newContent.length);
+                    setFormData(prev => ({ ...prev, content: newContent }));
+                  }}
                   placeholder="Escreva seu artigo aqui... Use Markdown para formatação (ex: # Título, **Negrito**)"
                   className="bg-white/5 border-white/10 resize-none h-[400px] font-sans leading-relaxed p-6"
                 />
