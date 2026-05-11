@@ -374,6 +374,13 @@ function DoarPage() {
                   {copied ? <Check className="w-4 h-4" /> : <Copy className="w-4 h-4" />}
                   {copied ? "Copiado!" : "Copiar código PIX"}
                 </Button>
+                <Button 
+                  onClick={() => navigate({ to: "/obrigado", search: { name, project: projectData?.name || "IDE Missões" } })}
+                  variant="outline"
+                  className="w-full mt-2 border-brand-orange text-brand-orange hover:bg-brand-orange/5"
+                >
+                  Já paguei / Ver confirmação
+                </Button>
               </>
             )}
           </div>
