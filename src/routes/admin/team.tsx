@@ -187,6 +187,35 @@ function TeamAdminPage() {
     fetchMembers();
   }
 
+  async function handleUploadImage(e: React.ChangeEvent<HTMLInputElement>) {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    setUploading(true);
+    try {
+      const fileExt = file.name.split(".").pop();
+      const fileName = `${Math.random()}.${fileExt}`;
+      const filePath = `${fileName}`;
+
+      const { error: uploadError } = await supabase.storage
+        .from("team-members")
+        .upload(filePath, file);
+
+      if (uploadError) throw uploadError;
+
+      const { data: { publicUrl } } = supabase.storage
+        .from("team-members")
+        .getPublicUrl(filePath);
+
+      setFormData(prev => ({ ...prev, image_url: publicUrl }));
+      toast.success("Foto enviada com sucesso!");
+    } catch (error: any) {
+      toast.error("Erro no upload: " + error.message);
+    } finally {
+      setUploading(false);
+    }
+  }
+
   const filtered = members.filter(
     (m) =>
       m.name.toLowerCase().includes(search.toLowerCase()) ||
