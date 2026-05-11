@@ -8,7 +8,9 @@ import {
   Menu, 
   X,
   Shield,
-  Loader2
+  Loader2,
+  Calendar,
+  FileText
 } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { cn } from "@/lib/utils";
@@ -87,6 +89,8 @@ function AdminLayout() {
   const menuItems = [
     { label: "Dashboard", icon: LayoutDashboard, path: "/admin" },
     { label: "Projetos / Missões", icon: Briefcase, path: "/admin/projects" },
+    { label: "Eventos", icon: Calendar, path: "/admin/events" },
+    { label: "Blog", icon: FileText, path: "/admin/posts" },
     { label: "Usuários", icon: Users, path: "/admin/users" },
   ];
 
