@@ -1,5 +1,5 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { 
   Plus, 
   Search, 
@@ -63,6 +63,8 @@ function PostsPage() {
   const [editingPost, setEditingPost] = useState<Post | null>(null);
   const [saving, setSaving] = useState(false);
   const [uploading, setUploading] = useState(false);
+  const [isAutoSaving, setIsAutoSaving] = useState(false);
+  const autoSaveTimerRef = useRef<NodeJS.Timeout | null>(null);
 
   const [formData, setFormData] = useState<Partial<Post>>({
     title: "",
@@ -174,6 +176,28 @@ function PostsPage() {
       toast.error("Erro ao salvar: " + error.message);
     } finally {
       setSaving(false);
+    }
+  }
+
+  async function handleAutoSave(content: string) {
+    if (!editingPost || !content || content === editingPost.content) return;
+    
+    setIsAutoSaving(true);
+    try {
+      const { error } = await supabase
+        .from("posts")
+        .update({ 
+          content,
+          updated_at: new Date().toISOString()
+        })
+        .eq("id", editingPost.id);
+      
+      if (error) throw error;
+      console.log("Auto-save successful");
+    } catch (error) {
+      console.error("Auto-save failed:", error);
+    } finally {
+      setTimeout(() => setIsAutoSaving(false), 1000);
     }
   }
 
@@ -422,14 +446,26 @@ function PostsPage() {
                       <ImageIcon className="w-3 h-3 mr-1" /> Inserir Imagem
                     </Button>
                     <span className="text-[10px] text-white/30 uppercase font-bold tracking-widest self-center">Aceita Markdown</span>
+                    {isAutoSaving && (
+                      <span className="text-[10px] text-brand-orange uppercase font-bold tracking-widest self-center animate-pulse flex items-center gap-1">
+                        <Loader2 className="w-2 h-2 animate-spin" /> Salvando...
+                      </span>
+                    )}
                   </div>
                 </div>
                 <Textarea 
                   value={formData.content || ""} 
                   onChange={e => {
                     const newContent = e.target.value;
-                    console.log("Textarea onChange. New length:", newContent.length);
                     setFormData(prev => ({ ...prev, content: newContent }));
+                    
+                    // Auto-save logic
+                    if (editingPost) {
+                      if (autoSaveTimerRef.current) clearTimeout(autoSaveTimerRef.current);
+                      autoSaveTimerRef.current = setTimeout(() => {
+                        handleAutoSave(newContent);
+                      }, 2000); // Auto-save after 2 seconds of inactivity
+                    }
                   }}
                   placeholder="Escreva seu artigo aqui... Use Markdown para formatação (ex: # Título, **Negrito**)"
                   className="bg-white/5 border-white/10 resize-none h-[400px] font-sans leading-relaxed p-6"
