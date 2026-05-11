@@ -109,7 +109,8 @@ Deno.serve(async (req) => {
       const customer = await customerRes.json();
       if (!customerRes.ok) {
         console.error("Erro ao criar cliente Asaas:", customer);
-        return new Response(JSON.stringify({ error: "Erro ao criar cliente Asaas", details: customer }), {
+        const errorMsg = customer.errors?.[0]?.description || "Erro ao criar cliente Asaas";
+        return new Response(JSON.stringify({ error: errorMsg, details: customer }), {
           status: 400,
           headers: { ...corsHeaders, "Content-Type": "application/json" },
         });
