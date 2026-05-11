@@ -2,6 +2,7 @@ import { motion } from "framer-motion";
 import { Heart, Phone, Users, CheckCircle } from "lucide-react";
 import { SectionTag } from "../SectionTag";
 import { Button } from "@/components/ui/button";
+import { Link } from "@tanstack/react-router";
 
 export function About() {
   return (
