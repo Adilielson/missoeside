@@ -50,8 +50,8 @@ export function Navbar({ dark = false }: { dark?: boolean }) {
                 to={item.href.startsWith("/") ? item.href : undefined}
                 hash={!item.href.startsWith("/") ? item.href.replace("#", "") : undefined}
                 className={cn(
-                  "text-sm font-medium transition-colors flex items-center gap-1",
-                  isScrolled || dark ? "text-white/90 hover:text-brand-orange" : "text-brand-dark hover:text-brand-orange"
+                  "text-sm font-semibold transition-colors flex items-center gap-1",
+                  isScrolled || dark ? "text-white hover:text-brand-orange" : "text-brand-dark hover:text-brand-orange"
                 )}
               >
                 {item.name}
