@@ -127,16 +127,14 @@ function PostsPage() {
       const payload = {
         title: formData.title,
         slug: formData.slug,
-        excerpt: formData.excerpt || null,
-        content: formData.content || null,
-        category: formData.category || null,
+        excerpt: formData.excerpt,
+        content: formData.content,
+        category: formData.category,
         tags: formData.tags || [],
         status: formData.status,
-        cover_image: formData.cover_image || null,
-        published_at: formData.status === "PUBLISHED" ? new Date().toISOString() : null,
+        cover_image: formData.cover_image,
+        published_at: formData.status === "PUBLISHED" ? new Date().toISOString() : (editingPost?.published_at || null),
       };
-
-      console.log("Saving payload:", payload);
 
       if (editingPost) {
         const { data, error } = await supabase
@@ -146,7 +144,6 @@ function PostsPage() {
           .select();
         
         if (error) throw error;
-        console.log("Updated data:", data);
         toast.success("Post atualizado com sucesso!");
       } else {
         const { data: { user } } = await supabase.auth.getUser();
@@ -156,11 +153,10 @@ function PostsPage() {
           .select();
           
         if (error) throw error;
-        console.log("Inserted data:", data);
         toast.success("Post criado com sucesso!");
       }
       setIsFormOpen(false);
-      fetchPosts();
+      await fetchPosts();
     } catch (error: any) {
       toast.error("Erro ao salvar: " + error.message);
     } finally {
