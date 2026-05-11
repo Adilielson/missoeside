@@ -136,19 +136,27 @@ function PostsPage() {
         published_at: formData.status === "PUBLISHED" ? new Date().toISOString() : null,
       };
 
+      console.log("Saving payload:", payload);
+
       if (editingPost) {
-        const { error } = await supabase
+        const { data, error } = await supabase
           .from("posts")
-          .update(payload as any)
-          .eq("id", editingPost.id);
+          .update(payload)
+          .eq("id", editingPost.id)
+          .select();
+        
         if (error) throw error;
+        console.log("Updated data:", data);
         toast.success("Post atualizado com sucesso!");
       } else {
         const { data: { user } } = await supabase.auth.getUser();
-        const { error } = await supabase
+        const { data, error } = await supabase
           .from("posts")
-          .insert([{ ...payload, author_id: user?.id } as any]);
+          .insert([{ ...payload, author_id: user?.id }])
+          .select();
+          
         if (error) throw error;
+        console.log("Inserted data:", data);
         toast.success("Post criado com sucesso!");
       }
       setIsFormOpen(false);
