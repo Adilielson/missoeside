@@ -419,6 +419,9 @@ function DoarPage() {
             )}
             {pixData?.payload && (
               <>
+                <p className="text-[10px] text-amber-600 bg-amber-50 px-2 py-1 rounded border border-amber-100 mb-1">
+                  Ambiente de Teste (Sandbox)
+                </p>
                 <p className="text-xs text-slate-500 break-all bg-slate-50 p-3 rounded font-mono">
                   {pixData.payload}
                 </p>
