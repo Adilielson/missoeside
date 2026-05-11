@@ -137,17 +137,24 @@ function PostsPage() {
         tags: formData.tags || [],
         status: formData.status,
         cover_image: formData.cover_image,
-        published_at: formData.status === "PUBLISHED" ? new Date().toISOString() : (editingPost?.published_at || null),
+        updated_at: new Date().toISOString(),
       };
+
+      console.log("Saving post ID:", editingPost?.id);
+      console.log("Payload content length:", payload.content?.length);
 
       if (editingPost) {
         const { data, error } = await supabase
           .from("posts")
           .update(payload)
-          .eq("id", editingPost.id)
+          .match({ id: editingPost.id })
           .select();
         
-        if (error) throw error;
+        if (error) {
+          console.error("Supabase Update Error:", error);
+          throw error;
+        }
+        console.log("Update success, returned data:", data);
         toast.success("Post atualizado com sucesso!");
       } else {
         const { data: { user } } = await supabase.auth.getUser();
