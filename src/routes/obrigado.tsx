@@ -38,7 +38,7 @@ function ObrigadoPage() {
           </div>
 
           <h1 className="text-3xl sm:text-4xl font-black text-white leading-tight">
-            Obrigado {nome}, o {projeto} agradece sua doação.
+            Obrigado {nome}, o IDE Missões agradece sua doação.
           </h1>
 
           <div className="space-y-4">
