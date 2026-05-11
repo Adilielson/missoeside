@@ -2,42 +2,23 @@ import { motion } from "framer-motion";
 import { MapPin, Calendar, ArrowRight } from "lucide-react";
 import { SectionTag } from "../SectionTag";
 import { Button } from "@/components/ui/button";
-import cultoMissoes from "@/assets/culto-missoes.png";
+import { useQuery } from "@tanstack/react-query";
+import { supabase } from "@/integrations/supabase/client";
+import { format } from "date-fns";
+import { ptBR } from "date-fns/locale";
+import { Link } from "@tanstack/react-router";
 
-const events = [
-  {
-    day: "21",
-    month: "SET",
-    title: "Culto de Missões",
-    desc: "Um encontro focado em estratégias para o evangelismo em grandes centros.",
-    location: "Templo Sede, São Mateus ES",
-    image: cultoMissoes,
-  },
-  {
-    day: "05",
-    month: "JUN",
-    title: "Treinamento Transcultural",
-    desc: "Capacitação intensiva para quem deseja servir em outros países e culturas.",
-    location: "Base IDE, Rio de Janeiro",
-    image: "https://images.unsplash.com/photo-1524178232363-1fb2b075b655?q=80&w=2070&auto=format&fit=crop",
-  },
-  {
-    day: "20",
-    month: "JUL",
-    title: "Noite de Adoração & Oração",
-    desc: "Momento de intercessão pelos campos e missionários ao redor do mundo.",
-    location: "Igreja Local, Curitiba",
-    image: "https://images.unsplash.com/photo-1438232992991-995b7058bbb3?q=80&w=2073&auto=format&fit=crop",
-  },
-  {
-    day: "15",
-    month: "AGO",
-    title: "Fórum de Sustentabilidade",
-    desc: "Discussão sobre projetos autossustentáveis em comunidades carentes.",
-    location: "Centro de Eventos, Salvador",
-    image: "https://images.unsplash.com/photo-1542601906990-b4d3fb778b09?q=80&w=2013&auto=format&fit=crop",
-  },
-];
+const fetchEvents = async () => {
+  const { data, error } = await supabase
+    .from("events")
+    .select("*")
+    .eq("status", "published")
+    .order("event_date", { ascending: true })
+    .limit(4);
+  
+  if (error) throw error;
+  return data;
+};
 
 export function Events() {
   return (
