@@ -2,8 +2,15 @@ import { createFileRoute, Link } from "@tanstack/react-router";
 import { Heart, Home, ArrowRight } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import logoIde from "@/assets/logo-ide.png";
+import { z } from "zod";
+
+const obrigadoSearchSchema = z.object({
+  name: z.string().optional(),
+  project: z.string().optional(),
+});
 
 export const Route = createFileRoute("/obrigado")({
+  validateSearch: (search) => obrigadoSearchSchema.parse(search),
   component: ObrigadoPage,
 });
 
