@@ -142,22 +142,22 @@ function EventsPage() {
       const payload = {
         title: formData.title,
         slug: formData.slug,
-        description: formData.description,
-        location: formData.location,
-        city: formData.city,
-        state: formData.state,
-        event_date: formData.event_date ? new Date(formData.event_date).toISOString() : null,
-        end_date: formData.end_date ? new Date(formData.end_date).toISOString() : null,
+        description: formData.description || null,
+        location: formData.location || null,
+        city: formData.city || null,
+        state: formData.state || null,
+        event_date: formData.event_date ? new Date(formData.event_date).toISOString() : undefined,
+        end_date: formData.end_date ? new Date(formData.end_date).toISOString() : undefined,
         status: formData.status,
-        max_attendees: formData.max_attendees,
-        registration_url: formData.registration_url,
-        cover_image: formData.cover_image,
+        max_attendees: formData.max_attendees || null,
+        registration_url: formData.registration_url || null,
+        cover_image: formData.cover_image || null,
       };
 
       if (editingEvent) {
         const { error } = await supabase
           .from("events")
-          .update(payload)
+          .update(payload as any)
           .eq("id", editingEvent.id);
         if (error) throw error;
         toast.success("Evento atualizado com sucesso!");
@@ -165,7 +165,7 @@ function EventsPage() {
         const { data: { user } } = await supabase.auth.getUser();
         const { error } = await supabase
           .from("events")
-          .insert([{ ...payload, author_id: user?.id }]);
+          .insert([{ ...payload, author_id: user?.id } as any]);
         if (error) throw error;
         toast.success("Evento criado com sucesso!");
       }
