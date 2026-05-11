@@ -393,13 +393,62 @@ function PostsPage() {
               <div className="space-y-2">
                 <div className="flex items-center justify-between">
                   <Label className="text-xs font-bold text-white/50 tracking-widest uppercase">Conteúdo</Label>
-                  <span className="text-[10px] text-white/30 uppercase font-bold tracking-widest">Aceita Markdown</span>
+                  <div className="flex gap-2">
+                    <Button 
+                      type="button"
+                      variant="outline" 
+                      size="sm" 
+                      onClick={() => document.getElementById('content-image-upload')?.click()}
+                      className="h-7 text-[10px] bg-white/5 border-white/10 hover:bg-white/10"
+                    >
+                      <ImageIcon className="w-3 h-3 mr-1" /> Inserir Imagem
+                    </Button>
+                    <span className="text-[10px] text-white/30 uppercase font-bold tracking-widest self-center">Aceita Markdown</span>
+                  </div>
                 </div>
                 <Textarea 
                   value={formData.content || ""} 
                   onChange={e => setFormData({...formData, content: e.target.value})}
                   placeholder="Escreva seu artigo aqui... Use Markdown para formatação (ex: # Título, **Negrito**)"
                   className="bg-white/5 border-white/10 resize-none h-[400px] font-sans leading-relaxed p-6"
+                />
+                <input 
+                  id="content-image-upload"
+                  type="file" 
+                  accept="image/*" 
+                  onChange={async (e) => {
+                    const file = e.target.files?.[0];
+                    if (!file) return;
+                    
+                    toast.loading("Enviando imagem...");
+                    try {
+                      const fileExt = file.name.split(".").pop();
+                      const fileName = `${Math.random()}.${fileExt}`;
+                      const filePath = `post-content/${fileName}`;
+
+                      const { error: uploadError } = await supabase.storage
+                        .from("project-covers")
+                        .upload(filePath, file);
+
+                      if (uploadError) throw uploadError;
+
+                      const { data: { publicUrl } } = supabase.storage
+                        .from("project-covers")
+                        .getPublicUrl(filePath);
+
+                      const imageMarkdown = `\n![${file.name}](${publicUrl})\n`;
+                      setFormData(prev => ({ 
+                        ...prev, 
+                        content: (prev.content || "") + imageMarkdown 
+                      }));
+                      toast.dismiss();
+                      toast.success("Imagem inserida!");
+                    } catch (error: any) {
+                      toast.dismiss();
+                      toast.error("Erro no upload: " + error.message);
+                    }
+                  }}
+                  className="hidden"
                 />
               </div>
             </div>
