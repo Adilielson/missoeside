@@ -165,7 +165,7 @@ function EventosPage() {
                         asChild
                         className="w-full bg-brand-dark hover:bg-brand-dark/90 text-white border-none py-7 rounded-2xl font-black group/btn transition-all"
                       >
-                        <Link to="/eventos">
+                        <Link to="/evento/$slug" params={{ slug: event.slug }}>
                           Ver Detalhes
                           <ArrowRight className="w-5 h-5 ml-2 group-hover/btn:translate-x-1 transition-transform" />
                         </Link>

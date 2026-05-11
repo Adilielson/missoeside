@@ -121,7 +121,7 @@ function BlogPage() {
                   transition={{ delay: index * 0.1 }}
                   className="group"
                 >
-                  <Link to="/blog" className="block overflow-hidden rounded-[40px] mb-8 aspect-[16/9] bg-white shadow-xl relative">
+                  <Link to="/blog/$slug" params={{ slug: post.slug }} className="block overflow-hidden rounded-[40px] mb-8 aspect-[16/9] bg-white shadow-xl relative">
                     <img 
                       src={post.cover_image || ""} 
                       alt={post.title} 
@@ -145,14 +145,15 @@ function BlogPage() {
                     </div>
                     
                     <h3 className="text-3xl font-black text-brand-dark mb-4 group-hover:text-brand-orange transition-colors leading-tight">
-                      <Link to="/blog">{post.title}</Link>
+                      <Link to="/blog/$slug" params={{ slug: post.slug }}>{post.title}</Link>
                     </h3>
                     <p className="text-brand-dark/50 text-lg mb-8 line-clamp-3 leading-relaxed">
                       {post.excerpt}
                     </p>
                     
                     <Link 
-                      to="/blog"
+                      to="/blog/$slug"
+                      params={{ slug: post.slug }}
                       className="inline-flex items-center gap-2 text-brand-orange font-black uppercase tracking-widest group/link"
                     >
                       Ler Artigo Completo
