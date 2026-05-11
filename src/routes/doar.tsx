@@ -62,6 +62,7 @@ function DoarPage() {
 
   // result modals
   const [pixData, setPixData] = useState<{ qr: string | null; payload: string | null; donationId?: string } | null>(null);
+  const [copied, setCopied] = useState(false);
   const [checkingStatus, setCheckingStatus] = useState(false);
 
   useEffect(() => {
