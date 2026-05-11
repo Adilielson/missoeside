@@ -49,7 +49,10 @@ export function Navbar({ dark = false }: { dark?: boolean }) {
               <Link
                 to={item.href.startsWith("/") ? item.href : undefined}
                 hash={!item.href.startsWith("/") ? item.href.replace("#", "") : undefined}
-                className="text-white/90 hover:text-brand-orange text-sm font-medium transition-colors flex items-center gap-1"
+                className={cn(
+                  "text-sm font-medium transition-colors flex items-center gap-1",
+                  isScrolled || dark ? "text-white/90 hover:text-brand-orange" : "text-brand-dark hover:text-brand-orange"
+                )}
               >
                 {item.name}
                 {["Projetos", "Doações"].includes(item.name) && (
@@ -64,7 +67,10 @@ export function Navbar({ dark = false }: { dark?: boolean }) {
         </div>
 
         <div className="flex items-center gap-4">
-          <button className="hidden sm:flex p-2 text-white/80 hover:text-brand-orange transition-colors">
+          <button className={cn(
+            "hidden sm:flex p-2 transition-colors",
+            isScrolled || dark ? "text-white/80 hover:text-brand-orange" : "text-brand-dark hover:text-brand-orange"
+          )}>
             <Search className="w-5 h-5" />
           </button>
           
@@ -76,7 +82,10 @@ export function Navbar({ dark = false }: { dark?: boolean }) {
           </Button>
 
           <button 
-            className="lg:hidden p-2 text-white"
+            className={cn(
+              "lg:hidden p-2 transition-colors",
+              isScrolled || dark ? "text-white" : "text-brand-dark"
+            )}
             onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
           >
             {mobileMenuOpen ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}
