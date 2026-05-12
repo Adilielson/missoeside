@@ -520,15 +520,44 @@ function UsersPage() {
               />
             </div>
 
+            <div className="space-y-3">
+              <Label className="text-xs font-bold text-white/50 tracking-widest uppercase">Áreas Permitidas</Label>
+              <div className="grid grid-cols-1 gap-2 border border-white/5 p-3 rounded-xl bg-white/[0.02]">
+                {permissionOptions.map((opt) => (
+                  <label 
+                    key={opt.id}
+                    className="flex items-center gap-3 cursor-pointer py-1"
+                  >
+                    <input 
+                      type="checkbox"
+                      className="rounded border-white/10 bg-white/5 text-[#e8440c] focus:ring-[#e8440c]"
+                      checked={selectedPermissions.includes(opt.id)}
+                      onChange={() => togglePermission(opt.id)}
+                    />
+                    <span className="text-sm text-white/70">{opt.label}</span>
+                  </label>
+                ))}
+              </div>
+            </div>
+
             <div className="space-y-2">
-              <Label className="text-xs font-bold text-white/50 tracking-widest uppercase">Cargo</Label>
-              <Select value={newUserRole || "null"} onValueChange={(val) => setNewUserRole(val === "null" ? null : val as any)}>
+              <Label className="text-xs font-bold text-white/50 tracking-widest uppercase">Perfil Base</Label>
+              <Select 
+                value={newUserRole || "null"} 
+                onValueChange={(val) => {
+                  const role = val === "null" ? null : val as any;
+                  setNewUserRole(role);
+                  if (role === 'admin') {
+                    setSelectedPermissions(['projects', 'events', 'posts', 'team', 'users']);
+                  }
+                }}
+              >
                 <SelectTrigger className="bg-white/5 border-white/10">
-                  <SelectValue placeholder="Selecione um cargo" />
+                  <SelectValue placeholder="Selecione um perfil" />
                 </SelectTrigger>
                 <SelectContent className="bg-[#0a1628] border-white/10 text-white">
                   <SelectItem value="null">Usuário Comum</SelectItem>
-                  <SelectItem value="editor">Editor de Projetos</SelectItem>
+                  <SelectItem value="editor">Editor Personalizado</SelectItem>
                   <SelectItem value="admin">Administrador</SelectItem>
                 </SelectContent>
               </Select>
