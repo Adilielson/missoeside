@@ -6,7 +6,8 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { toast } from "sonner";
-import { Loader2, Lock } from "lucide-react";
+import { Loader2 } from "lucide-react";
+import { Logo } from "@/components/Logo";
 
 export const Route = createFileRoute("/admin/login")({
   component: AdminLoginPage,
@@ -89,9 +90,7 @@ function AdminLoginPage() {
       <Card className="w-full max-w-md bg-white/[0.03] border-white/10 backdrop-blur-xl relative">
         <CardHeader className="space-y-1 text-center">
           <div className="flex justify-center mb-4">
-            <div className="p-3 bg-[#e8440c]/20 rounded-2xl border border-[#e8440c]/30">
-              <Lock className="w-8 h-8 text-[#e8440c]" />
-            </div>
+            <Logo className="h-16 w-auto" />
           </div>
           <CardTitle className="text-3xl font-black text-white uppercase tracking-tight">Painel Admin</CardTitle>
           <CardDescription className="text-white/50">
