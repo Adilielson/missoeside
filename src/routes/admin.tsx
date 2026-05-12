@@ -81,7 +81,6 @@ function AdminLayout() {
         if (currentPath !== "/admin" && currentPath !== "/admin/login") {
           const currentItem = menuItems.find(item => item.path === currentPath);
           if (currentItem && currentItem.id !== 'dashboard' && !permissions.includes(currentItem.id)) {
-            console.log("Access denied to", currentPath, "redirecting...");
             if (availableItems.length > 0) {
               navigate({ to: availableItems[0].path as any });
             } else {
@@ -112,7 +111,6 @@ function AdminLayout() {
   }
 
   if (!authed && location.pathname !== "/admin/login") {
-    console.log("Not authed and not on login page, showing nothing (redirecting...)");
     return null; // Let useEffect handle redirect
   }
 
@@ -198,7 +196,7 @@ function AdminLayout() {
 
       {/* Main Content */}
       <main className="flex-1 min-h-screen overflow-y-auto">
-        <div className="max-w-7xl mx-auto p-4 sm:p-6 lg:p-8">
+        <div className="max-w-7xl mx-auto p-4 sm:p-6 lg:p-8 min-h-[500px]">
           <Outlet />
         </div>
       </main>
