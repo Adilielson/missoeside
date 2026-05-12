@@ -97,7 +97,7 @@ function AdminLayout() {
         // Se estiver em uma rota que não tem permissão, redireciona para a primeira permitida
         const currentPath = location.pathname;
         const availableItems = menuItems.filter(item => 
-          permissions.includes(item.id)
+          item.id === 'dashboard' || permissions.includes(item.id)
         );
 
         const normalizePath = (p: string) => p.replace(/\/$/, "");
@@ -109,21 +109,25 @@ function AdminLayout() {
           
           // Se estamos no /admin (dashboard) e ele não tem permissão de dashboard
           if (currentPathNormalized === "/admin" && !permissions.includes('dashboard')) {
-             if (availableItems.length > 0) {
-                navigate({ to: availableItems[0].path as any });
+             const firstRestrictedItem = menuItems.find(item => item.id !== 'dashboard' && permissions.includes(item.id));
+             if (firstRestrictedItem) {
+                navigate({ to: firstRestrictedItem.path as any });
                 return;
              }
           }
 
           // Se estamos em outra rota e ele não tem permissão
-          if (currentItem && !permissions.includes(currentItem.id)) {
-            if (availableItems.length > 0) {
-              navigate({ to: availableItems[0].path as any });
+          if (currentItem && currentItem.id !== 'dashboard' && !permissions.includes(currentItem.id)) {
+            const firstRestrictedItem = menuItems.find(item => item.id !== 'dashboard' && permissions.includes(item.id));
+            if (firstRestrictedItem) {
+              navigate({ to: firstRestrictedItem.path as any });
               return;
             } else {
-              // Se não tem nenhuma permissão (teoricamente impossível pelo check acima)
-              await supabase.auth.signOut();
-              return;
+              // Se não tem nenhuma permissão específica além de dashboard (teoricamente impossível pelo check acima)
+              if (!permissions.includes('dashboard')) {
+                await supabase.auth.signOut();
+                return;
+              }
             }
           }
         }
