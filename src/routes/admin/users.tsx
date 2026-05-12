@@ -52,6 +52,7 @@ type UserProfile = {
   email: string;
   full_name: string | null;
   role: "admin" | "editor" | null;
+  permissions: string[] | null;
   avatar_url: string | null;
   created_at: string;
 };
@@ -70,6 +71,15 @@ function UsersPage() {
   const [newUserPassword, setNewUserPassword] = useState("");
   const [newUserRole, setNewUserRole] = useState<"admin" | "editor" | null>("editor");
   const [currentUserRole, setCurrentUserRole] = useState<string | null>(null);
+  const [selectedPermissions, setSelectedPermissions] = useState<string[]>([]);
+  
+  const permissionOptions = [
+    { id: 'projects', label: 'Projetos / Missões' },
+    { id: 'events', label: 'Eventos' },
+    { id: 'posts', label: 'Blog' },
+    { id: 'team', label: 'Equipe' },
+    { id: 'users', label: 'Usuários' },
+  ];
 
   useEffect(() => {
     fetchUsers();
@@ -112,7 +122,16 @@ function UsersPage() {
     }
     setEditingUser(user);
     setIsEditOpen(true);
+    setSelectedPermissions(user.permissions || []);
   }
+
+  const togglePermission = (permissionId: string) => {
+    setSelectedPermissions(prev => 
+      prev.includes(permissionId) 
+        ? prev.filter(p => p !== permissionId) 
+        : [...prev, permissionId]
+    );
+  };
 
   async function handleUpdateRole(newRole: "admin" | "editor" | null) {
     if (!editingUser) return;
@@ -120,7 +139,10 @@ function UsersPage() {
     try {
       const { error } = await supabase
         .from("profiles")
-        .update({ role: newRole })
+        .update({ 
+          role: newRole,
+          permissions: selectedPermissions 
+        })
         .eq("id", editingUser.id);
 
       if (error) throw error;
@@ -166,7 +188,8 @@ function UsersPage() {
           .from("profiles")
           .update({ 
             role: newUserRole,
-            full_name: newUserFullName 
+            full_name: newUserFullName,
+            permissions: selectedPermissions
           })
           .eq("id", data.user.id);
           
@@ -340,7 +363,7 @@ function UsersPage() {
           </DialogHeader>
           
           {editingUser && (
-            <div className="space-y-6 py-4">
+            <div className="space-y-6 py-4 max-h-[70vh] overflow-y-auto pr-2">
               <div className="flex items-center gap-4 p-4 rounded-2xl bg-white/5 border border-white/5">
                 <div className="w-12 h-12 rounded-full bg-white/5 border border-white/10 flex items-center justify-center overflow-hidden">
                   {editingUser.avatar_url ? (
@@ -356,10 +379,14 @@ function UsersPage() {
               </div>
 
               <div className="space-y-3">
-                <Label className="text-xs font-bold text-white/50 tracking-widest uppercase px-1">Nível de Acesso</Label>
+                <Label className="text-xs font-bold text-white/50 tracking-widest uppercase px-1">Nível de Acesso (Perfil)</Label>
                 <div className="grid gap-2">
                   <button
-                    onClick={() => handleUpdateRole('admin')}
+                    type="button"
+                    onClick={() => {
+                      handleUpdateRole('admin');
+                      setSelectedPermissions(['projects', 'events', 'posts', 'team', 'users']);
+                    }}
                     disabled={saving}
                     className={cn(
                       "flex items-center justify-between p-4 rounded-xl border transition-all text-left",
@@ -372,13 +399,14 @@ function UsersPage() {
                       <Shield className={cn("w-5 h-5", editingUser.role === 'admin' ? "text-[#e8440c]" : "text-white/30")} />
                       <div>
                         <p className="font-bold text-sm text-white">Administrador</p>
-                        <p className="text-[11px] text-white/40">Acesso total a todas as áreas do sistema.</p>
+                        <p className="text-[11px] text-white/40">Acesso total a todas as áreas.</p>
                       </div>
                     </div>
                     {editingUser.role === 'admin' && <Check className="w-5 h-5 text-[#e8440c]" />}
                   </button>
 
                   <button
+                    type="button"
                     onClick={() => handleUpdateRole('editor')}
                     disabled={saving}
                     className={cn(
@@ -391,32 +419,46 @@ function UsersPage() {
                     <div className="flex items-center gap-3">
                       <ShieldAlert className={cn("w-5 h-5", editingUser.role === 'editor' ? "text-blue-400" : "text-white/30")} />
                       <div>
-                        <p className="font-bold text-sm text-white">Editor de Projetos</p>
-                        <p className="text-[11px] text-white/40">Pode gerenciar apenas os Projetos e Missões.</p>
+                        <p className="font-bold text-sm text-white">Editor Personalizado</p>
+                        <p className="text-[11px] text-white/40">Acesso às áreas selecionadas abaixo.</p>
                       </div>
                     </div>
                     {editingUser.role === 'editor' && <Check className="w-5 h-5 text-blue-400" />}
                   </button>
+                </div>
+              </div>
 
-                  <button
-                    onClick={() => handleUpdateRole(null)}
+              <div className="space-y-3">
+                <Label className="text-xs font-bold text-white/50 tracking-widest uppercase px-1">Áreas Permitidas</Label>
+                <div className="grid grid-cols-1 gap-2">
+                  {permissionOptions.map((opt) => (
+                    <label 
+                      key={opt.id}
+                      className={cn(
+                        "flex items-center gap-3 p-3 rounded-xl border transition-all cursor-pointer",
+                        selectedPermissions.includes(opt.id)
+                          ? "bg-white/10 border-white/20 text-white"
+                          : "bg-white/5 border-transparent text-white/40 hover:bg-white/10"
+                      )}
+                    >
+                      <input 
+                        type="checkbox"
+                        className="rounded border-white/10 bg-white/5 text-[#e8440c] focus:ring-[#e8440c]"
+                        checked={selectedPermissions.includes(opt.id)}
+                        onChange={() => togglePermission(opt.id)}
+                      />
+                      <span className="text-sm font-medium">{opt.label}</span>
+                    </label>
+                  ))}
+                </div>
+                <div className="mt-4 flex justify-end">
+                   <Button 
+                    onClick={() => handleUpdateRole(editingUser.role)}
                     disabled={saving}
-                    className={cn(
-                      "flex items-center justify-between p-4 rounded-xl border transition-all text-left",
-                      editingUser.role === null 
-                        ? "bg-white/10 border-white/30 text-white" 
-                        : "bg-white/5 border-white/5 text-white/60 hover:border-white/10"
-                    )}
+                    className="bg-[#e8440c] hover:bg-[#c93a09] font-bold w-full"
                   >
-                    <div className="flex items-center gap-3">
-                      <UserIcon className={cn("w-5 h-5", editingUser.role === null ? "text-white" : "text-white/30")} />
-                      <div>
-                        <p className="font-bold text-sm text-white">Usuário Comum</p>
-                        <p className="text-[11px] text-white/40">Sem acesso à área administrativa.</p>
-                      </div>
-                    </div>
-                    {editingUser.role === null && <Check className="w-5 h-5 text-white" />}
-                  </button>
+                    {saving ? <Loader2 className="w-4 h-4 animate-spin mr-2" /> : "Salvar Permissões"}
+                  </Button>
                 </div>
               </div>
             </div>
@@ -478,15 +520,44 @@ function UsersPage() {
               />
             </div>
 
+            <div className="space-y-3">
+              <Label className="text-xs font-bold text-white/50 tracking-widest uppercase">Áreas Permitidas</Label>
+              <div className="grid grid-cols-1 gap-2 border border-white/5 p-3 rounded-xl bg-white/[0.02]">
+                {permissionOptions.map((opt) => (
+                  <label 
+                    key={opt.id}
+                    className="flex items-center gap-3 cursor-pointer py-1"
+                  >
+                    <input 
+                      type="checkbox"
+                      className="rounded border-white/10 bg-white/5 text-[#e8440c] focus:ring-[#e8440c]"
+                      checked={selectedPermissions.includes(opt.id)}
+                      onChange={() => togglePermission(opt.id)}
+                    />
+                    <span className="text-sm text-white/70">{opt.label}</span>
+                  </label>
+                ))}
+              </div>
+            </div>
+
             <div className="space-y-2">
-              <Label className="text-xs font-bold text-white/50 tracking-widest uppercase">Cargo</Label>
-              <Select value={newUserRole || "null"} onValueChange={(val) => setNewUserRole(val === "null" ? null : val as any)}>
+              <Label className="text-xs font-bold text-white/50 tracking-widest uppercase">Perfil Base</Label>
+              <Select 
+                value={newUserRole || "null"} 
+                onValueChange={(val) => {
+                  const role = val === "null" ? null : val as any;
+                  setNewUserRole(role);
+                  if (role === 'admin') {
+                    setSelectedPermissions(['projects', 'events', 'posts', 'team', 'users']);
+                  }
+                }}
+              >
                 <SelectTrigger className="bg-white/5 border-white/10">
-                  <SelectValue placeholder="Selecione um cargo" />
+                  <SelectValue placeholder="Selecione um perfil" />
                 </SelectTrigger>
                 <SelectContent className="bg-[#0a1628] border-white/10 text-white">
                   <SelectItem value="null">Usuário Comum</SelectItem>
-                  <SelectItem value="editor">Editor de Projetos</SelectItem>
+                  <SelectItem value="editor">Editor Personalizado</SelectItem>
                   <SelectItem value="admin">Administrador</SelectItem>
                 </SelectContent>
               </Select>
