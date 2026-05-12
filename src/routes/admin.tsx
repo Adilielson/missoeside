@@ -38,6 +38,7 @@ function AdminLayout() {
   const location = useLocation();
 
   useEffect(() => {
+    console.log("AdminLayout: checking admin...");
     checkAdmin();
     
     // Subscribe to auth changes
