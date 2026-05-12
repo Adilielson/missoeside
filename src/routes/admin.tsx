@@ -162,7 +162,15 @@ function AdminLayout() {
           <Shield className="w-12 h-12 text-[#e8440c] mx-auto mb-4 opacity-20" />
           <h2 className="text-xl font-bold mb-2">Redirecionando para o login...</h2>
           <p className="text-white/40 text-sm mb-6">Você precisa estar autenticado para acessar esta área.</p>
-          <Loader2 className="w-6 h-6 text-[#e8440c] animate-spin mx-auto" />
+          <div className="flex flex-col gap-3">
+            <Loader2 className="w-6 h-6 text-[#e8440c] animate-spin mx-auto" />
+            <Link 
+              to="/admin/login" 
+              className="text-xs text-[#e8440c] hover:underline mt-4"
+            >
+              Clique aqui se não for redirecionado
+            </Link>
+          </div>
         </div>
       </div>
     );
