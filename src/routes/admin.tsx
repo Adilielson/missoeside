@@ -34,7 +34,7 @@ function AdminLayout() {
   const [loading, setLoading] = useState(true);
   const [authed, setAuthed] = useState(false);
   const [userPermissions, setUserPermissions] = useState<string[]>([]);
-  const [sidebarOpen, setSidebarOpen] = useState(true);
+  const [sidebarOpen, setSidebarOpen] = useState(false);
   const navigate = useNavigate();
   const location = useLocation();
 
@@ -186,20 +186,29 @@ function AdminLayout() {
   );
 
   return (
-    <div className="min-h-screen bg-[#0a1628] text-white flex">
+    <div className="min-h-screen bg-[#0a1628] text-white flex overflow-x-hidden">
+      {/* Sidebar Mobile Toggle Button */}
+      <button 
+        onClick={() => setSidebarOpen(true)}
+        className={cn(
+          "lg:hidden fixed top-4 left-4 z-30 p-2 bg-black/40 border border-white/10 rounded-lg transition-opacity duration-300",
+          sidebarOpen ? "opacity-0 pointer-events-none" : "opacity-100"
+        )}
+      >
+        <Menu className="w-6 h-6" />
+      </button>
+
       {/* Sidebar Mobile Overlay */}
-      {!sidebarOpen && (
-        <button 
-          onClick={() => setSidebarOpen(true)}
-          className="lg:hidden fixed top-4 left-4 z-50 p-2 bg-black/40 border border-white/10 rounded-lg"
-        >
-          <Menu className="w-6 h-6" />
-        </button>
+      {sidebarOpen && (
+        <div 
+          className="fixed inset-0 bg-black/60 backdrop-blur-sm z-40 lg:hidden"
+          onClick={() => setSidebarOpen(false)}
+        />
       )}
 
       {/* Sidebar */}
       <aside className={cn(
-        "fixed inset-y-0 left-0 z-40 w-64 bg-black/40 border-r border-white/5 backdrop-blur-xl transition-transform lg:relative lg:translate-x-0",
+        "fixed inset-y-0 left-0 z-50 w-64 bg-black/40 border-r border-white/5 backdrop-blur-xl transition-transform duration-300 ease-in-out lg:relative lg:translate-x-0",
         sidebarOpen ? "translate-x-0" : "-translate-x-full"
       )}>
         <div className="flex flex-col h-full">
@@ -218,6 +227,7 @@ function AdminLayout() {
               <Link
                 key={item.path}
                 to={item.path}
+                onClick={() => setSidebarOpen(false)}
                 className={cn(
                   "flex items-center justify-between gap-3 px-4 py-3 rounded-xl transition-all group",
                   location.pathname === item.path
@@ -246,8 +256,8 @@ function AdminLayout() {
       </aside>
 
       {/* Main Content */}
-      <main className="flex-1 min-h-screen overflow-y-auto">
-        <div className="max-w-7xl mx-auto p-4 sm:p-6 lg:p-8 min-h-[500px]">
+      <main className="flex-1 min-h-screen flex flex-col min-w-0">
+        <div className="w-full max-w-7xl mx-auto p-4 sm:p-6 lg:p-8 pt-20 lg:pt-8">
           <Outlet />
         </div>
       </main>
