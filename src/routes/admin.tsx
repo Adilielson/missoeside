@@ -13,6 +13,7 @@ import {
   FileText,
   UserCircle
 } from "lucide-react";
+import { Logo } from "@/components/Logo";
 import { supabase } from "@/integrations/supabase/client";
 import { cn } from "@/lib/utils";
 
@@ -204,9 +205,7 @@ function AdminLayout() {
         <div className="flex flex-col h-full">
           <div className="p-6 flex items-center justify-between border-b border-white/5">
             <div className="flex items-center gap-3">
-              <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-[#e8440c] to-[#c93a09] flex items-center justify-center shadow-lg shadow-[#e8440c]/30">
-                <Shield className="w-5 h-5 text-white" />
-              </div>
+              <Logo className="h-10 w-auto" />
               <h1 className="text-lg font-black">Admin</h1>
             </div>
             <button onClick={() => setSidebarOpen(false)} className="lg:hidden text-white/50 hover:text-white">
