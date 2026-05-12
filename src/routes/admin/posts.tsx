@@ -479,7 +479,7 @@ function PostsPage() {
                       if (autoSaveTimerRef.current) clearTimeout(autoSaveTimerRef.current);
                       autoSaveTimerRef.current = setTimeout(() => {
                         handleAutoSave(newContent);
-                      }, 2000); // Auto-save after 2 seconds of inactivity
+                      }, 1000); // Salva após 1 segundo de inatividade
                     }
                   }}
                   placeholder="Escreva seu artigo aqui... Use Markdown para formatação (ex: # Título, **Negrito**)"
