@@ -384,7 +384,7 @@ function UsersPage() {
                   <button
                     type="button"
                     onClick={() => {
-                      handleUpdateRole('admin');
+                      setEditingUser(prev => prev ? { ...prev, role: 'admin' } : null);
                       setSelectedPermissions(['projects', 'events', 'posts', 'team', 'users']);
                     }}
                     disabled={saving}
@@ -407,7 +407,7 @@ function UsersPage() {
 
                   <button
                     type="button"
-                    onClick={() => handleUpdateRole('editor')}
+                    onClick={() => setEditingUser(prev => prev ? { ...prev, role: 'editor' } : null)}
                     disabled={saving}
                     className={cn(
                       "flex items-center justify-between p-4 rounded-xl border transition-all text-left",
