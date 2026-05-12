@@ -107,27 +107,29 @@ function AdminLayout() {
         if (currentPathNormalized.startsWith("/admin") && currentPathNormalized !== "/admin/login") {
           const currentItem = menuItems.find(item => normalizePath(item.path) === currentPathNormalized);
           
-          // Se estamos no /admin (dashboard) e ele não tem permissão de dashboard
-          if (currentPathNormalized === "/admin" && !permissions.includes('dashboard')) {
-             const firstRestrictedItem = menuItems.find(item => item.id !== 'dashboard' && permissions.includes(item.id));
-             if (firstRestrictedItem) {
+          // Especial para a rota raiz /admin (index)
+          if (currentPathNormalized === "/admin") {
+            // Se ele não tem permissão de projects (que é para onde o index redireciona por padrão)
+            // mas tem outras permissões, redirecionamos para a primeira disponível
+            if (!permissions.includes('projects')) {
+              const firstRestrictedItem = menuItems.find(item => item.id !== 'dashboard' && permissions.includes(item.id));
+              if (firstRestrictedItem) {
                 navigate({ to: firstRestrictedItem.path as any });
                 return;
-             }
+              }
+            }
           }
 
-          // Se estamos em outra rota e ele não tem permissão
+          // Se estamos em outra rota específica e ele não tem permissão
           if (currentItem && currentItem.id !== 'dashboard' && !permissions.includes(currentItem.id)) {
             const firstRestrictedItem = menuItems.find(item => item.id !== 'dashboard' && permissions.includes(item.id));
             if (firstRestrictedItem) {
               navigate({ to: firstRestrictedItem.path as any });
               return;
             } else {
-              // Se não tem nenhuma permissão específica além de dashboard (teoricamente impossível pelo check acima)
-              if (!permissions.includes('dashboard')) {
-                await supabase.auth.signOut();
-                return;
-              }
+              // Se não tem nenhuma permissão específica, desloga para evitar loop
+              await supabase.auth.signOut();
+              return;
             }
           }
         }
