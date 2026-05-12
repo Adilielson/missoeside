@@ -22,7 +22,34 @@ function AdminLoginPage() {
     const checkUser = async () => {
       const { data: { session } } = await supabase.auth.getSession();
       if (session) {
-        navigate({ to: "/admin/projects" });
+        // Buscar perfil para verificar permissões e redirecionar corretamente
+        const { data: profile } = await supabase
+          .from("profiles")
+          .select("role, permissions")
+          .eq("id", session.user.id)
+          .single();
+
+        if (profile) {
+          const permissions = profile.permissions || [];
+          if (profile.role === 'admin' || permissions.includes('dashboard')) {
+            navigate({ to: "/admin" });
+          } else if (permissions.length > 0) {
+            // Redireciona para a primeira permissão que ele tiver
+            const paths: Record<string, string> = {
+              'projects': '/admin/projects',
+              'events': '/admin/events',
+              'posts': '/admin/posts',
+              'team': '/admin/team',
+              'users': '/admin/users'
+            };
+            const firstPermission = permissions[0];
+            navigate({ to: (paths[firstPermission] || "/admin") as any });
+          } else {
+            navigate({ to: "/admin" });
+          }
+        } else {
+          navigate({ to: "/admin" });
+        }
       }
     };
     checkUser();
