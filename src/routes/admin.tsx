@@ -23,6 +23,7 @@ export const Route = createFileRoute("/admin")({
 function AdminLayout() {
   const [loading, setLoading] = useState(true);
   const [authed, setAuthed] = useState(false);
+  const [userPermissions, setUserPermissions] = useState<string[]>([]);
   const [sidebarOpen, setSidebarOpen] = useState(true);
   const navigate = useNavigate();
   const location = useLocation();
@@ -51,11 +52,42 @@ function AdminLayout() {
       
       if (!session) {
         setAuthed(false);
+        setUserPermissions([]);
         setLoading(false);
         if (location.pathname !== "/admin/login") {
           navigate({ to: "/admin/login" });
         }
         return;
+      }
+
+      // Buscar perfil para verificar permissões
+      const { data: profile } = await supabase
+        .from("profiles")
+        .select("role, permissions")
+        .eq("id", session.user.id)
+        .single();
+
+      if (profile) {
+        // Se for admin e não tiver permissões explícitas, concede todas por padrão
+        const permissions = profile.permissions || [];
+        setUserPermissions(permissions);
+        
+        // Se estiver em uma rota que não tem permissão, redireciona para a primeira permitida
+        const currentPath = location.pathname;
+        const availableItems = menuItems.filter(item => 
+          item.id === 'dashboard' || permissions.includes(item.id)
+        );
+
+        if (currentPath !== "/admin" && currentPath !== "/admin/login") {
+          const currentItem = menuItems.find(item => item.path === currentPath);
+          if (currentItem && currentItem.id !== 'dashboard' && !permissions.includes(currentItem.id)) {
+            if (availableItems.length > 0) {
+              navigate({ to: availableItems[0].path as any });
+            } else {
+              navigate({ to: "/admin" });
+            }
+          }
+        }
       }
 
       setAuthed(true);
@@ -88,13 +120,17 @@ function AdminLayout() {
 
 
   const menuItems = [
-    { label: "Dashboard", icon: LayoutDashboard, path: "/admin" },
-    { label: "Projetos / Missões", icon: Briefcase, path: "/admin/projects" },
-    { label: "Eventos", icon: Calendar, path: "/admin/events" },
-    { label: "Blog", icon: FileText, path: "/admin/posts" },
-    { label: "Equipe", icon: UserCircle, path: "/admin/team" },
-    { label: "Usuários", icon: Users, path: "/admin/users" },
+    { id: "dashboard", label: "Dashboard", icon: LayoutDashboard, path: "/admin" },
+    { id: "projects", label: "Projetos / Missões", icon: Briefcase, path: "/admin/projects" },
+    { id: "events", label: "Eventos", icon: Calendar, path: "/admin/events" },
+    { id: "posts", label: "Blog", icon: FileText, path: "/admin/posts" },
+    { id: "team", label: "Equipe", icon: UserCircle, path: "/admin/team" },
+    { id: "users", label: "Usuários", icon: Users, path: "/admin/users" },
   ];
+
+  const filteredMenuItems = menuItems.filter(item => 
+    item.id === 'dashboard' || userPermissions.includes(item.id)
+  );
 
   return (
     <div className="min-h-screen bg-[#0a1628] text-white flex">
@@ -127,7 +163,7 @@ function AdminLayout() {
           </div>
 
           <nav className="flex-1 p-4 space-y-1">
-            {menuItems.map((item) => (
+            {filteredMenuItems.map((item) => (
               <Link
                 key={item.path}
                 to={item.path}
