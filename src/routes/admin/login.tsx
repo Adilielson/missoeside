@@ -68,7 +68,10 @@ function AdminLoginPage() {
       if (error) throw error;
 
       toast.success("Login realizado com sucesso!");
-      navigate({ to: "/admin/projects" });
+      
+      // O useEffect no início do componente cuidará do redirecionamento baseado em permissões
+      // após a sessão ser estabelecida, mas vamos forçar um reload para garantir
+      window.location.href = "/admin";
     } catch (error: any) {
       toast.error("Erro ao entrar: " + error.message);
     } finally {
