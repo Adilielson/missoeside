@@ -118,6 +118,7 @@ function PostsPage() {
         status: "DRAFT",
         cover_image: null,
       });
+      if (autoSaveTimerRef.current) clearTimeout(autoSaveTimerRef.current);
     }
     setIsFormOpen(true);
   }
@@ -147,17 +148,27 @@ function PostsPage() {
       console.log("Payload content length:", payload.content?.length);
 
       if (editingPost) {
+        console.log("Starting Supabase Update for ID:", editingPost.id);
         const { data, error } = await supabase
           .from("posts")
           .update(payload)
-          .match({ id: editingPost.id })
+          .eq("id", editingPost.id)
           .select();
         
         if (error) {
           console.error("Supabase Update Error:", error);
           throw error;
         }
+        
         console.log("Update success, returned data:", data);
+        
+        if (!data || data.length === 0) {
+          console.warn("No rows updated! Checking if record exists...");
+          const { data: verify } = await supabase.from("posts").select("id").eq("id", editingPost.id).single();
+          if (!verify) throw new Error("O registro não foi encontrado no banco de dados.");
+          else throw new Error("O registro existe mas a atualização não afetou nenhuma linha.");
+        }
+
         toast.success("Post atualizado com sucesso!");
       } else {
         const { data: { user } } = await supabase.auth.getUser();
@@ -184,6 +195,7 @@ function PostsPage() {
     
     setIsAutoSaving(true);
     try {
+      console.log("Auto-saving content for ID:", editingPost.id, "Length:", content.length);
       const { error } = await supabase
         .from("posts")
         .update({ 
@@ -194,6 +206,9 @@ function PostsPage() {
       
       if (error) throw error;
       console.log("Auto-save successful");
+      
+      // Update the local list so the "edit" state remains consistent
+      setPosts(prev => prev.map(p => p.id === editingPost.id ? { ...p, content } : p));
     } catch (error) {
       console.error("Auto-save failed:", error);
     } finally {
@@ -464,7 +479,7 @@ function PostsPage() {
                       if (autoSaveTimerRef.current) clearTimeout(autoSaveTimerRef.current);
                       autoSaveTimerRef.current = setTimeout(() => {
                         handleAutoSave(newContent);
-                      }, 2000); // Auto-save after 2 seconds of inactivity
+                      }, 1000); // Salva após 1 segundo de inatividade
                     }
                   }}
                   placeholder="Escreva seu artigo aqui... Use Markdown para formatação (ex: # Título, **Negrito**)"
