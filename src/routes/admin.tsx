@@ -88,8 +88,11 @@ function AdminLayout() {
           item.id === 'dashboard' || permissions.includes(item.id)
         );
 
-        if (currentPath !== "/admin" && currentPath !== "/admin/login") {
-          const currentItem = menuItems.find(item => item.path === currentPath);
+        const normalizePath = (p: string) => p.replace(/\/$/, "");
+        const currentPathNormalized = normalizePath(currentPath);
+
+        if (currentPathNormalized !== "/admin" && currentPathNormalized !== "/admin/login") {
+          const currentItem = menuItems.find(item => normalizePath(item.path) === currentPathNormalized);
           if (currentItem && currentItem.id !== 'dashboard' && !permissions.includes(currentItem.id)) {
             if (availableItems.length > 0) {
               navigate({ to: availableItems[0].path as any });
