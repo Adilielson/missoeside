@@ -266,7 +266,8 @@ function UsersPage() {
       </div>
 
       <div className="bg-white/[0.03] border border-white/10 rounded-2xl overflow-hidden">
-        <Table>
+        <div className="overflow-x-auto">
+          <Table>
           <TableHeader className="bg-white/5">
             <TableRow className="border-white/5 hover:bg-transparent">
               <TableHead className="text-white/40 font-bold uppercase text-[10px] tracking-widest">Usuário</TableHead>
@@ -353,7 +354,8 @@ function UsersPage() {
               ))
             )}
           </TableBody>
-        </Table>
+          </Table>
+        </div>
       </div>
 
       <Dialog open={isEditOpen} onOpenChange={setIsEditOpen}>
