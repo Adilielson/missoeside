@@ -20,6 +20,15 @@ export const Route = createFileRoute("/admin")({
   component: AdminLayout,
 });
 
+const menuItems = [
+  { id: "dashboard", label: "Dashboard", icon: LayoutDashboard, path: "/admin" },
+  { id: "projects", label: "Projetos / Missões", icon: Briefcase, path: "/admin/projects" },
+  { id: "events", label: "Eventos", icon: Calendar, path: "/admin/events" },
+  { id: "posts", label: "Blog", icon: FileText, path: "/admin/posts" },
+  { id: "team", label: "Equipe", icon: UserCircle, path: "/admin/team" },
+  { id: "users", label: "Usuários", icon: Users, path: "/admin/users" },
+];
+
 function AdminLayout() {
   const [loading, setLoading] = useState(true);
   const [authed, setAuthed] = useState(false);
@@ -29,6 +38,7 @@ function AdminLayout() {
   const location = useLocation();
 
   useEffect(() => {
+    
     checkAdmin();
     
     // Subscribe to auth changes
@@ -68,8 +78,11 @@ function AdminLayout() {
         .single();
 
       if (profile) {
-        // Se for admin e não tiver permissões explícitas, concede todas por padrão
-        const permissions = profile.permissions || [];
+        // Se for admin, garante todas as permissões se não estiverem definidas
+        let permissions = profile.permissions || [];
+        if (profile.role === 'admin' && permissions.length === 0) {
+          permissions = ['projects', 'events', 'posts', 'team', 'users'];
+        }
         setUserPermissions(permissions);
         
         // Se estiver em uma rota que não tem permissão, redireciona para a primeira permitida
@@ -78,8 +91,11 @@ function AdminLayout() {
           item.id === 'dashboard' || permissions.includes(item.id)
         );
 
-        if (currentPath !== "/admin" && currentPath !== "/admin/login") {
-          const currentItem = menuItems.find(item => item.path === currentPath);
+        const normalizePath = (p: string) => p.replace(/\/$/, "");
+        const currentPathNormalized = normalizePath(currentPath);
+
+        if (currentPathNormalized !== "/admin" && currentPathNormalized !== "/admin/login") {
+          const currentItem = menuItems.find(item => normalizePath(item.path) === currentPathNormalized);
           if (currentItem && currentItem.id !== 'dashboard' && !permissions.includes(currentItem.id)) {
             if (availableItems.length > 0) {
               navigate({ to: availableItems[0].path as any });
@@ -111,22 +127,21 @@ function AdminLayout() {
   }
 
   if (!authed && location.pathname !== "/admin/login") {
-    return null; // Let useEffect handle redirect
+    return (
+      <div className="min-h-screen bg-[#0a1628] flex items-center justify-center text-white p-4 text-center">
+        <div>
+          <Shield className="w-12 h-12 text-[#e8440c] mx-auto mb-4 opacity-20" />
+          <h2 className="text-xl font-bold mb-2">Redirecionando para o login...</h2>
+          <p className="text-white/40 text-sm mb-6">Você precisa estar autenticado para acessar esta área.</p>
+          <Loader2 className="w-6 h-6 text-[#e8440c] animate-spin mx-auto" />
+        </div>
+      </div>
+    );
   }
 
   if (location.pathname === "/admin/login") {
     return <Outlet />;
   }
-
-
-  const menuItems = [
-    { id: "dashboard", label: "Dashboard", icon: LayoutDashboard, path: "/admin" },
-    { id: "projects", label: "Projetos / Missões", icon: Briefcase, path: "/admin/projects" },
-    { id: "events", label: "Eventos", icon: Calendar, path: "/admin/events" },
-    { id: "posts", label: "Blog", icon: FileText, path: "/admin/posts" },
-    { id: "team", label: "Equipe", icon: UserCircle, path: "/admin/team" },
-    { id: "users", label: "Usuários", icon: Users, path: "/admin/users" },
-  ];
 
   const filteredMenuItems = menuItems.filter(item => 
     item.id === 'dashboard' || userPermissions.includes(item.id)
