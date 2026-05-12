@@ -1,6 +1,7 @@
 import { Logo } from "../Logo";
-import { Globe, Share2, Phone, Mail, Send, ChevronRight } from "lucide-react";
+import { Globe, Share2, Phone, Mail, Send, ChevronRight, Lock } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { Link } from "@tanstack/react-router";
 
 export function Footer() {
   return (
