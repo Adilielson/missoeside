@@ -118,6 +118,7 @@ function PostsPage() {
         status: "DRAFT",
         cover_image: null,
       });
+      if (autoSaveTimerRef.current) clearTimeout(autoSaveTimerRef.current);
     }
     setIsFormOpen(true);
   }
