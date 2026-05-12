@@ -78,29 +78,52 @@ function AdminLayout() {
         .single();
 
       if (profile) {
-        // Se for admin, garante todas as permissões se não estiverem definidas
+        // Normalizar permissões
         let permissions = profile.permissions || [];
+        
+        // Se for admin, garante todas as permissões se não estiverem definidas
         if (profile.role === 'admin' && permissions.length === 0) {
-          permissions = ['projects', 'events', 'posts', 'team', 'users'];
+          permissions = ['dashboard', 'projects', 'events', 'posts', 'team', 'users'];
         }
+
+        // Se o usuário não tem permissão explicitamente para 'dashboard', mas está logado, 
+        // damos a ele acesso à base /admin se ele tiver QUALQUER outra permissão
+        if (permissions.length > 0 && !permissions.includes('dashboard')) {
+          permissions = ['dashboard', ...permissions];
+        }
+
         setUserPermissions(permissions);
         
         // Se estiver em uma rota que não tem permissão, redireciona para a primeira permitida
         const currentPath = location.pathname;
         const availableItems = menuItems.filter(item => 
-          item.id === 'dashboard' || permissions.includes(item.id)
+          permissions.includes(item.id)
         );
 
         const normalizePath = (p: string) => p.replace(/\/$/, "");
         const currentPathNormalized = normalizePath(currentPath);
 
-        if (currentPathNormalized !== "/admin" && currentPathNormalized !== "/admin/login") {
+        // Se o usuário está logado mas tenta acessar algo que não pode
+        if (currentPathNormalized.startsWith("/admin") && currentPathNormalized !== "/admin/login") {
           const currentItem = menuItems.find(item => normalizePath(item.path) === currentPathNormalized);
-          if (currentItem && currentItem.id !== 'dashboard' && !permissions.includes(currentItem.id)) {
+          
+          // Se estamos no /admin (dashboard) e ele não tem permissão de dashboard
+          if (currentPathNormalized === "/admin" && !permissions.includes('dashboard')) {
+             if (availableItems.length > 0) {
+                navigate({ to: availableItems[0].path as any });
+                return;
+             }
+          }
+
+          // Se estamos em outra rota e ele não tem permissão
+          if (currentItem && !permissions.includes(currentItem.id)) {
             if (availableItems.length > 0) {
               navigate({ to: availableItems[0].path as any });
+              return;
             } else {
-              navigate({ to: "/admin" });
+              // Se não tem nenhuma permissão (teoricamente impossível pelo check acima)
+              await supabase.auth.signOut();
+              return;
             }
           }
         }
