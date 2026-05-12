@@ -1,6 +1,7 @@
 import { Logo } from "../Logo";
-import { Globe, Share2, Phone, Mail, Send, ChevronRight } from "lucide-react";
+import { Globe, Share2, Phone, Mail, Send, ChevronRight, Lock } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { Link } from "@tanstack/react-router";
 
 export function Footer() {
   return (
@@ -42,6 +43,15 @@ export function Footer() {
                   </a>
                 </li>
               ))}
+              <li>
+                <Link 
+                  to="/admin/login" 
+                  className="text-white/20 hover:text-brand-orange transition-colors flex items-center gap-2 group mt-8 text-[10px] uppercase tracking-widest font-bold"
+                >
+                  <Lock className="w-3 h-3 opacity-50 group-hover:opacity-100" />
+                  Área Administrativa
+                </Link>
+              </li>
             </ul>
           </div>
 
