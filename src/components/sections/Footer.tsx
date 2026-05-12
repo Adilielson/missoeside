@@ -42,6 +42,15 @@ export function Footer() {
                   </a>
                 </li>
               ))}
+              <li>
+                <Link 
+                  to="/admin/login" 
+                  className="text-white/20 hover:text-brand-orange transition-colors flex items-center gap-2 group mt-8 text-[10px] uppercase tracking-widest font-bold"
+                >
+                  <Lock className="w-3 h-3 opacity-50 group-hover:opacity-100" />
+                  Área Administrativa
+                </Link>
+              </li>
             </ul>
           </div>
 
