@@ -20,6 +20,15 @@ export const Route = createFileRoute("/admin")({
   component: AdminLayout,
 });
 
+const menuItems = [
+  { id: "dashboard", label: "Dashboard", icon: LayoutDashboard, path: "/admin" },
+  { id: "projects", label: "Projetos / Missões", icon: Briefcase, path: "/admin/projects" },
+  { id: "events", label: "Eventos", icon: Calendar, path: "/admin/events" },
+  { id: "posts", label: "Blog", icon: FileText, path: "/admin/posts" },
+  { id: "team", label: "Equipe", icon: UserCircle, path: "/admin/team" },
+  { id: "users", label: "Usuários", icon: Users, path: "/admin/users" },
+];
+
 function AdminLayout() {
   const [loading, setLoading] = useState(true);
   const [authed, setAuthed] = useState(false);
@@ -117,16 +126,6 @@ function AdminLayout() {
   if (location.pathname === "/admin/login") {
     return <Outlet />;
   }
-
-
-  const menuItems = [
-    { id: "dashboard", label: "Dashboard", icon: LayoutDashboard, path: "/admin" },
-    { id: "projects", label: "Projetos / Missões", icon: Briefcase, path: "/admin/projects" },
-    { id: "events", label: "Eventos", icon: Calendar, path: "/admin/events" },
-    { id: "posts", label: "Blog", icon: FileText, path: "/admin/posts" },
-    { id: "team", label: "Equipe", icon: UserCircle, path: "/admin/team" },
-    { id: "users", label: "Usuários", icon: Users, path: "/admin/users" },
-  ];
 
   const filteredMenuItems = menuItems.filter(item => 
     item.id === 'dashboard' || userPermissions.includes(item.id)
