@@ -127,7 +127,16 @@ function AdminLayout() {
   }
 
   if (!authed && location.pathname !== "/admin/login") {
-    return null; // Let useEffect handle redirect
+    return (
+      <div className="min-h-screen bg-[#0a1628] flex items-center justify-center text-white p-4 text-center">
+        <div>
+          <Shield className="w-12 h-12 text-[#e8440c] mx-auto mb-4 opacity-20" />
+          <h2 className="text-xl font-bold mb-2">Redirecionando para o login...</h2>
+          <p className="text-white/40 text-sm mb-6">Você precisa estar autenticado para acessar esta área.</p>
+          <Loader2 className="w-6 h-6 text-[#e8440c] animate-spin mx-auto" />
+        </div>
+      </div>
+    );
   }
 
   if (location.pathname === "/admin/login") {
