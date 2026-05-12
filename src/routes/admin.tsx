@@ -78,8 +78,11 @@ function AdminLayout() {
         .single();
 
       if (profile) {
-        // Se for admin e não tiver permissões explícitas, concede todas por padrão
-        const permissions = profile.permissions || [];
+        // Se for admin, garante todas as permissões se não estiverem definidas
+        let permissions = profile.permissions || [];
+        if (profile.role === 'admin' && permissions.length === 0) {
+          permissions = ['projects', 'events', 'posts', 'team', 'users'];
+        }
         setUserPermissions(permissions);
         
         // Se estiver em uma rota que não tem permissão, redireciona para a primeira permitida
