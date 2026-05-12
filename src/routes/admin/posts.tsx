@@ -147,17 +147,27 @@ function PostsPage() {
       console.log("Payload content length:", payload.content?.length);
 
       if (editingPost) {
+        console.log("Starting Supabase Update for ID:", editingPost.id);
         const { data, error } = await supabase
           .from("posts")
           .update(payload)
-          .match({ id: editingPost.id })
+          .eq("id", editingPost.id)
           .select();
         
         if (error) {
           console.error("Supabase Update Error:", error);
           throw error;
         }
+        
         console.log("Update success, returned data:", data);
+        
+        if (!data || data.length === 0) {
+          console.warn("No rows updated! Checking if record exists...");
+          const { data: verify } = await supabase.from("posts").select("id").eq("id", editingPost.id).single();
+          if (!verify) throw new Error("O registro não foi encontrado no banco de dados.");
+          else throw new Error("O registro existe mas a atualização não afetou nenhuma linha.");
+        }
+
         toast.success("Post atualizado com sucesso!");
       } else {
         const { data: { user } } = await supabase.auth.getUser();
