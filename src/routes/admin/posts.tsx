@@ -194,6 +194,7 @@ function PostsPage() {
     
     setIsAutoSaving(true);
     try {
+      console.log("Auto-saving content for ID:", editingPost.id, "Length:", content.length);
       const { error } = await supabase
         .from("posts")
         .update({ 
@@ -204,6 +205,9 @@ function PostsPage() {
       
       if (error) throw error;
       console.log("Auto-save successful");
+      
+      // Update the local list so the "edit" state remains consistent
+      setPosts(prev => prev.map(p => p.id === editingPost.id ? { ...p, content } : p));
     } catch (error) {
       console.error("Auto-save failed:", error);
     } finally {
