@@ -9,8 +9,8 @@ export function ContactBar() {
             <MapPin className="w-6 h-6 sm:w-7 sm:h-7" />
           </div>
           <div className="min-w-0">
-            <p className="text-white/60 text-[10px] sm:text-xs font-bold uppercase tracking-widest mb-1">Nosso Endereço</p>
-            <p className="text-white font-black text-base sm:text-lg break-words">Av. das Nações, 1000 - SP</p>
+            <p className="text-white/60 text-[10px] sm:text-xs font-bold uppercase tracking-widest mb-1">Nosso E-mail</p>
+            <p className="text-white font-black text-base sm:text-lg break-words">agenciaidei@gmail.com</p>
           </div>
         </div>
 
