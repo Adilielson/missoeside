@@ -121,7 +121,7 @@ export function About() {
               </div>
               <div>
                 <p className="text-xs font-bold text-brand-dark/40 uppercase tracking-widest">Fale Conosco</p>
-                <p className="font-black text-brand-dark">+55 (11) 9999-9999</p>
+                <p className="font-black text-brand-dark">+55 (27) 99996-3696</p>
               </div>
             </div>
           </div>
