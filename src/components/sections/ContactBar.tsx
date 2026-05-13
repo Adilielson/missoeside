@@ -30,7 +30,7 @@ export function ContactBar() {
           </div>
           <div className="min-w-0">
             <p className="text-white/60 text-[10px] sm:text-xs font-bold uppercase tracking-widest mb-1">Emergência / WhatsApp</p>
-            <p className="text-white font-black text-base sm:text-lg">+55 (11) 98888-7777</p>
+            <p className="text-white font-black text-base sm:text-lg">+55 (27) 99996-3696</p>
           </div>
         </div>
       </div>
