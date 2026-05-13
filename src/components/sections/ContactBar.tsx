@@ -20,7 +20,7 @@ export function ContactBar() {
           </div>
           <div className="min-w-0">
             <p className="text-white/60 text-[10px] sm:text-xs font-bold uppercase tracking-widest mb-1">E-mail de Contato</p>
-            <p className="text-white font-black text-base sm:text-lg break-all">contato@idemissoes.org</p>
+            <p className="text-white font-black text-base sm:text-lg break-all">agenciaidei@gmail.com</p>
           </div>
         </div>
 
