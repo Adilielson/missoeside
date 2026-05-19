@@ -51,16 +51,35 @@ export function Blog() {
             </h2>
           </div>
           <div className="flex gap-4">
-            <button className="w-12 h-12 rounded-full border border-brand-orange/20 flex items-center justify-center hover:bg-brand-orange hover:text-white transition-all text-brand-orange">
+            <Button
+              variant="outline"
+              size="icon"
+              className="rounded-full border-brand-orange/20 text-brand-orange hover:bg-brand-orange hover:text-white"
+              onClick={() => {
+                const el = document.querySelector("#blog-scroll");
+                if (el) el.scrollBy({ left: -400, behavior: 'smooth' });
+              }}
+            >
               <ArrowLeft className="w-5 h-5" />
-            </button>
-            <button className="w-12 h-12 rounded-full border border-brand-orange/20 flex items-center justify-center hover:bg-brand-orange hover:text-white transition-all text-brand-orange">
+            </Button>
+            <Button
+              variant="outline"
+              size="icon"
+              className="rounded-full border-brand-orange/20 text-brand-orange hover:bg-brand-orange hover:text-white"
+              onClick={() => {
+                const el = document.querySelector("#blog-scroll");
+                if (el) el.scrollBy({ left: 400, behavior: 'smooth' });
+              }}
+            >
               <ArrowRight className="w-5 h-5" />
-            </button>
+            </Button>
           </div>
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 sm:gap-8">
+        <div 
+          id="blog-scroll"
+          className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 sm:gap-8 overflow-x-auto lg:overflow-visible pb-4 no-scrollbar scroll-smooth"
+        >
           {posts?.map((post, index) => {
             const date = post.published_at ? new Date(post.published_at) : new Date(post.created_at);
             const day = format(date, "dd");

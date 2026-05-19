@@ -35,12 +35,21 @@ export function Footer() {
               <span className="absolute -bottom-2 left-0 w-8 h-1 bg-brand-orange rounded-full" />
             </h4>
             <ul className="space-y-4">
-              {["Início", "Sobre Nós", "Nossas Missões", "Como Ajudar", "Eventos", "Contato"].map((link) => (
-                <li key={link}>
-                  <a href="#" className="text-white/50 hover:text-brand-orange transition-colors flex items-center gap-2 group">
+              {[
+                { label: "Início", to: "/" },
+                { label: "Sobre Nós", to: "/sobre" },
+                { label: "Nossos Projetos", to: "/nossos-projetos" },
+                { label: "Eventos", to: "/eventos" },
+                { label: "Blog", to: "/blog" },
+              ].map((link) => (
+                <li key={link.label}>
+                  <Link 
+                    to={link.to} 
+                    className="text-white/50 hover:text-brand-orange transition-colors flex items-center gap-2 group"
+                  >
                     <ChevronRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
-                    {link}
-                  </a>
+                    {link.label}
+                  </Link>
                 </li>
               ))}
               <li>
