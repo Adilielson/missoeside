@@ -49,6 +49,13 @@ export function Navbar({ dark = false }: { dark?: boolean }) {
               <Link
                 to={item.href.startsWith("/") ? item.href : undefined}
                 hash={!item.href.startsWith("/") ? item.href.replace("#", "") : undefined}
+                onClick={(e) => {
+                  if (item.href.startsWith("#")) {
+                    e.preventDefault();
+                    const el = document.getElementById(item.href.replace("#", ""));
+                    if (el) el.scrollIntoView({ behavior: 'smooth' });
+                  }
+                }}
                 className={cn(
                   "text-sm font-semibold transition-colors flex items-center gap-1",
                   isScrolled || dark ? "text-white hover:text-brand-orange" : "text-brand-dark hover:text-brand-orange"
