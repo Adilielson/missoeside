@@ -116,6 +116,16 @@ Deno.serve(async (req) => {
       }
     }
 
+    if (action === "logs") {
+      const { data, error } = await supabase
+        .from("system_keep_alive")
+        .select("*")
+        .order("created_at", { ascending: false })
+        .limit(20);
+      if (error) throw error;
+      return json({ logs: data });
+    }
+
     return json({ error: "Action inválida" }, 400);
   } catch (err) {
     return json({ error: (err as Error).message }, 500);
