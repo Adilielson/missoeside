@@ -236,8 +236,8 @@ function SuperadminPage() {
   }
 
   // ---------- DASHBOARD ----------
-  const group = GROUPS.find((g) => g.id === activeGroup)!;
-  const groupConfigured = group.fields.every((f) => settings[f.key]?.configured);
+  const group = GROUPS.find((g) => g.id === activeGroup);
+  const groupConfigured = group?.fields.every((f) => settings[f.key]?.configured) ?? false;
 
   return (
     <main className="min-h-screen bg-[#0a1628] text-white flex">
