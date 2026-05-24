@@ -449,16 +449,17 @@ function SuperadminPage() {
         ) : (
           <div className="max-w-3xl mx-auto p-8 lg:p-12">
           {/* Header */}
-          <div className="flex items-start justify-between gap-4 mb-8">
-            <div className="flex items-center gap-4">
-              <div className="w-14 h-14 rounded-2xl bg-gradient-to-br from-[#e8440c] to-[#c93a09] flex items-center justify-center shadow-xl shadow-[#e8440c]/20">
-                <group.icon className="w-7 h-7 text-white" />
+          {group && (
+            <div className="flex items-start justify-between gap-4 mb-8">
+              <div className="flex items-center gap-4">
+                <div className="w-14 h-14 rounded-2xl bg-gradient-to-br from-[#e8440c] to-[#c93a09] flex items-center justify-center shadow-xl shadow-[#e8440c]/20">
+                  <group.icon className="w-7 h-7 text-white" />
+                </div>
+                <div>
+                  <h2 className="text-3xl font-black tracking-tight">{group.name}</h2>
+                  <p className="text-sm text-white/50">{group.tagline}</p>
+                </div>
               </div>
-              <div>
-                <h2 className="text-3xl font-black tracking-tight">{group.name}</h2>
-                <p className="text-sm text-white/50">{group.tagline}</p>
-              </div>
-            </div>
 
             <div className="flex items-center gap-2">
               <span
@@ -486,10 +487,11 @@ function SuperadminPage() {
               )}
             </div>
           </div>
+          )}
 
           {/* Fields */}
           <div className="space-y-4">
-            {group.fields.map((f) => {
+            {group?.fields.map((f) => {
               const s = settings[f.key];
               const isSaving = savingKey === f.key;
               const isShown = !!show[f.key];
