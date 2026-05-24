@@ -32,6 +32,7 @@ import { Route as AdminProjectsRouteImport } from './routes/admin/projects'
 import { Route as AdminPostsRouteImport } from './routes/admin/posts'
 import { Route as AdminLoginRouteImport } from './routes/admin/login'
 import { Route as AdminEventsRouteImport } from './routes/admin/events'
+import { Route as AdminDashboardRouteImport } from './routes/admin.dashboard'
 
 const SuperadminRoute = SuperadminRouteImport.update({
   id: '/superadmin',
@@ -148,6 +149,11 @@ const AdminEventsRoute = AdminEventsRouteImport.update({
   path: '/events',
   getParentRoute: () => AdminRoute,
 } as any)
+const AdminDashboardRoute = AdminDashboardRouteImport.update({
+  id: '/dashboard',
+  path: '/dashboard',
+  getParentRoute: () => AdminRoute,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
@@ -160,6 +166,7 @@ export interface FileRoutesByFullPath {
   '/obrigado': typeof ObrigadoRoute
   '/sobre': typeof SobreRoute
   '/superadmin': typeof SuperadminRoute
+  '/admin/dashboard': typeof AdminDashboardRoute
   '/admin/events': typeof AdminEventsRoute
   '/admin/login': typeof AdminLoginRoute
   '/admin/posts': typeof AdminPostsRoute
@@ -182,6 +189,7 @@ export interface FileRoutesByTo {
   '/obrigado': typeof ObrigadoRoute
   '/sobre': typeof SobreRoute
   '/superadmin': typeof SuperadminRoute
+  '/admin/dashboard': typeof AdminDashboardRoute
   '/admin/events': typeof AdminEventsRoute
   '/admin/login': typeof AdminLoginRoute
   '/admin/posts': typeof AdminPostsRoute
@@ -208,6 +216,7 @@ export interface FileRoutesById {
   '/obrigado': typeof ObrigadoRoute
   '/sobre': typeof SobreRoute
   '/superadmin': typeof SuperadminRoute
+  '/admin/dashboard': typeof AdminDashboardRoute
   '/admin/events': typeof AdminEventsRoute
   '/admin/login': typeof AdminLoginRoute
   '/admin/posts': typeof AdminPostsRoute
@@ -235,6 +244,7 @@ export interface FileRouteTypes {
     | '/obrigado'
     | '/sobre'
     | '/superadmin'
+    | '/admin/dashboard'
     | '/admin/events'
     | '/admin/login'
     | '/admin/posts'
@@ -257,6 +267,7 @@ export interface FileRouteTypes {
     | '/obrigado'
     | '/sobre'
     | '/superadmin'
+    | '/admin/dashboard'
     | '/admin/events'
     | '/admin/login'
     | '/admin/posts'
@@ -282,6 +293,7 @@ export interface FileRouteTypes {
     | '/obrigado'
     | '/sobre'
     | '/superadmin'
+    | '/admin/dashboard'
     | '/admin/events'
     | '/admin/login'
     | '/admin/posts'
@@ -475,10 +487,18 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AdminEventsRouteImport
       parentRoute: typeof AdminRoute
     }
+    '/admin/dashboard': {
+      id: '/admin/dashboard'
+      path: '/dashboard'
+      fullPath: '/admin/dashboard'
+      preLoaderRoute: typeof AdminDashboardRouteImport
+      parentRoute: typeof AdminRoute
+    }
   }
 }
 
 interface AdminRouteChildren {
+  AdminDashboardRoute: typeof AdminDashboardRoute
   AdminEventsRoute: typeof AdminEventsRoute
   AdminLoginRoute: typeof AdminLoginRoute
   AdminPostsRoute: typeof AdminPostsRoute
@@ -489,6 +509,7 @@ interface AdminRouteChildren {
 }
 
 const AdminRouteChildren: AdminRouteChildren = {
+  AdminDashboardRoute: AdminDashboardRoute,
   AdminEventsRoute: AdminEventsRoute,
   AdminLoginRoute: AdminLoginRoute,
   AdminPostsRoute: AdminPostsRoute,

@@ -396,6 +396,24 @@ export type Database = {
           },
         ]
       }
+      system_keep_alive: {
+        Row: {
+          created_at: string
+          id: string
+          message: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          message: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          message?: string
+        }
+        Relationships: []
+      }
       system_settings: {
         Row: {
           description: string | null
