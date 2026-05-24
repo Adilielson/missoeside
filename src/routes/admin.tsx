@@ -22,7 +22,6 @@ export const Route = createFileRoute("/admin")({
 });
 
 const menuItems = [
-  { id: "dashboard", label: "Dashboard", icon: LayoutDashboard, path: "/admin/dashboard" },
   { id: "projects", label: "Projetos / Missões", icon: Briefcase, path: "/admin/projects" },
   { id: "events", label: "Eventos", icon: Calendar, path: "/admin/events" },
   { id: "posts", label: "Blog", icon: FileText, path: "/admin/posts" },
