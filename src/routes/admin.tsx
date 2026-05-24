@@ -1,8 +1,7 @@
 import { createFileRoute, Link, useNavigate, useLocation, Outlet } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
 import { 
-  LayoutDashboard, 
-  Briefcase, 
+  Briefcase,
   Users,
   LogOut, 
   Menu, 
