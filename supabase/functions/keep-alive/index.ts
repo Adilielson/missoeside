@@ -14,28 +14,49 @@ const QUOTES = [
 ];
 
 serve(async (req) => {
+  // Handle CORS
+  if (req.method === 'OPTIONS') {
+    return new Response('ok', { headers: { 'Access-Control-Allow-Origin': '*' } })
+  }
+
   try {
-    const supabaseClient = createClient(
-      Deno.env.get('SUPABASE_URL') ?? '',
-      Deno.env.get('SUPABASE_SERVICE_ROLE_KEY') ?? ''
-    )
+    const supabaseUrl = Deno.env.get('SUPABASE_URL');
+    const supabaseKey = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY');
+
+    if (!supabaseUrl || !supabaseKey) {
+      throw new Error('Missing environment variables');
+    }
+
+    const supabaseClient = createClient(supabaseUrl, supabaseKey);
 
     const randomQuote = QUOTES[Math.floor(Math.random() * QUOTES.length)];
     
-    const { error } = await supabaseClient
+    console.log(`Inserting quote: ${randomQuote}`);
+
+    const { data, error } = await supabaseClient
       .from('system_keep_alive')
       .insert([{ message: randomQuote }])
+      .select();
 
-    if (error) throw error
+    if (error) {
+      console.error('Insert error:', error);
+      throw error;
+    }
 
-    return new Response(JSON.stringify({ message: "Keep-alive active!", quote: randomQuote }), {
-      headers: { "Content-Type": "application/json" },
+    return new Response(JSON.stringify({ 
+      message: "Keep-alive active!", 
+      quote: randomQuote,
+      data 
+    }), {
+      headers: { "Content-Type": "application/json", 'Access-Control-Allow-Origin': '*' },
       status: 200,
     })
   } catch (error) {
+    console.error('Function error:', error);
     return new Response(JSON.stringify({ error: error.message }), {
-      headers: { "Content-Type": "application/json" },
+      headers: { "Content-Type": "application/json", 'Access-Control-Allow-Origin': '*' },
       status: 500,
     })
   }
 })
+
