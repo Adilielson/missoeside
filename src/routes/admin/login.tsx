@@ -83,13 +83,23 @@ function AdminLoginPage() {
   };
 
   return (
-    <div className="min-h-screen bg-[#060b13] flex items-center justify-center p-4">
-      <div className="absolute inset-0 overflow-hidden pointer-events-none">
+    <div className="min-h-screen bg-[#060b13] flex items-center justify-center p-4 relative">
+      {/* Background Image */}
+      <div className="absolute inset-0 z-0">
+        <img 
+          src={voluntariosImg} 
+          alt="" 
+          className="w-full h-full object-cover opacity-25"
+        />
+        <div className="absolute inset-0 bg-[#060b13]/70" />
+      </div>
+
+      <div className="absolute inset-0 overflow-hidden pointer-events-none z-0">
         <div className="absolute top-[-10%] left-[-10%] w-[40%] h-[40%] bg-[#e8440c]/10 blur-[120px] rounded-full" />
         <div className="absolute bottom-[-10%] right-[-10%] w-[40%] h-[40%] bg-blue-500/10 blur-[120px] rounded-full" />
       </div>
 
-      <Card className="w-full max-w-md bg-white/[0.03] border-white/10 backdrop-blur-xl relative">
+      <Card className="w-full max-w-md bg-white/10 border-white/10 backdrop-blur-xl relative z-10 shadow-2xl">
         <CardHeader className="space-y-1 text-center">
           <div className="flex justify-center mb-4">
             <Logo className="h-16 w-auto" />
