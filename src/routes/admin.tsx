@@ -10,7 +10,8 @@ import {
   Loader2,
   Calendar,
   FileText,
-  UserCircle
+  UserCircle,
+  BarChart3
 } from "lucide-react";
 import { Logo } from "@/components/Logo";
 import { supabase } from "@/integrations/supabase/client";
@@ -25,6 +26,7 @@ const menuItems = [
   { id: "events", label: "Eventos", icon: Calendar, path: "/admin/events" },
   { id: "posts", label: "Blog", icon: FileText, path: "/admin/posts" },
   { id: "team", label: "Equipe", icon: UserCircle, path: "/admin/team" },
+  { id: "analytics", label: "Acompanhamento", icon: BarChart3, path: "/admin/analytics" },
   { id: "users", label: "Usuários", icon: Users, path: "/admin/users" },
 ];
 
@@ -82,7 +84,7 @@ function AdminLayout() {
         
         // Se for admin, garante todas as permissões se não estiverem definidas
         if (profile.role === 'admin' && permissions.length === 0) {
-          permissions = ['dashboard', 'projects', 'events', 'posts', 'team', 'users'];
+          permissions = ['dashboard', 'projects', 'events', 'posts', 'team', 'analytics', 'users'];
         }
 
         // Se o usuário não tem permissão explicitamente para 'dashboard', mas está logado, 
