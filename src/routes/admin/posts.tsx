@@ -494,7 +494,7 @@ function PostsPage() {
       </div>
 
       <Dialog open={isFormOpen} onOpenChange={setIsFormOpen}>
-        <DialogContent className="max-w-4xl w-full h-full sm:h-auto sm:max-h-[90vh] overflow-y-auto bg-[#0a1628] border-white/10 text-white sm:rounded-2xl p-4 sm:p-6">
+        <DialogContent className="max-w-none sm:max-w-4xl w-full h-dvh sm:h-auto sm:max-h-[90vh] !inset-0 sm:!inset-auto !translate-x-0 sm:!translate-x-[-50%] !translate-y-0 sm:!translate-y-[-50%] !rounded-none sm:!rounded-2xl overflow-y-auto bg-[#0a1628] border-white/10 text-white p-4 sm:p-6">
           <DialogHeader>
             <DialogTitle className="text-xl sm:text-2xl font-black">
               {editingPost ? "Editar Artigo" : "Novo Artigo"}
