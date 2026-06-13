@@ -494,14 +494,14 @@ function PostsPage() {
       </div>
 
       <Dialog open={isFormOpen} onOpenChange={setIsFormOpen}>
-        <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto bg-[#0a1628] border-white/10 text-white">
+        <DialogContent className="max-w-4xl w-full h-full sm:h-auto sm:max-h-[90vh] overflow-y-auto bg-[#0a1628] border-white/10 text-white sm:rounded-2xl p-4 sm:p-6">
           <DialogHeader>
-            <DialogTitle className="text-2xl font-black">
+            <DialogTitle className="text-xl sm:text-2xl font-black">
               {editingPost ? "Editar Artigo" : "Novo Artigo"}
             </DialogTitle>
           </DialogHeader>
 
-          <form onSubmit={handleSave} className="grid grid-cols-1 md:grid-cols-2 gap-6 py-4">
+          <form onSubmit={handleSave} className="grid grid-cols-1 md:grid-cols-2 gap-4 sm:gap-6 py-2 sm:py-4">
             <div className="space-y-4">
               <div className="space-y-2">
                 <Label className="text-xs font-bold text-white/50 tracking-widest uppercase">Título do Artigo</Label>
