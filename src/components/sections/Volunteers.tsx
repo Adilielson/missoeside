@@ -1,7 +1,8 @@
 import { motion } from "framer-motion";
 import { Heart } from "lucide-react";
 import { SectionTag } from "../SectionTag";
-import voluntariosImg from "@/assets/voluntarios.png";
+import voluntariosAsset from "@/assets/voluntarios-ide.png.asset.json";
+const voluntariosImg = voluntariosAsset.url;
 import {
   Accordion,
   AccordionContent,
