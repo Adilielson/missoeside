@@ -5,6 +5,7 @@ import { SectionTag } from "../SectionTag";
 import { Button } from "@/components/ui/button";
 import { Link } from "@tanstack/react-router";
 import { supabase } from "@/integrations/supabase/client";
+import { trackEvent } from "@/hooks/useAnalytics";
 
 type Project = {
   id: string;
@@ -113,7 +114,7 @@ export function Causes() {
                     asChild
                     className="flex-1 bg-brand-orange hover:bg-brand-orange/90 text-white border-none py-6 rounded-2xl font-bold group/btn"
                   >
-                    <Link to="/doar" search={{ project: project.slug }}>
+                    <Link to="/doar" search={{ project: project.slug }} onClick={() => trackEvent("apoiar_agora", { project_slug: project.slug, metadata: { location: "home_causes" } })}>
                       Apoiar Agora
                       <ArrowRight className="w-4 h-4 ml-2 group-hover/btn:translate-x-1 transition-transform" />
                     </Link>

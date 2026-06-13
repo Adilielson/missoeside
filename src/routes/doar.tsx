@@ -14,6 +14,7 @@ import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import ofertaMissionaria from "@/assets/qrcode-pix-ide.png.asset.json";
 import logoIde from "@/assets/logo-ide.png";
+import { trackEvent } from "@/hooks/useAnalytics";
 
 export const Route = createFileRoute("/doar")({
   head: () => ({
@@ -40,6 +41,10 @@ function CopyRow({ label, value }: { label: string; value: string }) {
       await navigator.clipboard.writeText(value);
       setCopied(true);
       toast.success(`${label} copiado!`);
+      const isPix = /pix|cnpj/i.test(label);
+      trackEvent(isPix ? "copiar_pix_cnpj" : "copiar_dado_bancario", {
+        metadata: { location: "doar_page", label },
+      });
       setTimeout(() => setCopied(false), 2000);
     } catch {
       toast.error(`Copie manualmente: ${value}`);

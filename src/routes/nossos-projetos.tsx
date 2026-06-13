@@ -150,7 +150,7 @@ function NossosProjetos() {
                         asChild
                         className="w-full bg-brand-orange hover:bg-brand-orange/90 text-white border-none py-7 rounded-2xl font-black group/btn shadow-lg shadow-brand-orange/20"
                       >
-                        <Link to="/doar" search={{ project: project.slug }}>
+                        <Link to="/doar" search={{ project: project.slug }} onClick={() => trackEvent("apoiar_agora", { project_slug: project.slug, metadata: { location: "nossos_projetos" } })}>
                           Apoiar Agora
                           <ArrowRight className="w-5 h-5 ml-2 group-hover/btn:translate-x-1 transition-transform" />
                         </Link>

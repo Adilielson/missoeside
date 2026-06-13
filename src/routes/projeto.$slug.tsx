@@ -203,7 +203,7 @@ function ProjectPage() {
                   asChild
                   className="w-full bg-brand-gradient hover:opacity-90 text-white py-8 rounded-2xl font-black text-lg shadow-lg shadow-brand-orange/20"
                 >
-                  <Link to="/doar" search={{ project: project.slug }}>
+                  <Link to="/doar" search={{ project: project.slug }} onClick={() => trackEvent("apoiar_agora", { project_slug: project.slug, metadata: { location: "project_page" } })}>
                     Apoiar Agora
                     <ArrowRight className="w-5 h-5 ml-2" />
                   </Link>
