@@ -11,7 +11,8 @@ import {
   Calendar,
   FileText,
   UserCircle,
-  BarChart3
+  BarChart3,
+  Mail
 } from "lucide-react";
 import { Logo } from "@/components/Logo";
 import { supabase } from "@/integrations/supabase/client";
@@ -27,6 +28,7 @@ const menuItems = [
   { id: "posts", label: "Blog", icon: FileText, path: "/admin/posts" },
   { id: "team", label: "Equipe", icon: UserCircle, path: "/admin/team" },
   { id: "analytics", label: "Acompanhamento", icon: BarChart3, path: "/admin/analytics" },
+  { id: "newsletter", label: "Newsletter", icon: Mail, path: "/admin/newsletter", adminOnly: true },
   { id: "users", label: "Usuários", icon: Users, path: "/admin/users" },
 ];
 
@@ -34,6 +36,7 @@ function AdminLayout() {
   const [loading, setLoading] = useState(true);
   const [authed, setAuthed] = useState(false);
   const [userPermissions, setUserPermissions] = useState<string[]>([]);
+  const [userRole, setUserRole] = useState<string | null>(null);
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const navigate = useNavigate();
   const location = useLocation();
@@ -79,12 +82,13 @@ function AdminLayout() {
         .single();
 
       if (profile) {
+        setUserRole(profile.role);
         // Normalizar permissões
         let permissions = profile.permissions || [];
         
         // Se for admin, garante todas as permissões se não estiverem definidas
         if (profile.role === 'admin' && permissions.length === 0) {
-          permissions = ['dashboard', 'projects', 'events', 'posts', 'team', 'analytics', 'users'];
+          permissions = ['dashboard', 'projects', 'events', 'posts', 'team', 'analytics', 'newsletter', 'users'];
         }
 
         // Se o usuário não tem permissão explicitamente para 'dashboard', mas está logado, 
@@ -186,9 +190,10 @@ function AdminLayout() {
     return <Outlet />;
   }
 
-  const filteredMenuItems = menuItems.filter(item => 
-    item.id === 'dashboard' || userPermissions.includes(item.id)
-  );
+  const filteredMenuItems = menuItems.filter(item => {
+    if ((item as any).adminOnly && userRole !== 'admin') return false;
+    return item.id === 'dashboard' || userPermissions.includes(item.id);
+  });
 
   return (
     <div className="min-h-screen bg-[#0a1628] text-white flex overflow-x-hidden">
