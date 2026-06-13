@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { Search, ArrowRight, Menu, X, ChevronDown } from "lucide-react";
+import { Search, ArrowRight, Menu, X } from "lucide-react";
 import { Logo } from "../Logo";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
