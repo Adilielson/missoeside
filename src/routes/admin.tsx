@@ -11,7 +11,8 @@ import {
   Calendar,
   FileText,
   UserCircle,
-  BarChart3
+  BarChart3,
+  Mail
 } from "lucide-react";
 import { Logo } from "@/components/Logo";
 import { supabase } from "@/integrations/supabase/client";
@@ -27,6 +28,7 @@ const menuItems = [
   { id: "posts", label: "Blog", icon: FileText, path: "/admin/posts" },
   { id: "team", label: "Equipe", icon: UserCircle, path: "/admin/team" },
   { id: "analytics", label: "Acompanhamento", icon: BarChart3, path: "/admin/analytics" },
+  { id: "newsletter", label: "Newsletter", icon: Mail, path: "/admin/newsletter", adminOnly: true },
   { id: "users", label: "Usuários", icon: Users, path: "/admin/users" },
 ];
 
