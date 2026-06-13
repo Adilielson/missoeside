@@ -93,6 +93,11 @@ function AdminLayout() {
           permissions = ['dashboard', ...permissions];
         }
 
+        // Analytics deve ser visível para todo usuário que acessa o admin
+        if (!permissions.includes('analytics')) {
+          permissions = [...permissions, 'analytics'];
+        }
+
         setUserPermissions(permissions);
         
         // Se estiver em uma rota que não tem permissão, redireciona para a primeira permitida
