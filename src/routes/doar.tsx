@@ -12,7 +12,7 @@ import { useState } from "react";
 import { Heart, Copy, Check, Landmark, ArrowLeft, QrCode } from "lucide-react";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
-import ofertaMissionaria from "@/assets/oferta-missionaria-ide.jpeg.asset.json";
+import ofertaMissionaria from "@/assets/qrcode-pix-ide.png.asset.json";
 import logoIde from "@/assets/logo-ide.png";
 
 export const Route = createFileRoute("/doar")({
