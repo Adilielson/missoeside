@@ -37,7 +37,7 @@ async function send(payload: TrackPayload) {
       referrer: typeof document !== "undefined" ? document.referrer || null : null,
       user_agent: typeof navigator !== "undefined" ? navigator.userAgent : null,
       session_id: getSessionId(),
-      metadata: payload.metadata ?? null,
+      metadata: (payload.metadata ?? null) as any,
     });
   } catch (e) {
     console.warn("[analytics] failed", e);
