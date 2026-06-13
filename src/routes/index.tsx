@@ -26,7 +26,7 @@ function Index() {
       <About />
       <Causes />
       <Stats />
-      <Events />
+      {/* <Events /> oculto temporariamente no front — admin/back continua funcionando */}
       <Volunteers />
       
       <Testimonials />
