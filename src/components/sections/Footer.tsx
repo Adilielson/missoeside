@@ -1,9 +1,35 @@
 import { Logo } from "../Logo";
-import { Globe, Share2, Phone, Mail, Send, ChevronRight, Lock } from "lucide-react";
+import { Globe, Share2, Phone, Mail, Send, ChevronRight, Lock, Loader2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Link } from "@tanstack/react-router";
+import { useState } from "react";
+import { toast } from "sonner";
+import { supabase } from "@/integrations/supabase/client";
 
 export function Footer() {
+  const [email, setEmail] = useState("");
+  const [submitting, setSubmitting] = useState(false);
+
+  async function handleSubscribe(e?: React.FormEvent) {
+    e?.preventDefault();
+    const value = email.trim().toLowerCase();
+    if (!value || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value)) {
+      toast.error("Informe um e-mail válido");
+      return;
+    }
+    setSubmitting(true);
+    const { error } = await supabase
+      .from("newsletter_subscribers")
+      .insert({ email: value, source: "footer" });
+    setSubmitting(false);
+    if (error && error.code !== "23505") {
+      toast.error("Não foi possível inscrever. Tente novamente.");
+      return;
+    }
+    toast.success("Te cadastramos!");
+    setEmail("");
+  }
+
   return (
     <footer id="contato" className="bg-brand-dark pt-16 sm:pt-24">
       <div className="max-w-7xl mx-auto px-5 sm:px-6 pb-16 sm:pb-20">
@@ -100,16 +126,24 @@ export function Footer() {
               <span className="absolute -bottom-2 left-0 w-8 h-1 bg-brand-orange rounded-full" />
             </h4>
             <p className="text-white/40 text-sm mb-6">Inscreva-se para receber atualizações e notícias do campo.</p>
-            <div className="relative mb-4">
-              <input 
-                type="email" 
-                placeholder="Seu melhor e-mail" 
-                className="w-full bg-white/5 border border-white/10 rounded-full py-4 px-6 text-white focus:outline-none focus:border-brand-orange transition-all"
+            <form onSubmit={handleSubscribe} className="relative mb-4">
+              <input
+                type="email"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                disabled={submitting}
+                placeholder="Seu melhor e-mail"
+                className="w-full bg-white/5 border border-white/10 rounded-full py-4 px-6 text-white focus:outline-none focus:border-brand-orange transition-all disabled:opacity-60"
               />
-              <button className="absolute right-2 top-2 w-10 h-10 rounded-full bg-brand-orange text-white flex items-center justify-center hover:bg-brand-burgundy transition-all">
-                <Send className="w-4 h-4" />
+              <button
+                type="submit"
+                disabled={submitting}
+                aria-label="Inscrever na newsletter"
+                className="absolute right-2 top-2 w-10 h-10 rounded-full bg-brand-orange text-white flex items-center justify-center hover:bg-brand-burgundy transition-all disabled:opacity-60"
+              >
+                {submitting ? <Loader2 className="w-4 h-4 animate-spin" /> : <Send className="w-4 h-4" />}
               </button>
-            </div>
+            </form>
             <div className="flex items-center gap-2">
               <input type="checkbox" id="privacy" className="accent-brand-orange" />
               <label htmlFor="privacy" className="text-white/30 text-[10px] font-medium leading-none cursor-pointer">
