@@ -12,10 +12,12 @@ import { useState } from "react";
 import { Heart, Copy, Check, Landmark, ArrowLeft, QrCode } from "lucide-react";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
-import ofertaMissionaria from "@/assets/qrcode-pix-ide.png.asset.json";
+import ofertaMissionariaAsset from "@/assets/qrcode-pix-ide.png.asset.json";
 import logoIde from "@/assets/logo-ide.png";
 import voluntariosAsset from "@/assets/voluntarios-ide.png.asset.json";
-const voluntariosImg = voluntariosAsset.url;
+import { assetUrl } from "@/lib/assetUrl";
+const ofertaMissionaria = { url: assetUrl(ofertaMissionariaAsset) };
+const voluntariosImg = assetUrl(voluntariosAsset);
 import { trackEvent } from "@/hooks/useAnalytics";
 
 export const Route = createFileRoute("/doar")({
