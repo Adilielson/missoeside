@@ -209,6 +209,45 @@ export type Database = {
           },
         ]
       }
+      page_events: {
+        Row: {
+          created_at: string
+          event_name: string
+          event_type: string
+          id: string
+          metadata: Json | null
+          path: string | null
+          project_slug: string | null
+          referrer: string | null
+          session_id: string | null
+          user_agent: string | null
+        }
+        Insert: {
+          created_at?: string
+          event_name: string
+          event_type: string
+          id?: string
+          metadata?: Json | null
+          path?: string | null
+          project_slug?: string | null
+          referrer?: string | null
+          session_id?: string | null
+          user_agent?: string | null
+        }
+        Update: {
+          created_at?: string
+          event_name?: string
+          event_type?: string
+          id?: string
+          metadata?: Json | null
+          path?: string | null
+          project_slug?: string | null
+          referrer?: string | null
+          session_id?: string | null
+          user_agent?: string | null
+        }
+        Relationships: []
+      }
       posts: {
         Row: {
           author_id: string | null

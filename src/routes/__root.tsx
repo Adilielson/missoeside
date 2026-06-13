@@ -1,5 +1,6 @@
 import { Outlet, Link, createRootRoute } from "@tanstack/react-router";
 import { Toaster } from "@/components/ui/sonner";
+import { usePageViewTracker } from "@/hooks/useAnalytics";
 
 function NotFoundComponent() {
   return (
@@ -29,6 +30,7 @@ export const Route = createRootRoute({
 });
 
 function RootComponent() {
+  usePageViewTracker();
   return (
     <>
       <Outlet />

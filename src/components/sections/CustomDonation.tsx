@@ -13,6 +13,7 @@ import { Button } from "@/components/ui/button";
 import { useState } from "react";
 import { toast } from "sonner";
 import ofertaMissionaria from "@/assets/qrcode-pix-ide.png.asset.json";
+import { trackEvent } from "@/hooks/useAnalytics";
 
 const PIX_KEY = "65.267.286/0001-11";
 const BANCO = "Caixa Econômica Federal";
@@ -28,6 +29,7 @@ export function CustomDonation() {
       await navigator.clipboard.writeText(PIX_KEY);
       setCopied(true);
       toast.success("Chave PIX copiada!");
+      trackEvent("copiar_pix_cnpj", { metadata: { location: "home_donation" } });
       setTimeout(() => setCopied(false), 2500);
     } catch {
       toast.error("Não foi possível copiar. Copie manualmente: " + PIX_KEY);
