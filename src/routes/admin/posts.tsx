@@ -307,7 +307,8 @@ function PostsPage() {
       </div>
 
       <div className="bg-white/[0.03] border border-white/10 rounded-2xl overflow-hidden">
-        <div className="overflow-x-auto">
+        {/* Desktop Table */}
+        <div className="hidden md:block overflow-x-auto">
           <Table>
           <TableHeader className="bg-white/5">
             <TableRow className="border-white/5 hover:bg-transparent">
@@ -404,6 +405,91 @@ function PostsPage() {
             )}
           </TableBody>
           </Table>
+        </div>
+
+        {/* Mobile Cards */}
+        <div className="block md:hidden">
+          {loading ? (
+            <div className="h-48 flex items-center justify-center">
+              <Loader2 className="w-8 h-8 animate-spin text-[#e8440c]" />
+            </div>
+          ) : filteredPosts.length === 0 ? (
+            <div className="h-48 flex items-center justify-center text-white/40 text-sm">
+              Nenhum post encontrado.
+            </div>
+          ) : (
+            <div className="divide-y divide-white/5">
+              {filteredPosts.map((p) => (
+                <div key={p.id} className="p-4 space-y-3">
+                  {/* Header: Image + Title */}
+                  <div className="flex items-start gap-3">
+                    <div className="w-12 h-12 rounded-lg bg-white/5 overflow-hidden shrink-0 border border-white/10">
+                      {p.cover_image ? (
+                        <img src={p.cover_image} alt={p.title} className="w-full h-full object-cover" />
+                      ) : (
+                        <ImageIcon className="w-full h-full p-3 text-white/20" />
+                      )}
+                    </div>
+                    <div className="flex-1 min-w-0">
+                      <p className="font-bold text-sm truncate">{p.title}</p>
+                      <p className="text-[11px] text-white/40 font-mono truncate">/{p.slug}</p>
+                    </div>
+                  </div>
+
+                  {/* Info Row */}
+                  <div className="flex flex-wrap items-center gap-2">
+                    <Badge variant="outline" className="border-white/10 text-white/60 text-[10px]">
+                      <Tag className="w-3 h-3 mr-1" />
+                      {p.category || "Sem categoria"}
+                    </Badge>
+                    <Badge className={cn(
+                      "font-bold text-[10px] tracking-wider",
+                      p.status === "PUBLISHED" 
+                        ? "bg-emerald-500/10 text-emerald-400 border-emerald-500/20" 
+                        : "bg-amber-500/10 text-amber-400 border-amber-500/20"
+                    )}>
+                      {p.status === "PUBLISHED" ? "PUBLICADO" : "RASCUNHO"}
+                    </Badge>
+                    <span className="text-[11px] text-white/40">
+                      {p.published_at ? format(new Date(p.published_at), "dd/MM/yyyy") : "-"}
+                    </span>
+                  </div>
+
+                  {/* Actions Row */}
+                  <div className="flex items-center gap-2 pt-1">
+                    <Button 
+                      variant="ghost" 
+                      size="sm" 
+                      onClick={() => handleToggleStatus(p)}
+                      className="text-white/40 hover:text-white hover:bg-white/5 h-8 text-xs px-3"
+                    >
+                      {p.status === "PUBLISHED" ? (
+                        <><XCircle className="w-3.5 h-3.5 mr-1.5" /> Despublicar</>
+                      ) : (
+                        <><CheckCircle2 className="w-3.5 h-3.5 mr-1.5" /> Publicar</>
+                      )}
+                    </Button>
+                    <Button 
+                      variant="ghost" 
+                      size="sm" 
+                      onClick={() => handleOpenForm(p)}
+                      className="text-white/40 hover:text-white hover:bg-white/5 h-8 text-xs px-3"
+                    >
+                      <Edit2 className="w-3.5 h-3.5 mr-1.5" /> Editar
+                    </Button>
+                    <Button 
+                      variant="ghost" 
+                      size="sm" 
+                      onClick={() => handleDelete(p.id)}
+                      className="text-white/40 hover:text-red-400 hover:bg-red-400/10 h-8 text-xs px-3 ml-auto"
+                    >
+                      <Trash2 className="w-3.5 h-3.5 mr-1.5" /> Excluir
+                    </Button>
+                  </div>
+                </div>
+              ))}
+            </div>
+          )}
         </div>
       </div>
 
