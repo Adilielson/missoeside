@@ -12,7 +12,9 @@ import { SectionTag } from "../SectionTag";
 import { Button } from "@/components/ui/button";
 import { useState } from "react";
 import { toast } from "sonner";
-import ofertaMissionaria from "@/assets/qrcode-pix-ide.png.asset.json";
+import ofertaMissionariaAsset from "@/assets/qrcode-pix-ide.png.asset.json";
+import { assetUrl } from "@/lib/assetUrl";
+const ofertaMissionaria = { url: assetUrl(ofertaMissionariaAsset) };
 import { trackEvent } from "@/hooks/useAnalytics";
 
 const PIX_KEY = "65.267.286/0001-11";

@@ -1,5 +1,6 @@
 import { motion } from "framer-motion";
 import criancasCulto from "@/assets/criancas-culto-ide.jpeg.asset.json";
+import { assetUrl } from "@/lib/assetUrl";
 
 const images = [
   "https://images.unsplash.com/photo-1488521787991-ed7bbaae773c?q=80&w=400&auto=format&fit=crop",
@@ -7,7 +8,7 @@ const images = [
   "https://images.unsplash.com/photo-1593113598332-cd288d649433?q=80&w=400&auto=format&fit=crop",
   "https://images.unsplash.com/photo-1469571486292-0ba58a3f068b?q=80&w=400&auto=format&fit=crop",
   "https://images.unsplash.com/photo-1526660690293-bcd32dc3b123?q=80&w=400&auto=format&fit=crop",
-  criancasCulto.url,
+  assetUrl(criancasCulto),
   "https://images.unsplash.com/photo-1497633762265-9d179a990aa6?q=80&w=400&auto=format&fit=crop",
   "https://images.unsplash.com/photo-1511632765486-a01980e01a18?q=80&w=400&auto=format&fit=crop",
 ];
