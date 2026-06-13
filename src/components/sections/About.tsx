@@ -81,35 +81,6 @@ export function About() {
             do planeta, levando não apenas assistência material, mas a mensagem transformadora do Evangelho.
           </p>
 
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-6 mb-10">
-            <div className="flex items-start gap-4 p-4 rounded-2xl bg-white border border-brand-orange/10 shadow-sm">
-              <div className="w-12 h-12 rounded-xl bg-brand-orange/10 flex items-center justify-center text-brand-orange shrink-0">
-                <Users className="w-6 h-6" />
-              </div>
-              <div>
-                <p className="font-black text-brand-dark">Equipe de Missão</p>
-                <div className="flex -space-x-2 mt-2">
-                  {[1, 2, 3].map(i => (
-                    <img 
-                      key={i} 
-                      src={`https://i.pravatar.cc/150?u=team-${i}`} 
-                      className="w-6 h-6 rounded-full border-2 border-white" 
-                      alt="Membro"
-                    />
-                  ))}
-                </div>
-              </div>
-            </div>
-            <div className="flex items-start gap-4 p-4 rounded-2xl bg-white border border-brand-orange/10 shadow-sm">
-              <div className="w-12 h-12 rounded-xl bg-brand-orange/10 flex items-center justify-center text-brand-orange shrink-0">
-                <CheckCircle className="w-6 h-6" />
-              </div>
-              <div>
-                <p className="font-black text-brand-dark">Projetos Ativos</p>
-                <p className="text-sm text-brand-dark/50">Mais de 50 países</p>
-              </div>
-            </div>
-          </div>
 
           <div className="flex flex-wrap items-center gap-8">
             <Button asChild className="bg-brand-orange hover:bg-brand-burgundy text-white px-8 py-6 rounded-full transition-all">
