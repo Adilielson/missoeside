@@ -12,7 +12,7 @@ import { SectionTag } from "../SectionTag";
 import { Button } from "@/components/ui/button";
 import { useState } from "react";
 import { toast } from "sonner";
-import ofertaMissionaria from "@/assets/oferta-missionaria-ide.jpeg.asset.json";
+import ofertaMissionaria from "@/assets/qrcode-pix-ide.png.asset.json";
 
 const PIX_KEY = "65.267.286/0001-11";
 const BANCO = "Caixa Econômica Federal";
