@@ -494,14 +494,14 @@ function PostsPage() {
       </div>
 
       <Dialog open={isFormOpen} onOpenChange={setIsFormOpen}>
-        <DialogContent className="max-w-none sm:max-w-4xl w-full h-dvh sm:h-auto sm:max-h-[90vh] !inset-0 sm:!inset-auto !translate-x-0 sm:!translate-x-[-50%] !translate-y-0 sm:!translate-y-[-50%] !rounded-none sm:!rounded-2xl overflow-y-auto bg-[#0a1628] border-white/10 text-white p-4 sm:p-6">
+        <DialogContent className="max-w-none sm:max-w-3xl lg:max-w-4xl xl:max-w-6xl w-full h-dvh sm:h-auto sm:max-h-[90vh] !inset-0 sm:!inset-auto !translate-x-0 sm:!translate-x-[-50%] !translate-y-0 sm:!translate-y-[-50%] !rounded-none sm:!rounded-2xl overflow-y-auto bg-[#0a1628] border-white/10 text-white p-4 sm:p-6">
           <DialogHeader>
             <DialogTitle className="text-xl sm:text-2xl font-black">
               {editingPost ? "Editar Artigo" : "Novo Artigo"}
             </DialogTitle>
           </DialogHeader>
 
-          <form onSubmit={handleSave} className="grid grid-cols-1 md:grid-cols-2 gap-4 sm:gap-6 py-2 sm:py-4">
+          <form onSubmit={handleSave} className="grid grid-cols-1 lg:grid-cols-2 gap-4 sm:gap-6 py-2 sm:py-4">
             <div className="space-y-4">
               <div className="space-y-2">
                 <Label className="text-xs font-bold text-white/50 tracking-widest uppercase">Título do Artigo</Label>
