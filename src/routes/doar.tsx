@@ -112,7 +112,7 @@ function DoarPage() {
 
             <div className="bg-white rounded-3xl p-3 sm:p-4 mb-6 max-w-sm mx-auto">
               <img
-                src={ofertaMissionaria.url}
+                src={`https://missoeside.lovable.app${ofertaMissionaria.url}`}
                 alt="QR Code PIX - Oferta Missionária IDE"
                 className="w-full h-auto rounded-2xl"
               />
