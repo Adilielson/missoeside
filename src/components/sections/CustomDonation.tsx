@@ -62,7 +62,7 @@ export function CustomDonation() {
 
             <div className="bg-white rounded-3xl p-3 sm:p-4 mb-6 max-w-xs mx-auto sm:mx-0">
               <img
-                src={ofertaMissionaria.url}
+                src={`https://missoeside.lovable.app${ofertaMissionaria.url}`}
                 alt="QR Code PIX - Oferta Missionária IDE"
                 className="w-full h-auto rounded-2xl"
               />
