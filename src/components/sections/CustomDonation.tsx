@@ -1,24 +1,45 @@
+// ============================================================================
+// ⚠️ ADAPTAÇÃO TEMPORÁRIA — LANÇAMENTO SEM ASAAS EM PRODUÇÃO
+// ----------------------------------------------------------------------------
+// O painel esquerdo (formulário Asaas) foi substituído por dados bancários
+// e QR Code PIX enquanto a integração Asaas não está em produção.
+// Para reverter: restaurar este arquivo da versão anterior no histórico.
+// As demais rotas (/doar, edge functions, webhooks) seguem intactas.
+// ============================================================================
 import { motion } from "framer-motion";
-import { Heart, DollarSign } from "lucide-react";
+import { Copy, Check, Landmark } from "lucide-react";
 import { SectionTag } from "../SectionTag";
 import { Button } from "@/components/ui/button";
-import { Progress } from "@/components/ui/progress";
 import { useState } from "react";
-import { cn } from "@/lib/utils";
+import { toast } from "sonner";
+import ofertaMissionaria from "@/assets/oferta-missionaria-ide.jpeg.asset.json";
 
-const quickAmounts = [10, 20, 50, 100, 200];
+const PIX_KEY = "65.267.286/0001-11";
+const BANCO = "Caixa Econômica Federal";
+const AGENCIA = "0553";
+const CONTA = "0555 / 1292 / 000570691693-0";
+const TITULAR = "Agência Cristã Missionária IDE";
 
 export function CustomDonation() {
-  const [selectedAmount, setSelectedAmount] = useState<number | null>(50);
-  const [customAmount, setCustomAmount] = useState("");
+  const [copied, setCopied] = useState(false);
+
+  const copyPix = async () => {
+    try {
+      await navigator.clipboard.writeText(PIX_KEY);
+      setCopied(true);
+      toast.success("Chave PIX copiada!");
+      setTimeout(() => setCopied(false), 2500);
+    } catch {
+      toast.error("Não foi possível copiar. Copie manualmente: " + PIX_KEY);
+    }
+  };
 
   return (
     <section id="doacoes" className="py-16 md:py-24 relative overflow-hidden">
-      {/* Background with overlay */}
       <div className="absolute inset-0 z-0">
-        <img 
-          src="https://images.unsplash.com/photo-1488521787991-ed7bbaae773c?q=80&w=2070&auto=format&fit=crop" 
-          alt="Donate background" 
+        <img
+          src="https://images.unsplash.com/photo-1488521787991-ed7bbaae773c?q=80&w=2070&auto=format&fit=crop"
+          alt=""
           className="w-full h-full object-cover"
         />
         <div className="absolute inset-0 bg-brand-dark/90" />
@@ -26,57 +47,55 @@ export function CustomDonation() {
 
       <div className="max-w-7xl mx-auto px-5 sm:px-6 relative z-10">
         <div className="grid grid-cols-1 lg:grid-cols-2 rounded-[32px] sm:rounded-[48px] lg:rounded-[60px] overflow-hidden shadow-2xl">
-          {/* Left: Donation Form */}
+          {/* Left: PIX + Dados Bancários (substitui temporariamente o form Asaas) */}
           <motion.div
             initial={{ opacity: 0, x: -50 }}
             whileInView={{ opacity: 1, x: 0 }}
             viewport={{ once: true }}
-            className="bg-brand-dark/40 backdrop-blur-md p-8 sm:p-12 lg:p-20 text-white"
+            className="bg-brand-dark/60 backdrop-blur-md p-8 sm:p-12 lg:p-16 text-white"
           >
-            <h2 className="text-3xl sm:text-4xl md:text-5xl font-black mb-8 sm:mb-10">Doe Agora</h2>
-            
-            <p className="text-white/60 mb-8 font-medium">Escolha um valor para transformar uma vida:</p>
-            
-            <div className="grid grid-cols-3 sm:flex sm:flex-wrap gap-3 sm:gap-4 mb-8">
-              {quickAmounts.map((amount) => (
-                <button
-                  key={amount}
-                  onClick={() => {
-                    setSelectedAmount(amount);
-                    setCustomAmount("");
-                  }}
-                  className={cn(
-                    "px-4 sm:px-8 py-3 sm:py-4 rounded-full font-black transition-all border-2 text-sm sm:text-base",
-                    selectedAmount === amount 
-                      ? "bg-brand-orange border-brand-orange text-white" 
-                      : "bg-white/5 border-white/10 text-white hover:border-brand-orange/50"
-                  )}
-                >
-                  R${amount}
-                </button>
-              ))}
-            </div>
+            <SectionTag text="Doe via PIX ou Transferência" />
+            <h2 className="text-3xl sm:text-4xl md:text-5xl font-black mb-3">Oferta Missionária</h2>
+            <p className="text-white/60 mb-8 font-medium">
+              Aponte a câmera do seu celular para o QR Code abaixo e contribua com qualquer valor.
+            </p>
 
-            <div className="relative mb-10">
-              <span className="absolute left-6 top-1/2 -translate-y-1/2 text-white/40 font-black">R$</span>
-              <input 
-                type="number"
-                placeholder="Valor Personalizado"
-                value={customAmount}
-                onChange={(e) => {
-                  setCustomAmount(e.target.value);
-                  setSelectedAmount(null);
-                }}
-                className="w-full bg-white/5 border-2 border-white/10 rounded-full py-5 pl-14 pr-6 focus:outline-none focus:border-brand-orange transition-all font-black text-xl"
+            <div className="bg-white rounded-3xl p-3 sm:p-4 mb-6 max-w-xs mx-auto sm:mx-0">
+              <img
+                src={ofertaMissionaria.url}
+                alt="QR Code PIX - Oferta Missionária IDE"
+                className="w-full h-auto rounded-2xl"
               />
             </div>
 
-            <Button className="w-full bg-brand-gradient hover:opacity-90 text-white text-lg sm:text-xl py-6 sm:py-8 rounded-full shadow-lg shadow-brand-orange/20 transition-all active:scale-95">
-              Fazer Doação <Heart className="ml-2 w-5 h-5 sm:w-6 sm:h-6 fill-white" />
+            <Button
+              onClick={copyPix}
+              className="w-full bg-brand-gradient hover:opacity-90 text-white text-base sm:text-lg py-6 sm:py-7 rounded-full shadow-lg shadow-brand-orange/20 transition-all active:scale-95 mb-4"
+            >
+              {copied ? (
+                <>
+                  <Check className="mr-2 w-5 h-5" /> Chave PIX copiada
+                </>
+              ) : (
+                <>
+                  <Copy className="mr-2 w-5 h-5" /> Copiar Chave PIX (CNPJ)
+                </>
+              )}
             </Button>
+
+            <div className="bg-white/5 border border-white/10 rounded-2xl p-5 text-sm space-y-1.5">
+              <div className="flex items-center gap-2 text-brand-orange font-bold uppercase tracking-widest text-xs mb-2">
+                <Landmark className="w-4 h-4" /> Dados Bancários
+              </div>
+              <p><span className="text-white/50">Titular:</span> <span className="font-semibold">{TITULAR}</span></p>
+              <p><span className="text-white/50">Banco:</span> <span className="font-semibold">{BANCO}</span></p>
+              <p><span className="text-white/50">Agência:</span> <span className="font-semibold">{AGENCIA}</span></p>
+              <p><span className="text-white/50">Conta Corrente:</span> <span className="font-semibold">{CONTA}</span></p>
+              <p><span className="text-white/50">Chave PIX (CNPJ):</span> <span className="font-semibold">{PIX_KEY}</span></p>
+            </div>
           </motion.div>
 
-          {/* Right: Info Panel */}
+          {/* Right: Info Panel (inalterado) */}
           <motion.div
             initial={{ opacity: 0, x: 50 }}
             whileInView={{ opacity: 1, x: 0 }}
@@ -88,7 +107,7 @@ export function CustomDonation() {
               Sua Generosidade Alimenta a Esperança do Mundo
             </h3>
             <p className="text-white/80 mb-10 sm:mb-12 text-base sm:text-lg leading-relaxed">
-              Cada centavo doado é direcionado integralmente para as nossas frentes missionárias. 
+              Cada centavo doado é direcionado integralmente para as nossas frentes missionárias.
               Juntos, podemos alcançar lugares onde ninguém mais vai.
             </p>
 
@@ -98,7 +117,7 @@ export function CustomDonation() {
                 <span>85%</span>
               </div>
               <div className="h-4 w-full bg-white/20 rounded-full overflow-hidden">
-                <motion.div 
+                <motion.div
                   initial={{ width: 0 }}
                   whileInView={{ width: "85%" }}
                   viewport={{ once: true }}
