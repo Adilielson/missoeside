@@ -7,7 +7,7 @@ import { Causes } from "@/components/sections/Causes";
 import { Stats } from "@/components/sections/Stats";
 import { Events } from "@/components/sections/Events";
 import { Volunteers } from "@/components/sections/Volunteers";
-import { Team } from "@/components/sections/Team";
+
 import { Testimonials } from "@/components/sections/Testimonials";
 import { Blog } from "@/components/sections/Blog";
 import { MarqueeGallery } from "@/components/sections/MarqueeGallery";
@@ -28,7 +28,7 @@ function Index() {
       <Stats />
       <Events />
       <Volunteers />
-      <Team />
+      
       <Testimonials />
       <Blog />
       <MarqueeGallery />
