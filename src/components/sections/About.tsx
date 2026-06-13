@@ -35,7 +35,7 @@ export function About() {
               </div>
               <div className="aspect-square rounded-full overflow-hidden border-8 border-white shadow-xl">
                 <img 
-                  src={`https://missoeside.lovable.app${criancasCulto.url}`}
+                  src={criancasCulto.url}
                   alt="Crianças no culto"
                   className="w-full h-full object-cover"
                 />
