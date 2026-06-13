@@ -8,6 +8,8 @@ import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle }
 import { toast } from "sonner";
 import { Loader2 } from "lucide-react";
 import { Logo } from "@/components/Logo";
+import voluntariosAsset from "@/assets/voluntarios-ide.png.asset.json";
+const voluntariosImg = voluntariosAsset.url;
 
 export const Route = createFileRoute("/admin/login")({
   component: AdminLoginPage,
