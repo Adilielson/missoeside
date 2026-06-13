@@ -72,7 +72,17 @@ function CopyRow({ label, value }: { label: string; value: string }) {
 function DoarPage() {
   return (
     <main className="min-h-screen bg-brand-dark text-white relative overflow-hidden">
-      {/* Background */}
+      {/* Background Image */}
+      <div className="absolute inset-0 z-0">
+        <img 
+          src={voluntariosImg} 
+          alt="" 
+          className="w-full h-full object-cover opacity-25"
+        />
+        <div className="absolute inset-0 bg-brand-dark/70" />
+      </div>
+
+      {/* Background blobs */}
       <div className="absolute inset-0 z-0 opacity-20">
         <div className="absolute -top-40 -right-40 w-[600px] h-[600px] rounded-full bg-brand-orange/30 blur-3xl" />
         <div className="absolute -bottom-40 -left-40 w-[600px] h-[600px] rounded-full bg-brand-orange/20 blur-3xl" />
