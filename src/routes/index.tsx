@@ -8,7 +8,7 @@ import { Stats } from "@/components/sections/Stats";
 import { Events } from "@/components/sections/Events";
 import { Volunteers } from "@/components/sections/Volunteers";
 
-import { Testimonials } from "@/components/sections/Testimonials";
+// import { Testimonials } from "@/components/sections/Testimonials";
 import { Blog } from "@/components/sections/Blog";
 import { MarqueeGallery } from "@/components/sections/MarqueeGallery";
 import { ContactBar } from "@/components/sections/ContactBar";
@@ -29,7 +29,7 @@ function Index() {
       {/* <Events /> oculto temporariamente no front — admin/back continua funcionando */}
       <Volunteers />
       
-      <Testimonials />
+      {/* <Testimonials /> oculto temporariamente */}
       <Blog />
       <MarqueeGallery />
       <ContactBar />
