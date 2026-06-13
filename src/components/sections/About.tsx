@@ -3,6 +3,7 @@ import { Heart, Phone, Users, CheckCircle } from "lucide-react";
 import { SectionTag } from "../SectionTag";
 import { Button } from "@/components/ui/button";
 import { Link } from "@tanstack/react-router";
+import criancasCulto from "@/assets/criancas-culto-ide.jpeg.asset.json";
 
 export function About() {
   return (
