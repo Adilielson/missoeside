@@ -3,6 +3,7 @@ import { Heart, Phone, Users, CheckCircle } from "lucide-react";
 import { SectionTag } from "../SectionTag";
 import { Button } from "@/components/ui/button";
 import { Link } from "@tanstack/react-router";
+import criancasCulto from "@/assets/criancas-culto-ide.jpeg.asset.json";
 
 export function About() {
   return (
@@ -34,8 +35,8 @@ export function About() {
               </div>
               <div className="aspect-square rounded-full overflow-hidden border-8 border-white shadow-xl">
                 <img 
-                  src="https://images.unsplash.com/photo-1526660690293-bcd32dc3b123?q=80&w=2070&auto=format&fit=crop" 
-                  alt="Missão 2" 
+                  src={criancasCulto.url}
+                  alt="Crianças no culto"
                   className="w-full h-full object-cover"
                 />
               </div>
