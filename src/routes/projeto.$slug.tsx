@@ -8,6 +8,7 @@ import { SectionTag } from "@/components/SectionTag";
 import { Button } from "@/components/ui/button";
 import { useState, useEffect } from "react";
 import { supabase } from "@/integrations/supabase/client";
+import { trackEvent } from "@/hooks/useAnalytics";
 
 export const Route = createFileRoute("/projeto/$slug")({
   component: ProjectPage,
