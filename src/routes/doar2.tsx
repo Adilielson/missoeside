@@ -10,7 +10,7 @@ import { cn } from "@/lib/utils";
 import logoIde from "@/assets/logo-ide.png";
 import bgImage from "@/assets/africa-xai-xai.png";
 
-export const Route = createFileRoute("/doar")({
+export const Route = createFileRoute("/doar2")({
   head: () => ({
     meta: [
       { title: "Doe Agora — IDE Missões para o Mundo" },
@@ -370,7 +370,6 @@ function DoarPage() {
           </div>
         </div>
       </section>
-
       {/* RIGHT: Image / Project Info */}
       <aside className="hidden lg:block lg:w-[55%] relative overflow-hidden">
         <img 
@@ -410,7 +409,6 @@ function DoarPage() {
           )}
         </div>
       </aside>
-
       {/* PIX modal */}
       <Dialog open={!!pixData} onOpenChange={(o) => !o && setPixData(null)}>
         <DialogContent className="max-w-md">
@@ -455,7 +453,7 @@ function DoarPage() {
         </DialogContent>
       </Dialog>
     </main>
-  );
+  )
 }
 
 function Section({ title, children }: { title: string; children: React.ReactNode }) {

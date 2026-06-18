@@ -15,6 +15,7 @@ import { Route as ObrigadoRouteImport } from './routes/obrigado'
 import { Route as NossosProjetosRouteImport } from './routes/nossos-projetos'
 import { Route as EventosRouteImport } from './routes/eventos'
 import { Route as EquipeRouteImport } from './routes/equipe'
+import { Route as Doar2RouteImport } from './routes/doar2'
 import { Route as DoarRouteImport } from './routes/doar'
 import { Route as BlogRouteImport } from './routes/blog'
 import { Route as AdminRouteImport } from './routes/admin'
@@ -63,6 +64,11 @@ const EventosRoute = EventosRouteImport.update({
 const EquipeRoute = EquipeRouteImport.update({
   id: '/equipe',
   path: '/equipe',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const Doar2Route = Doar2RouteImport.update({
+  id: '/doar2',
+  path: '/doar2',
   getParentRoute: () => rootRouteImport,
 } as any)
 const DoarRoute = DoarRouteImport.update({
@@ -166,6 +172,7 @@ export interface FileRoutesByFullPath {
   '/admin': typeof AdminRouteWithChildren
   '/blog': typeof BlogRouteWithChildren
   '/doar': typeof DoarRoute
+  '/doar2': typeof Doar2Route
   '/equipe': typeof EquipeRouteWithChildren
   '/eventos': typeof EventosRoute
   '/nossos-projetos': typeof NossosProjetosRoute
@@ -191,6 +198,7 @@ export interface FileRoutesByFullPath {
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/doar': typeof DoarRoute
+  '/doar2': typeof Doar2Route
   '/eventos': typeof EventosRoute
   '/nossos-projetos': typeof NossosProjetosRoute
   '/obrigado': typeof ObrigadoRoute
@@ -218,6 +226,7 @@ export interface FileRoutesById {
   '/admin': typeof AdminRouteWithChildren
   '/blog': typeof BlogRouteWithChildren
   '/doar': typeof DoarRoute
+  '/doar2': typeof Doar2Route
   '/equipe': typeof EquipeRouteWithChildren
   '/eventos': typeof EventosRoute
   '/nossos-projetos': typeof NossosProjetosRoute
@@ -247,6 +256,7 @@ export interface FileRouteTypes {
     | '/admin'
     | '/blog'
     | '/doar'
+    | '/doar2'
     | '/equipe'
     | '/eventos'
     | '/nossos-projetos'
@@ -272,6 +282,7 @@ export interface FileRouteTypes {
   to:
     | '/'
     | '/doar'
+    | '/doar2'
     | '/eventos'
     | '/nossos-projetos'
     | '/obrigado'
@@ -298,6 +309,7 @@ export interface FileRouteTypes {
     | '/admin'
     | '/blog'
     | '/doar'
+    | '/doar2'
     | '/equipe'
     | '/eventos'
     | '/nossos-projetos'
@@ -326,6 +338,7 @@ export interface RootRouteChildren {
   AdminRoute: typeof AdminRouteWithChildren
   BlogRoute: typeof BlogRouteWithChildren
   DoarRoute: typeof DoarRoute
+  Doar2Route: typeof Doar2Route
   EquipeRoute: typeof EquipeRouteWithChildren
   EventosRoute: typeof EventosRoute
   NossosProjetosRoute: typeof NossosProjetosRoute
@@ -378,6 +391,13 @@ declare module '@tanstack/react-router' {
       path: '/equipe'
       fullPath: '/equipe'
       preLoaderRoute: typeof EquipeRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/doar2': {
+      id: '/doar2'
+      path: '/doar2'
+      fullPath: '/doar2'
+      preLoaderRoute: typeof Doar2RouteImport
       parentRoute: typeof rootRouteImport
     }
     '/doar': {
@@ -572,6 +592,7 @@ const rootRouteChildren: RootRouteChildren = {
   AdminRoute: AdminRouteWithChildren,
   BlogRoute: BlogRouteWithChildren,
   DoarRoute: DoarRoute,
+  Doar2Route: Doar2Route,
   EquipeRoute: EquipeRouteWithChildren,
   EventosRoute: EventosRoute,
   NossosProjetosRoute: NossosProjetosRoute,
