@@ -14,6 +14,7 @@ import {
   X
 } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
+import { createClient } from "@supabase/supabase-js";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import {
@@ -165,36 +166,46 @@ function UsersPage() {
     
     setCreating(true);
     try {
-      // 1. Criar usuário no Auth do Supabase via Edge Function ou API (se permitido pela configuração)
-      // Como não temos uma edge function de admin setada agora, vamos usar o signUp
-      // Mas em um cenário real de Admin, o ideal é usar a Admin API do Supabase (que requer service_role key)
-      // ou uma Edge Function. Vamos simular/usar o que é possível pelo cliente.
-      
-      const { data, error: signUpError } = await supabase.auth.signUp({
+      // IMPORTANTE: usamos um cliente Supabase TEMPORÁRIO e isolado para o signUp,
+      // sem persistir sessão nem armazenamento — assim NÃO substituímos a sessão
+      // do admin logado pela sessão do novo usuário recém-criado.
+      const tempClient = createClient(
+        import.meta.env.VITE_SUPABASE_URL as string,
+        import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY as string,
+        {
+          auth: {
+            persistSession: false,
+            autoRefreshToken: false,
+            storageKey: `sb-temp-signup-${Date.now()}`,
+          },
+        }
+      );
+
+      const { data, error: signUpError } = await tempClient.auth.signUp({
         email: newUserEmail,
         password: newUserPassword,
         options: {
           data: {
             full_name: newUserFullName,
-          }
-        }
+          },
+        },
       });
 
       if (signUpError) throw signUpError;
-      
+
       if (data.user) {
-        // 2. Atualizar o profile com o cargo selecionado
+        // 2. Atualizar o profile com o cargo selecionado usando o cliente do admin
         const { error: profileError } = await supabase
           .from("profiles")
-          .update({ 
+          .update({
             role: newUserRole,
             full_name: newUserFullName,
-            permissions: selectedPermissions
+            permissions: selectedPermissions,
           })
           .eq("id", data.user.id);
-          
+
         if (profileError) throw profileError;
-        
+
         toast.success("Usuário criado com sucesso!");
         setIsCreateOpen(false);
         setNewUserEmail("");
