@@ -69,12 +69,14 @@ export function Hero() {
             aria-hidden="true"
             className="absolute inset-0 w-full h-full object-cover"
             initial={false}
-            animate={{ opacity: i === imgIndex ? 0.25 : 0 }}
+            animate={{ opacity: i === imgIndex ? 1 : 0 }}
             transition={{ duration: 1.5, ease: "easeInOut" }}
           />
         ))}
-        <div className="absolute inset-0 bg-gradient-to-b from-brand-dark via-brand-dark/85 to-brand-dark" />
+        {/* Overlay para legibilidade do texto sem esconder a imagem */}
+        <div className="absolute inset-0 bg-gradient-to-b from-brand-dark/85 via-brand-dark/55 to-brand-dark/90" />
       </div>
+
 
       {/* Soft glows */}
       <div className="absolute top-1/4 left-10 w-72 md:w-96 h-72 md:h-96 bg-brand-orange/10 blur-[140px] rounded-full pointer-events-none" />
