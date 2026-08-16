@@ -1,40 +1,29 @@
-# Plan to Rename "Blog" to "News"
+# Plano: Aba de Histórico de Alterações (Admin)
 
-Rename all occurrences of "Blog" to "News" across the application, including UI text, headlines, navigation, SEO metadata, and routes.
+Este plano descreve a implementação de um sistema de logs de auditoria para rastrear ações realizadas por usuários no painel administrativo (criação/edição de posts, projetos, eventos e usuários).
 
-## User Review Required
+## Alterações Propostas
 
-> [!IMPORTANT]
-> This change will rename the URL from `/blog` to `/news`. Existing links to `/blog` will no longer work unless a redirect is implemented.
+### Backend & Banco de Dados
+- **Tabela de Logs**: Utilizaremos a tabela `page_events` existente para eventos simples, ou criaremos uma nova tabela `admin_logs` se for necessário armazenar o estado anterior/novo das alterações (diff).
+- **Triggers (Opcional)**: Avaliar o uso de triggers no banco para capturar alterações automáticas, ou implementar via aplicação para maior controle.
 
-## Proposed Changes
+### Frontend & Dashboards
+- **Nova Aba no Admin**: Adicionar "Histórico" ao menu lateral do `/admin`.
+- **Página de Histórico**: Criar `src/routes/admin/history.tsx` com filtros por data, usuário e tipo de ação.
+- **Integração de Logs**:
+  - Instrumentar as páginas de Posts, Projetos e Eventos para disparar eventos de log no sucesso de operações de salvamento/exclusão.
+  - Logar acessos à área administrativa.
 
-### Routes and Navigation
-- Rename route files:
-  - `src/routes/blog.tsx` -> `src/routes/news.tsx`
-  - `src/routes/blog.index.tsx` -> `src/routes/news.index.tsx`
-  - `src/routes/blog.$slug.tsx` -> `src/routes/news.$slug.tsx`
-- Update all navigation links:
-  - `Navbar.tsx`: Change label "Blog" to "News" and href to `/news`.
-  - `Footer.tsx`: Change label "Blog" to "News" and href to `/news`.
-  - `Blog.tsx` (section): Change ID to `#news` and links to `/news`.
+### Segurança
+- **Restrição de Acesso**: A nova aba será visível e acessível **apenas** para usuários com o cargo (`role`) de `admin`.
 
-### UI Text and Headlines
-- Update "Nosso Blog" to "News" or "IDE News" in `Blog.tsx` and `news.index.tsx`.
-- Update back links (e.g., "Voltar para Blog" -> "Voltar para News").
-- Update placeholders (e.g., "Carregando blog..." -> "Carregando news...").
-- Update admin dashboard labels and headlines.
+## Detalhes Técnicos
+- **Hook de Registro**: Criar `useAdminLogger.ts` que facilita o envio de logs estruturados para o Supabase.
+- **Componente de Timeline**: Exibir os logs em formato de linha do tempo ou tabela detalhada.
+- **Metadados**: Salvar o JSON da alteração no campo `metadata` para permitir visualização do que mudou.
 
-### SEO and Metadata
-- Update `<title>` tags from "Blog IDE" to "News IDE".
-- Update `<meta name="description">` content that mentions "blog".
-- Update OpenGraph tags.
-
-### Code Consistency
-- Rename `Blog` component to `News` in `src/components/sections/Blog.tsx`.
-- Update imports and usage in `src/routes/index.tsx`.
-
-## Technical Details
-- Using `mv` to rename route files.
-- Using `line_replace` to update text and identifiers.
-- The `routeTree.gen.ts` will auto-update after file changes.
+## Próximos Passos
+1. Criar a nova rota de histórico no admin.
+2. Adicionar o item ao menu em `src/routes/admin.tsx`.
+3. Implementar a lógica de captura de logs nos formulários existentes.
