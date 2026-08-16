@@ -36,6 +36,7 @@ import { toast } from "sonner";
 import { cn } from "@/lib/utils";
 import { format } from "date-fns";
 import { ptBR } from "date-fns/locale";
+import { logAdminAction } from "@/hooks/useAdminLogger";
 
 export const Route = createFileRoute("/admin/posts")({
   component: PostsPage,
