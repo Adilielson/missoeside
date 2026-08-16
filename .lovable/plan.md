@@ -1,29 +1,34 @@
-# Plano: Aba de Histórico de Alterações (Admin)
+# Plan - Administrative Route Access and Analytics Testing
 
-Este plano descreve a implementação de um sistema de logs de auditoria para rastrear ações realizadas por usuários no painel administrativo (criação/edição de posts, projetos, eventos e usuários).
+Verify access to administrative routes, ensure the "Acompanhamento" (Analytics) panel is correctly tracking interactions (including button clicks and PIX code copying), and confirm the "Histórico" (Activity History) records these actions.
 
-## Alterações Propostas
+## User Review Required
 
-### Backend & Banco de Dados
-- **Tabela de Logs**: Utilizaremos a tabela `page_events` existente para eventos simples, ou criaremos uma nova tabela `admin_logs` se for necessário armazenar o estado anterior/novo das alterações (diff).
-- **Triggers (Opcional)**: Avaliar o uso de triggers no banco para capturar alterações automáticas, ou implementar via aplicação para maior controle.
+> [!IMPORTANT]
+> Since testing authenticated routes and specific button actions requires a live user session, I will use a Playwright script to simulate these actions in the sandbox environment.
 
-### Frontend & Dashboards
-- **Nova Aba no Admin**: Adicionar "Histórico" ao menu lateral do `/admin`.
-- **Página de Histórico**: Criar `src/routes/admin/history.tsx` com filtros por data, usuário e tipo de ação.
-- **Integração de Logs**:
-  - Instrumentar as páginas de Posts, Projetos e Eventos para disparar eventos de log no sucesso de operações de salvamento/exclusão.
-  - Logar acessos à área administrativa.
+- **Authentication**: I will attempt to mint a session for an existing administrative user to access the `/admin` routes.
+- **Verification**: I will perform specific actions (visiting pages, clicking buttons) and then check the Analytics and History panels to ensure they captured the data with the correct Brazilian time (America/Sao_Paulo).
 
-### Segurança
-- **Restrição de Acesso**: A nova aba será visível e acessível **apenas** para usuários com o cargo (`role`) de `admin`.
+## Technical Details
 
-## Detalhes Técnicos
-- **Hook de Registro**: Criar `useAdminLogger.ts` que facilita o envio de logs estruturados para o Supabase.
-- **Componente de Timeline**: Exibir os logs em formato de linha do tempo ou tabela detalhada.
-- **Metadados**: Salvar o JSON da alteração no campo `metadata` para permitir visualização do que mudou.
+### Administrative Access
+- Navigate to `/admin/login` and verify redirections.
+- Confirm sidebar visibility of "Acompanhamento" and "Histórico" for administrators.
 
-## Próximos Passos
-1. Criar a nova rota de histórico no admin.
-2. Adicionar o item ao menu em `src/routes/admin.tsx`.
-3. Implementar a lógica de captura de logs nos formulários existentes.
+### Analytics Tracking (`page_events` table)
+- **Page Views**: Verify that navigating to `/nossos-projetos` and project details generates `page_view` events.
+- **Button Clicks**:
+    - Trigger "Apoiar Agora" clicks and verify `button_click` events with `metadata.location`.
+    - Trigger PIX CNPJ copy action and verify `copiar_pix_cnpj` event.
+- **Timezone**: Ensure `created_at` timestamps are correctly interpreted as Brasília time in the dashboard display (`America/Sao_Paulo`).
+
+### Audit Logging
+- Perform a dummy update (e.g., updating a post or user permission) and verify it appears in `/admin/history`.
+
+### Validation Steps
+1. Run a Playwright script to:
+    - Log in to `/admin`.
+    - Navigate to public pages and click tracking-enabled buttons.
+    - Return to `/admin/analytics` and `/admin/history` to verify records exist.
+2. Capture screenshots of the Analytics dashboard showing the new data.
