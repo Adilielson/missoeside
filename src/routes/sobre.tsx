@@ -64,7 +64,7 @@ function AboutPage() {
               transition={{ delay: 0.3 }}
               className="text-lg md:text-xl text-white/70 leading-relaxed mb-8"
             >
-              Nossa missão é ir por todo o mundo e pregar o evangelho a toda criatura, sendo o braço estendido de Cristo em cada nação.
+              Levar esperança, dignidade e o amor de DEUS á todos que necessitam, promovendo transformação espiritual, social e emocional.
             </motion.p>
           </div>
         </div>
@@ -78,19 +78,19 @@ function AboutPage() {
               {
                 icon: Target,
                 title: "Missão",
-                text: "Ser o braço estendido de Cristo em cada nação, provendo auxílio prático e esperança espiritual através de missões globais integradas.",
+                text: "Levar esperança, dignidade e o amor de DEUS á todos que necessitam, promovendo transformação espiritual, social e emocional.",
                 color: "bg-brand-orange/10 text-brand-orange"
               },
               {
                 icon: Globe,
                 title: "Visão",
-                text: "Alcançar os lugares mais remotos e as comunidades mais vulneráveis, criando um ecossistema de generosidade e transformação sustentável.",
+                text: "Ser uma Agência Missionária reconhecida, por transformar vidas, alcançando nações com o Evangelho e cuidado integral.",
                 color: "bg-brand-burgundy/10 text-brand-burgundy"
               },
               {
                 icon: Sparkles,
                 title: "Valores",
-                text: "Fé inabalável, transparência radical, amor em ação e o compromisso solene de proclamar a palavra de Deus.",
+                text: "Amor ao próximo, Compaixão, Justiça Social, Fé e Dependência em DEUS, Excelência no Servir, Compromisso com vidas",
                 color: "bg-brand-dark/10 text-brand-dark"
               }
             ].map((item, i) => (
