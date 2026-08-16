@@ -3,6 +3,7 @@ import { Navbar } from "@/components/sections/Navbar";
 import { Footer } from "@/components/sections/Footer";
 import { ContactBar } from "@/components/sections/ContactBar";
 import { motion } from "framer-motion";
+import { Helmet } from "react-helmet-async";
 import { Heart, Calendar, MapPin, Share2, ArrowRight, ChevronLeft, Loader2 } from "lucide-react";
 import { SectionTag } from "@/components/SectionTag";
 import { Button } from "@/components/ui/button";
@@ -93,6 +94,12 @@ function ProjectPage() {
 
   return (
     <main className="min-h-screen selection:bg-brand-orange selection:text-white bg-brand-light relative">
+      <Helmet>
+        <title>{project.name} | Agência Cristã Missionária IDE</title>
+        <meta name="description" content={project.short_description || `Conheça o projeto ${project.name} e saiba como você pode ajudar a transformar vidas.`} />
+        <meta property="og:title" content={`${project.name} | IDE`} />
+        <meta property="og:image" content={project.cover_image || ""} />
+      </Helmet>
       <Navbar dark />
       <div className="absolute top-28 left-0 right-0 z-30 pointer-events-none">
         <div className="max-w-7xl mx-auto px-5 sm:px-6">

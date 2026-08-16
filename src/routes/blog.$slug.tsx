@@ -3,6 +3,7 @@ import { Navbar } from "@/components/sections/Navbar";
 import { Footer } from "@/components/sections/Footer";
 import { ContactBar } from "@/components/sections/ContactBar";
 import { motion } from "framer-motion";
+import { Helmet } from "react-helmet-async";
 import { User, Calendar, Share2, ArrowRight, ChevronLeft, Loader2, Tag } from "lucide-react";
 import { SectionTag } from "@/components/SectionTag";
 import { Button } from "@/components/ui/button";
@@ -92,6 +93,13 @@ function PostPage() {
 
   return (
     <main className="min-h-screen selection:bg-brand-orange selection:text-white bg-brand-light relative">
+      <Helmet>
+        <title>{post.title} | Blog IDE</title>
+        <meta name="description" content={post.excerpt || `Leia sobre ${post.title} no blog da Agência Cristã Missionária IDE.`} />
+        <meta property="og:title" content={post.title} />
+        <meta property="og:image" content={post.cover_image || ""} />
+        <meta property="og:type" content="article" />
+      </Helmet>
       <Navbar dark />
       <div className="absolute top-28 left-0 right-0 z-30 pointer-events-none">
         <div className="max-w-7xl mx-auto px-5 sm:px-6">

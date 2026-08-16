@@ -1,5 +1,6 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { motion } from "framer-motion";
+import { Helmet } from "react-helmet-async";
 import { ArrowLeft, Heart, Target, Sparkles, Globe, MessageSquare } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { SectionTag } from "@/components/SectionTag";
@@ -13,6 +14,10 @@ export const Route = createFileRoute("/sobre")({
 function AboutPage() {
   return (
     <main className="min-h-screen bg-brand-light selection:bg-brand-orange selection:text-white">
+      <Helmet>
+        <title>Nossa Essência | Agência Cristã Missionária IDE</title>
+        <meta name="description" content="Conheça a nossa missão, visão e valores. Saiba como a Agência IDE está impactando nações através do amor de Deus e cuidado integral." />
+      </Helmet>
       <Navbar dark />
       
       {/* Hero Section */}
