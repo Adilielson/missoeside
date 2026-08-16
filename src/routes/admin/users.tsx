@@ -147,6 +147,7 @@ function UsersPage() {
         .eq("id", editingUser.id);
 
       if (error) throw error;
+      void logAdminAction('user_update', { target_id: editingUser.id, metadata: { role: newRole } });
       toast.success("Perfil atualizado com sucesso!");
       setIsEditOpen(false);
       fetchUsers();
@@ -206,6 +207,7 @@ function UsersPage() {
 
         if (profileError) throw profileError;
 
+        void logAdminAction('user_create', { target_id: data.user.id, metadata: { email: newUserEmail } });
         toast.success("Usuário criado com sucesso!");
         setIsCreateOpen(false);
         setNewUserEmail("");
@@ -237,6 +239,7 @@ function UsersPage() {
         .eq("id", userId);
 
       if (error) throw error;
+      void logAdminAction('user_delete', { target_id: userId });
       toast.success("Usuário removido da lista de perfis.");
       fetchUsers();
     } catch (error: any) {

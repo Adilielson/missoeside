@@ -17,10 +17,12 @@ import {
 import { Logo } from "@/components/Logo";
 import { supabase } from "@/integrations/supabase/client";
 import { cn } from "@/lib/utils";
+import { logAdminAction } from "@/hooks/useAdminLogger";
 
 export const Route = createFileRoute("/admin")({
   component: AdminLayout,
 });
+
 
 const menuItems = [
   { id: "projects", label: "Projetos / Missões", icon: Briefcase, path: "/admin/projects" },
@@ -89,7 +91,7 @@ function AdminLayout() {
         
         // Se for admin, garante todas as permissões se não estiverem definidas
         if (profile.role === 'admin' && permissions.length === 0) {
-          permissions = ['dashboard', 'projects', 'events', 'posts', 'team', 'analytics', 'newsletter', 'users'];
+          permissions = ['dashboard', 'projects', 'events', 'posts', 'team', 'analytics', 'history', 'newsletter', 'users'];
         }
 
         // Se o usuário não tem permissão explicitamente para 'dashboard', mas está logado, 
@@ -147,6 +149,7 @@ function AdminLayout() {
       }
 
       setAuthed(true);
+      void logAdminAction('admin_access');
     } catch (error) {
       console.error("Error checking admin:", error);
     } finally {
