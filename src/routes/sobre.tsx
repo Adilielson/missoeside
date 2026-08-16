@@ -64,7 +64,7 @@ function AboutPage() {
               transition={{ delay: 0.3 }}
               className="text-lg md:text-xl text-white/70 leading-relaxed mb-8"
             >
-              Nossa missão é ir por todo o mundo e pregar o evangelho a toda criatura, sendo o braço estendido de Cristo em cada nação.
+              Levar esperança, dignidade e o amor de DEUS á todos que necessitam, promovendo transformação espiritual, social e emocional.
             </motion.p>
           </div>
         </div>
