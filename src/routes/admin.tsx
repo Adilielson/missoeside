@@ -28,6 +28,7 @@ const menuItems = [
   { id: "posts", label: "News", icon: FileText, path: "/admin/posts" },
   { id: "team", label: "Equipe", icon: UserCircle, path: "/admin/team" },
   { id: "analytics", label: "Acompanhamento", icon: BarChart3, path: "/admin/analytics" },
+  { id: "history", label: "Histórico", icon: Shield, path: "/admin/history", adminOnly: true },
   { id: "newsletter", label: "Newsletter", icon: Mail, path: "/admin/newsletter", adminOnly: true },
   { id: "users", label: "Usuários", icon: Users, path: "/admin/users" },
 ];
