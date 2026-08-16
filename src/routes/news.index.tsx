@@ -73,7 +73,7 @@ function NewsPage() {
           >
             <SectionTag icon={FileText} text="Conhecimento e Reflexão" />
             <h1 className="text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-black text-white leading-[1.05] mb-8 uppercase tracking-tighter">
-              Nosso <span className="text-brand-orange">News</span>
+              NEWS
             </h1>
             <p className="text-white/60 text-lg max-w-2xl mx-auto mb-12">
               Artigos, notícias e estudos sobre missões, evangelismo e a vida cristã. Mantenha-se informado e inspirado.
