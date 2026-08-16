@@ -77,7 +77,7 @@ function UsersPage() {
   const permissionOptions = [
     { id: 'projects', label: 'Projetos / Missões' },
     { id: 'events', label: 'Eventos' },
-    { id: 'posts', label: 'Blog' },
+    { id: 'posts', label: 'News' },
     { id: 'team', label: 'Equipe' },
     { id: 'users', label: 'Usuários' },
   ];

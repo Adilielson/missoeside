@@ -24,7 +24,7 @@ type Post = {
   published_at: string | null;
 };
 
-function BlogPage() {
+function NewsPage() {
   const [posts, setPosts] = useState<Post[]>([]);
   const [loading, setLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState("");
@@ -73,7 +73,7 @@ function BlogPage() {
           >
             <SectionTag icon={FileText} text="Conhecimento e Reflexão" />
             <h1 className="text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-black text-white leading-[1.05] mb-8 uppercase tracking-tighter">
-              Nosso <span className="text-brand-orange">Blog</span>
+              Nosso <span className="text-brand-orange">News</span>
             </h1>
             <p className="text-white/60 text-lg max-w-2xl mx-auto mb-12">
               Artigos, notícias e estudos sobre missões, evangelismo e a vida cristã. Mantenha-se informado e inspirado.
@@ -121,7 +121,7 @@ function BlogPage() {
                   transition={{ delay: index * 0.1 }}
                   className="group"
                 >
-                  <Link to="/blog/$slug" params={{ slug: post.slug }} className="block overflow-hidden rounded-[40px] mb-8 aspect-[16/9] bg-white shadow-xl relative">
+                  <Link to="/news/$slug" params={{ slug: post.slug }} className="block overflow-hidden rounded-[40px] mb-8 aspect-[16/9] bg-white shadow-xl relative">
                     <img 
                       src={post.cover_image || ""} 
                       alt={post.title} 
@@ -145,14 +145,14 @@ function BlogPage() {
                     </div>
                     
                     <h3 className="text-3xl font-black text-brand-dark mb-4 group-hover:text-brand-orange transition-colors leading-tight">
-                      <Link to="/blog/$slug" params={{ slug: post.slug }}>{post.title}</Link>
+                      <Link to="/news/$slug" params={{ slug: post.slug }}>{post.title}</Link>
                     </h3>
                     <p className="text-brand-dark/50 text-lg mb-8 line-clamp-3 leading-relaxed">
                       {post.excerpt}
                     </p>
                     
                     <Link 
-                      to="/blog/$slug"
+                      to="/news/$slug"
                       params={{ slug: post.slug }}
                       className="inline-flex items-center gap-2 text-brand-orange font-black uppercase tracking-widest group/link"
                     >

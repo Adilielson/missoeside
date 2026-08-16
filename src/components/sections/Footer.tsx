@@ -66,7 +66,7 @@ export function Footer() {
                 { label: "Sobre Nós", to: "/sobre" },
                 { label: "Nossos Projetos", to: "/nossos-projetos" },
                 { label: "Eventos", to: "/eventos" },
-                { label: "Blog", to: "/blog" },
+                { label: "News", to: "/news" },
               ].map((link) => (
                 <li key={link.label}>
                   <Link 

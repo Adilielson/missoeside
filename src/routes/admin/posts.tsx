@@ -284,7 +284,7 @@ function PostsPage() {
     <div className="space-y-6">
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
-          <h2 className="text-3xl font-black tracking-tight">Blog / Artigos</h2>
+          <h2 className="text-3xl font-black tracking-tight">News / Artigos</h2>
           <p className="text-white/50">Gerencie o conteúdo e notícias do IDE.</p>
         </div>
         <Button 
