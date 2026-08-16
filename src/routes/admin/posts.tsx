@@ -36,6 +36,7 @@ import { toast } from "sonner";
 import { cn } from "@/lib/utils";
 import { format } from "date-fns";
 import { ptBR } from "date-fns/locale";
+import { logAdminAction } from "@/hooks/useAdminLogger";
 
 export const Route = createFileRoute("/admin/posts")({
   component: PostsPage,
@@ -169,6 +170,7 @@ function PostsPage() {
           else throw new Error("O registro existe mas a atualização não afetou nenhuma linha.");
         }
 
+        void logAdminAction('post_update', { target_id: editingPost.id, metadata: { title: payload.title } });
         toast.success("Post atualizado com sucesso!");
       } else {
         const { data: { user } } = await supabase.auth.getUser();
@@ -178,6 +180,9 @@ function PostsPage() {
           .select();
           
         if (error) throw error;
+        if (data?.[0]) {
+          void logAdminAction('post_create', { target_id: data[0].id, metadata: { title: payload.title } });
+        }
         toast.success("Post criado com sucesso!");
       }
       await fetchPosts();
@@ -221,6 +226,7 @@ function PostsPage() {
     try {
       const { error } = await supabase.from("posts").delete().eq("id", id);
       if (error) throw error;
+      void logAdminAction('post_delete', { target_id: id });
       toast.success("Post excluído!");
       fetchPosts();
     } catch (error: any) {

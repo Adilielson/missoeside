@@ -36,6 +36,7 @@ import { toast } from "sonner";
 import { cn } from "@/lib/utils";
 import { format } from "date-fns";
 import { ptBR } from "date-fns/locale";
+import { logAdminAction } from "@/hooks/useAdminLogger";
 
 export const Route = createFileRoute("/admin/events")({
   component: EventsPage,
@@ -160,13 +161,18 @@ function EventsPage() {
           .update(payload as any)
           .eq("id", editingEvent.id);
         if (error) throw error;
+        void logAdminAction('event_update', { target_id: editingEvent.id, metadata: { title: payload.title } });
         toast.success("Evento atualizado com sucesso!");
       } else {
         const { data: { user } } = await supabase.auth.getUser();
-        const { error } = await supabase
+        const { data, error } = await supabase
           .from("events")
-          .insert([{ ...payload, author_id: user?.id } as any]);
+          .insert([{ ...payload, author_id: user?.id } as any])
+          .select();
         if (error) throw error;
+        if (data?.[0]) {
+          void logAdminAction('event_create', { target_id: data[0].id, metadata: { title: payload.title } });
+        }
         toast.success("Evento criado com sucesso!");
       }
       setIsFormOpen(false);
@@ -183,6 +189,7 @@ function EventsPage() {
     try {
       const { error } = await supabase.from("events").delete().eq("id", id);
       if (error) throw error;
+      void logAdminAction('event_delete', { target_id: id });
       toast.success("Evento excluído!");
       fetchEvents();
     } catch (error: any) {

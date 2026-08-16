@@ -33,6 +33,7 @@ import { Route as AdminProjectsRouteImport } from './routes/admin/projects'
 import { Route as AdminPostsRouteImport } from './routes/admin/posts'
 import { Route as AdminNewsletterRouteImport } from './routes/admin/newsletter'
 import { Route as AdminLoginRouteImport } from './routes/admin/login'
+import { Route as AdminHistoryRouteImport } from './routes/admin/history'
 import { Route as AdminEventsRouteImport } from './routes/admin/events'
 import { Route as AdminAnalyticsRouteImport } from './routes/admin/analytics'
 
@@ -156,6 +157,11 @@ const AdminLoginRoute = AdminLoginRouteImport.update({
   path: '/login',
   getParentRoute: () => AdminRoute,
 } as any)
+const AdminHistoryRoute = AdminHistoryRouteImport.update({
+  id: '/history',
+  path: '/history',
+  getParentRoute: () => AdminRoute,
+} as any)
 const AdminEventsRoute = AdminEventsRouteImport.update({
   id: '/events',
   path: '/events',
@@ -181,6 +187,7 @@ export interface FileRoutesByFullPath {
   '/superadmin': typeof SuperadminRoute
   '/admin/analytics': typeof AdminAnalyticsRoute
   '/admin/events': typeof AdminEventsRoute
+  '/admin/history': typeof AdminHistoryRoute
   '/admin/login': typeof AdminLoginRoute
   '/admin/newsletter': typeof AdminNewsletterRoute
   '/admin/posts': typeof AdminPostsRoute
@@ -206,6 +213,7 @@ export interface FileRoutesByTo {
   '/superadmin': typeof SuperadminRoute
   '/admin/analytics': typeof AdminAnalyticsRoute
   '/admin/events': typeof AdminEventsRoute
+  '/admin/history': typeof AdminHistoryRoute
   '/admin/login': typeof AdminLoginRoute
   '/admin/newsletter': typeof AdminNewsletterRoute
   '/admin/posts': typeof AdminPostsRoute
@@ -235,6 +243,7 @@ export interface FileRoutesById {
   '/superadmin': typeof SuperadminRoute
   '/admin/analytics': typeof AdminAnalyticsRoute
   '/admin/events': typeof AdminEventsRoute
+  '/admin/history': typeof AdminHistoryRoute
   '/admin/login': typeof AdminLoginRoute
   '/admin/newsletter': typeof AdminNewsletterRoute
   '/admin/posts': typeof AdminPostsRoute
@@ -265,6 +274,7 @@ export interface FileRouteTypes {
     | '/superadmin'
     | '/admin/analytics'
     | '/admin/events'
+    | '/admin/history'
     | '/admin/login'
     | '/admin/newsletter'
     | '/admin/posts'
@@ -290,6 +300,7 @@ export interface FileRouteTypes {
     | '/superadmin'
     | '/admin/analytics'
     | '/admin/events'
+    | '/admin/history'
     | '/admin/login'
     | '/admin/newsletter'
     | '/admin/posts'
@@ -318,6 +329,7 @@ export interface FileRouteTypes {
     | '/superadmin'
     | '/admin/analytics'
     | '/admin/events'
+    | '/admin/history'
     | '/admin/login'
     | '/admin/newsletter'
     | '/admin/posts'
@@ -519,6 +531,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AdminLoginRouteImport
       parentRoute: typeof AdminRoute
     }
+    '/admin/history': {
+      id: '/admin/history'
+      path: '/history'
+      fullPath: '/admin/history'
+      preLoaderRoute: typeof AdminHistoryRouteImport
+      parentRoute: typeof AdminRoute
+    }
     '/admin/events': {
       id: '/admin/events'
       path: '/events'
@@ -539,6 +558,7 @@ declare module '@tanstack/react-router' {
 interface AdminRouteChildren {
   AdminAnalyticsRoute: typeof AdminAnalyticsRoute
   AdminEventsRoute: typeof AdminEventsRoute
+  AdminHistoryRoute: typeof AdminHistoryRoute
   AdminLoginRoute: typeof AdminLoginRoute
   AdminNewsletterRoute: typeof AdminNewsletterRoute
   AdminPostsRoute: typeof AdminPostsRoute
@@ -551,6 +571,7 @@ interface AdminRouteChildren {
 const AdminRouteChildren: AdminRouteChildren = {
   AdminAnalyticsRoute: AdminAnalyticsRoute,
   AdminEventsRoute: AdminEventsRoute,
+  AdminHistoryRoute: AdminHistoryRoute,
   AdminLoginRoute: AdminLoginRoute,
   AdminNewsletterRoute: AdminNewsletterRoute,
   AdminPostsRoute: AdminPostsRoute,
