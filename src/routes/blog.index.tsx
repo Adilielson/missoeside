@@ -140,7 +140,7 @@ function BlogPage() {
                       </div>
                       <div className="flex items-center gap-2">
                         <User className="w-3.5 h-3.5" />
-                        IDE Missões
+                        Por Agencia IDE
                       </div>
                     </div>
                     
