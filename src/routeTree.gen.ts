@@ -24,9 +24,9 @@ import { Route as NewsIndexRouteImport } from './routes/news.index'
 import { Route as EquipeIndexRouteImport } from './routes/equipe.index'
 import { Route as AdminIndexRouteImport } from './routes/admin.index'
 import { Route as ProjetoSlugRouteImport } from './routes/projeto.$slug'
+import { Route as NewsSlugRouteImport } from './routes/news.$slug'
 import { Route as EventoSlugRouteImport } from './routes/evento.$slug'
 import { Route as EquipeSlugRouteImport } from './routes/equipe.$slug'
-import { Route as BlogSlugRouteImport } from './routes/blog.$slug'
 import { Route as AdminUsersRouteImport } from './routes/admin/users'
 import { Route as AdminTeamRouteImport } from './routes/admin/team'
 import { Route as AdminProjectsRouteImport } from './routes/admin/projects'
@@ -111,6 +111,11 @@ const ProjetoSlugRoute = ProjetoSlugRouteImport.update({
   path: '/projeto/$slug',
   getParentRoute: () => rootRouteImport,
 } as any)
+const NewsSlugRoute = NewsSlugRouteImport.update({
+  id: '/$slug',
+  path: '/$slug',
+  getParentRoute: () => NewsRoute,
+} as any)
 const EventoSlugRoute = EventoSlugRouteImport.update({
   id: '/evento/$slug',
   path: '/evento/$slug',
@@ -120,11 +125,6 @@ const EquipeSlugRoute = EquipeSlugRouteImport.update({
   id: '/$slug',
   path: '/$slug',
   getParentRoute: () => EquipeRoute,
-} as any)
-const BlogSlugRoute = BlogSlugRouteImport.update({
-  id: '/blog/$slug',
-  path: '/blog/$slug',
-  getParentRoute: () => rootRouteImport,
 } as any)
 const AdminUsersRoute = AdminUsersRouteImport.update({
   id: '/users',
@@ -187,9 +187,9 @@ export interface FileRoutesByFullPath {
   '/admin/projects': typeof AdminProjectsRoute
   '/admin/team': typeof AdminTeamRoute
   '/admin/users': typeof AdminUsersRoute
-  '/blog/$slug': typeof BlogSlugRoute
   '/equipe/$slug': typeof EquipeSlugRoute
   '/evento/$slug': typeof EventoSlugRoute
+  '/news/$slug': typeof NewsSlugRoute
   '/projeto/$slug': typeof ProjetoSlugRoute
   '/admin/': typeof AdminIndexRoute
   '/equipe/': typeof EquipeIndexRoute
@@ -212,9 +212,9 @@ export interface FileRoutesByTo {
   '/admin/projects': typeof AdminProjectsRoute
   '/admin/team': typeof AdminTeamRoute
   '/admin/users': typeof AdminUsersRoute
-  '/blog/$slug': typeof BlogSlugRoute
   '/equipe/$slug': typeof EquipeSlugRoute
   '/evento/$slug': typeof EventoSlugRoute
+  '/news/$slug': typeof NewsSlugRoute
   '/projeto/$slug': typeof ProjetoSlugRoute
   '/admin': typeof AdminIndexRoute
   '/equipe': typeof EquipeIndexRoute
@@ -241,9 +241,9 @@ export interface FileRoutesById {
   '/admin/projects': typeof AdminProjectsRoute
   '/admin/team': typeof AdminTeamRoute
   '/admin/users': typeof AdminUsersRoute
-  '/blog/$slug': typeof BlogSlugRoute
   '/equipe/$slug': typeof EquipeSlugRoute
   '/evento/$slug': typeof EventoSlugRoute
+  '/news/$slug': typeof NewsSlugRoute
   '/projeto/$slug': typeof ProjetoSlugRoute
   '/admin/': typeof AdminIndexRoute
   '/equipe/': typeof EquipeIndexRoute
@@ -271,9 +271,9 @@ export interface FileRouteTypes {
     | '/admin/projects'
     | '/admin/team'
     | '/admin/users'
-    | '/blog/$slug'
     | '/equipe/$slug'
     | '/evento/$slug'
+    | '/news/$slug'
     | '/projeto/$slug'
     | '/admin/'
     | '/equipe/'
@@ -296,9 +296,9 @@ export interface FileRouteTypes {
     | '/admin/projects'
     | '/admin/team'
     | '/admin/users'
-    | '/blog/$slug'
     | '/equipe/$slug'
     | '/evento/$slug'
+    | '/news/$slug'
     | '/projeto/$slug'
     | '/admin'
     | '/equipe'
@@ -324,9 +324,9 @@ export interface FileRouteTypes {
     | '/admin/projects'
     | '/admin/team'
     | '/admin/users'
-    | '/blog/$slug'
     | '/equipe/$slug'
     | '/evento/$slug'
+    | '/news/$slug'
     | '/projeto/$slug'
     | '/admin/'
     | '/equipe/'
@@ -345,7 +345,6 @@ export interface RootRouteChildren {
   ObrigadoRoute: typeof ObrigadoRoute
   SobreRoute: typeof SobreRoute
   SuperadminRoute: typeof SuperadminRoute
-  BlogSlugRoute: typeof BlogSlugRoute
   EventoSlugRoute: typeof EventoSlugRoute
   ProjetoSlugRoute: typeof ProjetoSlugRoute
 }
@@ -457,6 +456,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ProjetoSlugRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/news/$slug': {
+      id: '/news/$slug'
+      path: '/$slug'
+      fullPath: '/news/$slug'
+      preLoaderRoute: typeof NewsSlugRouteImport
+      parentRoute: typeof NewsRoute
+    }
     '/evento/$slug': {
       id: '/evento/$slug'
       path: '/evento/$slug'
@@ -470,13 +476,6 @@ declare module '@tanstack/react-router' {
       fullPath: '/equipe/$slug'
       preLoaderRoute: typeof EquipeSlugRouteImport
       parentRoute: typeof EquipeRoute
-    }
-    '/blog/$slug': {
-      id: '/blog/$slug'
-      path: '/blog/$slug'
-      fullPath: '/blog/$slug'
-      preLoaderRoute: typeof BlogSlugRouteImport
-      parentRoute: typeof rootRouteImport
     }
     '/admin/users': {
       id: '/admin/users'
@@ -577,10 +576,12 @@ const EquipeRouteWithChildren =
   EquipeRoute._addFileChildren(EquipeRouteChildren)
 
 interface NewsRouteChildren {
+  NewsSlugRoute: typeof NewsSlugRoute
   NewsIndexRoute: typeof NewsIndexRoute
 }
 
 const NewsRouteChildren: NewsRouteChildren = {
+  NewsSlugRoute: NewsSlugRoute,
   NewsIndexRoute: NewsIndexRoute,
 }
 
@@ -598,7 +599,6 @@ const rootRouteChildren: RootRouteChildren = {
   ObrigadoRoute: ObrigadoRoute,
   SobreRoute: SobreRoute,
   SuperadminRoute: SuperadminRoute,
-  BlogSlugRoute: BlogSlugRoute,
   EventoSlugRoute: EventoSlugRoute,
   ProjetoSlugRoute: ProjetoSlugRoute,
 }

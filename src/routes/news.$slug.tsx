@@ -14,7 +14,7 @@ import { ptBR } from "date-fns/locale";
 import ReactMarkdown from "react-markdown";
 import remarkGfm from "remark-gfm";
 
-export const Route = createFileRoute("/blog/$slug")({
+export const Route = createFileRoute("/news/$slug")({
   component: PostPage,
 });
 
