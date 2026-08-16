@@ -46,6 +46,7 @@ import { Label } from "@/components/ui/label";
 import { Badge } from "@/components/ui/badge";
 import { toast } from "sonner";
 import { cn } from "@/lib/utils";
+import { logAdminAction } from "@/hooks/useAdminLogger";
 
 export const Route = createFileRoute("/admin/projects")({
   component: ProjectsPage,
@@ -178,12 +179,17 @@ function ProjectsPage() {
           .update(payload)
           .eq("id", editingProject.id);
         if (error) throw error;
+        void logAdminAction('project_update', { target_id: editingProject.id, metadata: { name: payload.name } });
         toast.success("Projeto atualizado com sucesso!");
       } else {
-        const { error } = await supabase
+        const { data, error } = await supabase
           .from("projects")
-          .insert([payload]);
+          .insert([payload])
+          .select();
         if (error) throw error;
+        if (data?.[0]) {
+          void logAdminAction('project_create', { target_id: data[0].id, metadata: { name: payload.name } });
+        }
         toast.success("Projeto criado com sucesso!");
       }
       setIsFormOpen(false);
@@ -200,6 +206,7 @@ function ProjectsPage() {
     try {
       const { error } = await supabase.from("projects").delete().eq("id", id);
       if (error) throw error;
+      void logAdminAction('project_delete', { target_id: id });
       toast.success("Projeto excluído!");
       fetchProjects();
     } catch (error: any) {
