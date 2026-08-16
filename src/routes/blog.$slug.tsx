@@ -3,6 +3,7 @@ import { Navbar } from "@/components/sections/Navbar";
 import { Footer } from "@/components/sections/Footer";
 import { ContactBar } from "@/components/sections/ContactBar";
 import { motion } from "framer-motion";
+import { Helmet } from "react-helmet-async";
 import { User, Calendar, Share2, ArrowRight, ChevronLeft, Loader2, Tag } from "lucide-react";
 import { SectionTag } from "@/components/SectionTag";
 import { Button } from "@/components/ui/button";
