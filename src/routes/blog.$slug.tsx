@@ -141,7 +141,7 @@ function PostPage() {
               </div>
               <div className="flex items-center gap-2">
                 <User className="w-5 h-5 text-brand-orange" />
-                <span>IDE Missões</span>
+                <span>Por Agencia IDE</span>
               </div>
             </div>
           </motion.div>

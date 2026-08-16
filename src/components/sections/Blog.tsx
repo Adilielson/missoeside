@@ -108,7 +108,7 @@ export function Blog() {
                   </div>
                   
                   <div className="flex items-center gap-4 text-xs font-bold uppercase tracking-widest text-brand-orange mb-4">
-                    <span>Por {Array.isArray(post.author) ? post.author[0]?.full_name : (post.author as any)?.full_name || "IDE Missões"}</span>
+                    <span>Por Agencia IDE</span>
                     <span className="w-1 h-1 bg-brand-dark/20 rounded-full" />
                     <span>{post.category}</span>
                   </div>
