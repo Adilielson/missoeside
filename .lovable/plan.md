@@ -1,45 +1,40 @@
-# SEO Review Plan - Agência Cristã Missionária IDE
+# Plan to Rename "Blog" to "News"
 
-The goal is to optimize the website for search engines (Google), ensuring all pages have proper metadata, semantic structure, and social sharing optimization.
+Rename all occurrences of "Blog" to "News" across the application, including UI text, headlines, navigation, SEO metadata, and routes.
+
+## User Review Required
+
+> [!IMPORTANT]
+> This change will rename the URL from `/blog` to `/news`. Existing links to `/blog` will no longer work unless a redirect is implemented.
 
 ## Proposed Changes
 
-### 1. Global Metadata & Technical SEO
-- Update `index.html` with improved descriptive meta tags and language settings.
-- Ensure the PWA manifest is correctly linked for mobile discovery.
+### Routes and Navigation
+- Rename route files:
+  - `src/routes/blog.tsx` -> `src/routes/news.tsx`
+  - `src/routes/blog.index.tsx` -> `src/routes/news.index.tsx`
+  - `src/routes/blog.$slug.tsx` -> `src/routes/news.$slug.tsx`
+- Update all navigation links:
+  - `Navbar.tsx`: Change label "Blog" to "News" and href to `/news`.
+  - `Footer.tsx`: Change label "Blog" to "News" and href to `/news`.
+  - `Blog.tsx` (section): Change ID to `#news` and links to `/news`.
 
-### 2. Semantic HTML & Headings
-- Audit and adjust heading hierarchies (`H1`, `H2`, `H3`) across main components to ensure one `H1` per page and logical nesting.
+### UI Text and Headlines
+- Update "Nosso Blog" to "News" or "IDE News" in `Blog.tsx` and `news.index.tsx`.
+- Update back links (e.g., "Voltar para Blog" -> "Voltar para News").
+- Update placeholders (e.g., "Carregando blog..." -> "Carregando news...").
+- Update admin dashboard labels and headlines.
 
-### 3. Dynamic SEO for Routes
-- Implement `react-helmet-async` or a similar solution to manage dynamic metadata for:
-    - **Blog Posts**: Title and description based on post content.
-    - **Project Pages**: Title and description based on specific mission projects.
-    - **Static Routes**: Unique titles and descriptions for "Sobre", "Doar", "Projetos", etc.
+### SEO and Metadata
+- Update `<title>` tags from "Blog IDE" to "News IDE".
+- Update `<meta name="description">` content that mentions "blog".
+- Update OpenGraph tags.
 
-### 4. Image Optimization
-- Add `alt` text to images where missing.
-- Ensure images use descriptive file names (handled via asset naming).
-
-### 5. Content & Keywords
-- Review main headings to include relevant keywords like "Agência Missionária", "Doação Cristã", "Missões Mundiais", "Evangelho".
+### Code Consistency
+- Rename `Blog` component to `News` in `src/components/sections/Blog.tsx`.
+- Update imports and usage in `src/routes/index.tsx`.
 
 ## Technical Details
-
-- **Head Management**: I will install `react-helmet-async` to allow each route component to define its own `<title>` and `<meta>` tags dynamically.
-- **Index.html**:
-    - Add `lang="pt-BR"`.
-    - Update `<title>` to a more keyword-rich version: "Agência Cristã Missionária IDE | Transformando Vidas no Mundo".
-- **Dynamic Routes**:
-    - In `src/routes/blog.$slug.tsx`, metadata will reflect the article's title.
-    - In `src/routes/projeto.$slug.tsx`, metadata will reflect the project's name.
-
-```typescript
-// Example for Dynamic SEO
-<Helmet>
-  <title>{post.title} | IDE Blog</title>
-  <meta name="description" content={post.excerpt} />
-  <meta property="og:title" content={post.title} />
-  <meta property="og:image" content={post.cover_image} />
-</Helmet>
-```
+- Using `mv` to rename route files.
+- Using `line_replace` to update text and identifiers.
+- The `routeTree.gen.ts` will auto-update after file changes.
