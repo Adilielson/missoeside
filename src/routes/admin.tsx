@@ -25,7 +25,7 @@ export const Route = createFileRoute("/admin")({
 const menuItems = [
   { id: "projects", label: "Projetos / Missões", icon: Briefcase, path: "/admin/projects" },
   { id: "events", label: "Eventos", icon: Calendar, path: "/admin/events" },
-  { id: "posts", label: "Blog", icon: FileText, path: "/admin/posts" },
+  { id: "posts", label: "News", icon: FileText, path: "/admin/posts" },
   { id: "team", label: "Equipe", icon: UserCircle, path: "/admin/team" },
   { id: "analytics", label: "Acompanhamento", icon: BarChart3, path: "/admin/analytics" },
   { id: "newsletter", label: "Newsletter", icon: Mail, path: "/admin/newsletter", adminOnly: true },

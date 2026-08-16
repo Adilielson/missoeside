@@ -11,7 +11,7 @@ const menuItems = [
   { name: "Sobre", href: "/sobre" },
   { name: "Projetos", href: "/nossos-projetos" },
   { name: "Eventos", href: "/eventos" },
-  { name: "Blog", href: "/blog" },
+  { name: "News", href: "/news" },
   { name: "Contato", href: "#contato" },
 ];
 

@@ -23,7 +23,7 @@ const fetchPosts = async () => {
   return data;
 };
 
-export function Blog() {
+export function News() {
   const { data: posts, isLoading } = useQuery({
     queryKey: ["posts-home"],
     queryFn: fetchPosts,
@@ -31,23 +31,23 @@ export function Blog() {
 
   if (isLoading) {
     return (
-      <section id="blog" className="py-16 md:py-24 bg-white overflow-hidden">
+      <section id="news" className="py-16 md:py-24 bg-white overflow-hidden">
         <div className="max-w-7xl mx-auto px-5 sm:px-6 text-center">
-          <p className="text-brand-dark/60">Carregando blog...</p>
+          <p className="text-brand-dark/60">Carregando news...</p>
         </div>
       </section>
     );
   }
 
   return (
-    <section id="blog" className="py-16 md:py-24 bg-white overflow-hidden">
+    <section id="news" className="py-16 md:py-24 bg-white overflow-hidden">
       <div className="max-w-7xl mx-auto px-5 sm:px-6">
         <div className="flex flex-col md:flex-row md:items-end justify-between gap-6 md:gap-8 mb-12 md:mb-16">
           <div className="max-w-2xl">
             <SectionTag icon={Calendar} text="Últimas Notícias" light />
             <h2 className="text-3xl sm:text-4xl md:text-5xl font-black text-brand-dark leading-tight">
               Fique por Dentro do <br />
-              <span className="text-brand-orange">Nosso Blog</span>
+              <span className="text-brand-orange">Nosso News</span>
             </h2>
           </div>
           <div className="flex gap-4">
@@ -56,7 +56,7 @@ export function Blog() {
               size="icon"
               className="rounded-full border-brand-orange/20 text-brand-orange hover:bg-brand-orange hover:text-white"
               onClick={() => {
-                const el = document.querySelector("#blog-scroll");
+                const el = document.querySelector("#news-scroll");
                 if (el) el.scrollBy({ left: -400, behavior: 'smooth' });
               }}
             >
@@ -67,7 +67,7 @@ export function Blog() {
               size="icon"
               className="rounded-full border-brand-orange/20 text-brand-orange hover:bg-brand-orange hover:text-white"
               onClick={() => {
-                const el = document.querySelector("#blog-scroll");
+                const el = document.querySelector("#news-scroll");
                 if (el) el.scrollBy({ left: 400, behavior: 'smooth' });
               }}
             >
@@ -77,7 +77,7 @@ export function Blog() {
         </div>
 
         <div 
-          id="blog-scroll"
+          id="news-scroll"
           className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 sm:gap-8 overflow-x-auto lg:overflow-visible pb-4 no-scrollbar scroll-smooth"
         >
           {posts?.map((post, index) => {
@@ -94,7 +94,7 @@ export function Blog() {
                 transition={{ delay: index * 0.1 }}
                 className="group cursor-pointer"
               >
-                <Link to="/blog/$slug" params={{ slug: post.slug }}>
+                <Link to="/news/$slug" params={{ slug: post.slug }}>
                   <div className="relative aspect-[4/3] rounded-[28px] sm:rounded-[40px] overflow-hidden mb-6">
                     <img 
                       src={post.cover_image || "https://images.unsplash.com/photo-1516627145497-ae6968895b74?q=80&w=2040&auto=format&fit=crop"} 

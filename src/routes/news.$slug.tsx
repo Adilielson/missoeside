@@ -14,7 +14,7 @@ import { ptBR } from "date-fns/locale";
 import ReactMarkdown from "react-markdown";
 import remarkGfm from "remark-gfm";
 
-export const Route = createFileRoute("/blog/$slug")({
+export const Route = createFileRoute("/news/$slug")({
   component: PostPage,
 });
 
@@ -84,7 +84,7 @@ function PostPage() {
         <div className="text-center">
           <h1 className="text-4xl font-black text-brand-dark mb-6">Artigo não encontrado</h1>
           <Button asChild className="bg-brand-orange hover:bg-brand-orange/90 text-white py-6 px-8 rounded-2xl font-bold">
-            <Link to="/blog">Ver todos os artigos</Link>
+            <Link to="/news">Ver todos os artigos</Link>
           </Button>
         </div>
       </main>
@@ -94,8 +94,8 @@ function PostPage() {
   return (
     <main className="min-h-screen selection:bg-brand-orange selection:text-white bg-brand-light relative">
       <Helmet>
-        <title>{post.title} | Blog IDE</title>
-        <meta name="description" content={post.excerpt || `Leia sobre ${post.title} no blog da Agência Cristã Missionária IDE.`} />
+        <title>{post.title} | News IDE</title>
+        <meta name="description" content={post.excerpt || `Leia sobre ${post.title} no news da Agência Cristã Missionária IDE.`} />
         <meta property="og:title" content={post.title} />
         <meta property="og:image" content={post.cover_image || ""} />
         <meta property="og:type" content="article" />
@@ -104,9 +104,9 @@ function PostPage() {
       <div className="absolute top-28 left-0 right-0 z-30 pointer-events-none">
         <div className="max-w-7xl mx-auto px-5 sm:px-6">
           <Button asChild variant="ghost" className="text-white hover:bg-white/10 pointer-events-auto inline-flex items-center gap-2 font-bold uppercase tracking-widest text-[10px] sm:text-xs p-0 group hover:text-brand-orange transition-colors">
-            <Link to="/blog">
+            <Link to="/news">
               <ChevronLeft className="w-4 h-4 group-hover:-translate-x-1 transition-transform" />
-              Voltar para Blog
+              Voltar para News
             </Link>
           </Button>
         </div>
@@ -129,7 +129,7 @@ function PostPage() {
             transition={{ duration: 0.6 }}
             className="max-w-5xl mx-auto text-center"
           >
-            <SectionTag icon={Tag} text={post.category || "BLOG"} />
+            <SectionTag icon={Tag} text={post.category || "NEWS"} />
             <h1 className="text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-black text-white leading-[1.05] mb-8">
               {post.title}
             </h1>
@@ -235,7 +235,7 @@ function PostPage() {
           <div className="flex items-center justify-between mb-12">
             <h4 className="text-3xl font-black text-white uppercase tracking-tighter">Continue <span className="text-brand-orange">Lendo</span></h4>
             <Button asChild variant="link" className="text-brand-orange font-bold uppercase tracking-widest">
-              <Link to="/blog">Ver Blog Completo</Link>
+              <Link to="/news">Ver News Completo</Link>
             </Button>
           </div>
           
@@ -243,7 +243,7 @@ function PostPage() {
             {otherPosts.map((other) => (
               <Link 
                 key={other.id} 
-                to="/blog/$slug" 
+                to="/news/$slug" 
                 params={{ slug: other.slug }}
                 className="bg-white/5 rounded-[30px] overflow-hidden group border border-white/5"
               >

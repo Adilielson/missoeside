@@ -10,7 +10,7 @@ import { Events } from "@/components/sections/Events";
 import { Volunteers } from "@/components/sections/Volunteers";
 
 // import { Testimonials } from "@/components/sections/Testimonials";
-import { Blog } from "@/components/sections/Blog";
+import { News } from "@/components/sections/News";
 import { MarqueeGallery } from "@/components/sections/MarqueeGallery";
 import { ContactBar } from "@/components/sections/ContactBar";
 import { Footer } from "@/components/sections/Footer";
@@ -38,7 +38,7 @@ function Index() {
       <Volunteers />
       
       {/* <Testimonials /> oculto temporariamente */}
-      <Blog />
+      <News />
       <MarqueeGallery />
       <ContactBar />
       <Footer />
