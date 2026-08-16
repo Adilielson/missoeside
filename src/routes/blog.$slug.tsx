@@ -93,6 +93,13 @@ function PostPage() {
 
   return (
     <main className="min-h-screen selection:bg-brand-orange selection:text-white bg-brand-light relative">
+      <Helmet>
+        <title>{post.title} | Blog IDE</title>
+        <meta name="description" content={post.excerpt || `Leia sobre ${post.title} no blog da Agência Cristã Missionária IDE.`} />
+        <meta property="og:title" content={post.title} />
+        <meta property="og:image" content={post.cover_image || ""} />
+        <meta property="og:type" content="article" />
+      </Helmet>
       <Navbar dark />
       <div className="absolute top-28 left-0 right-0 z-30 pointer-events-none">
         <div className="max-w-7xl mx-auto px-5 sm:px-6">
