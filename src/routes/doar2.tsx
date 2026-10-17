@@ -90,6 +90,7 @@ function DoarPage() {
   const progress = Math.min(100, (raised / META) * 100);
 
   async function handleSubmit() {
+    if (type === "MONTHLY" && method !== "BOLETO") return toast.error("A doação mensal está disponível somente por boleto.");
     if (!accepted) return toast.error("Aceite as Políticas de Privacidade.");
     if (!name || !phone || !cpf || !postalCode) return toast.error("Preencha os campos obrigatórios (incluindo o CEP).");
     if (finalAmount < 5) return toast.error("Valor mínimo: R$ 5,00");
@@ -242,7 +243,7 @@ function DoarPage() {
           <Section title="SELECIONE TIPO DA DOAÇÃO">
             <div className="grid grid-cols-2 gap-3">
               {(["MONTHLY", "ONE_TIME"] as DonationType[]).map((t) => (
-                <Toggle key={t} active={type === t} onClick={() => setType(t)}>
+                <Toggle key={t} active={type === t} onClick={() => { setType(t); if (t === "MONTHLY") setMethod("BOLETO"); }}>
                   {t === "MONTHLY" ? "Mensal" : "Único"}
                 </Toggle>
               ))}
@@ -306,19 +307,19 @@ function DoarPage() {
 
           {/* Method */}
           <Section title="SELECIONE FORMA DE PAGAMENTO">
-            <div className="grid grid-cols-3 gap-3">
-              <MethodBtn active={method === "PIX"} onClick={() => setMethod("PIX")} icon={<QrCode className="w-4 h-4" />}>
+            <div className={cn("grid gap-3", type === "MONTHLY" ? "grid-cols-1" : "grid-cols-3")}>
+              {type === "ONE_TIME" && <MethodBtn active={method === "PIX"} onClick={() => setMethod("PIX")} icon={<QrCode className="w-4 h-4" />}>
                 PIX
-              </MethodBtn>
-              <MethodBtn active={method === "CREDIT_CARD"} onClick={() => setMethod("CREDIT_CARD")} icon={<CreditCard className="w-4 h-4" />}>
+              </MethodBtn>}
+              {type === "ONE_TIME" && <MethodBtn active={method === "CREDIT_CARD"} onClick={() => setMethod("CREDIT_CARD")} icon={<CreditCard className="w-4 h-4" />}>
                 CARTÃO
-              </MethodBtn>
+              </MethodBtn>}
               <MethodBtn active={method === "BOLETO"} onClick={() => setMethod("BOLETO")} icon={<FileText className="w-4 h-4" />}>
                 BOLETO
               </MethodBtn>
             </div>
 
-            {method === "CREDIT_CARD" && (
+            {type === "ONE_TIME" && method === "CREDIT_CARD" && (
               <div className="grid grid-cols-2 gap-3 mt-3">
                 <Input placeholder="Número do cartão" value={cardNumber} onChange={(e) => setCardNumber(e.target.value)} className="h-12 col-span-2 bg-white/5 border-white/10 text-white placeholder:text-white/40" />
                 <Input 
@@ -335,6 +336,8 @@ function DoarPage() {
               </div>
             )}
           </Section>
+
+          {type === "MONTHLY" && <p className="text-sm text-white/60 mt-3">Sua contribuição mensal será cobrada por boleto. Cada boleto precisará ser pago por você; não há débito automático.</p>}
 
           {/* Terms */}
           <label className="flex items-start gap-2 mt-6 text-sm text-white/70 cursor-pointer">
