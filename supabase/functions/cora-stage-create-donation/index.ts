@@ -81,11 +81,11 @@ Deno.serve(async req=>{
     provider_invoice_id:invoice.id,provider_status:invoice.status||"OPEN",
     pix_payload:invoice.pix?.emv||null,
     pix_qrcode:invoice.payment_options?.bank_slip?.url||null,
-    boleto_url:invoice.payment_options?.bank_slip?.url||null
+    boleto_url:null // boleto PDF URL requires schema validation in Stage; don't confuse QR PNG with boleto
   }).eq("id",id);
   if(upd.error)throw new Error("Cobrança emitida, mas não conciliada; verificar manualmente invoice "+invoice.id);
   return json({success:true,donation:{id,status:"PENDING"},invoice_id:invoice.id,
     pix_payload:invoice.pix?.emv??null,pix_qrcode:method==="PIX"?invoice.payment_options?.bank_slip?.url??null:null,
-    boleto_url:method==="BOLETO"?invoice.payment_options?.bank_slip?.url??null:null});
+    boleto_url:null // do not return QR image URL as boleto link});
  }catch(e){console.error("Cora Stage adapter failure",String(e));return json({error:"Falha na integração Stage; cobrança requer verificação pelo operador."},502)}
 });
