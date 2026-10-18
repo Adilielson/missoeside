@@ -3,8 +3,10 @@
 ## Escopo aprovado
 - Doação única: PIX e boleto Cora **e cartão de crédito**, obrigatoriamente através de um gateway complementar de cartão a definir (semelhante a checkout hospedado/tokenizado).
 - Doação mensal: SOMENTE boleto, com uma cobrança nova por mês. Sem cobrança automática em conta bancária.
-- **Decisão do proprietário (18/10/2026): manter cartão como opção de pagamento ÚNICO.** Nunca mostrar cartão quando o doador selecionar MENSAL.
-- Cartão não é suportado pelo adaptador da API de cobrança Cora. Integrar outro provedor com checkout hospedado ou campos tokenizados, confirmação server-to-server e recebimento/repasse próprios do gateway. A escolha do parceiro ainda está pendente.
+- **Decisão do proprietário (18/10/2026): manter cartão como opção de pagamento ÚNICO e permitir conclusão IMEDIATA, 24/7, sem equipe humana.** Nunca mostrar cartão quando o doador selecionar MENSAL.
+- Cartão não é suportado pelo adaptador da API de cobrança Cora. Para conclusão imediata, o candidato técnico é **Mercado Pago Checkout Pro via Orders API**, criado automaticamente em backend por doação e redirecionado por checkout_url; ou Card Payment Brick se o proprietário exigir checkout embutido. Confirmação de cobrança exclusivamente por webhook assinado + consulta ao provedor, nunca pelo simples retorno no browser. Esta é uma recomendação de arquitetura, ainda depende de aprovação e credenciais de conta da organização.
+- A Orders API é a rota moderna recomendada pelo Mercado Pago em outubro/2026; NÃO iniciar nova integração via Preferences API sem motivo.
+- Preferência de métodos: excluir PIX, boleto e carteiras não desejadas na order do Mercado Pago, exibindo somente cartão quando tecnicamente suportado. Verificar requisitos do provedor e aprovação da conta antes do uso real.
 - Enquanto não houver gateway de cartão homologado, a opção de cartão não pode processar cobrança nem exibir sucesso fictício. Preservar o layout de cartão apenas como planejado e não lançar a rota renovada até a modalidade funcionar; alternativamente exibir mensagem de indisponibilidade temporária se a publicação não puder esperar.
 - **Nunca** repassar número integral, validade ou CVV de cartão pelo Supabase Edge Functions, logs ou tabelas, sem arquitetura/escopo de conformidade PCI formalmente validada. Substituir os campos atualmente existentes em /doar2 por fluxo tokenizado/hospedado do novo gateway.
 - Não alterar /doar em produção antes de testar e aprovar uma publicação separada.
