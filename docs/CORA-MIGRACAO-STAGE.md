@@ -1,9 +1,12 @@
 # Missões IDE — Migração Cora Stage (não publicar sem homologação)
 
 ## Escopo aprovado
-- Doação única: PIX e boleto Cora.
+- Doação única: PIX e boleto Cora **e cartão de crédito**, obrigatoriamente através de um gateway complementar de cartão a definir (semelhante a checkout hospedado/tokenizado).
 - Doação mensal: SOMENTE boleto, com uma cobrança nova por mês. Sem cobrança automática em conta bancária.
-- Cartão NÃO é disponibilizado na integração Cora. Se futuramente houver gateway de cartão para doação única, deve ser implementado separadamente. Não prometer que cartão funciona sem gateway contratado.
+- **Decisão do proprietário (18/10/2026): manter cartão como opção de pagamento ÚNICO.** Nunca mostrar cartão quando o doador selecionar MENSAL.
+- Cartão não é suportado pelo adaptador da API de cobrança Cora. Integrar outro provedor com checkout hospedado ou campos tokenizados, confirmação server-to-server e recebimento/repasse próprios do gateway. A escolha do parceiro ainda está pendente.
+- Enquanto não houver gateway de cartão homologado, a opção de cartão não pode processar cobrança nem exibir sucesso fictício. Preservar o layout de cartão apenas como planejado e não lançar a rota renovada até a modalidade funcionar; alternativamente exibir mensagem de indisponibilidade temporária se a publicação não puder esperar.
+- **Nunca** repassar número integral, validade ou CVV de cartão pelo Supabase Edge Functions, logs ou tabelas, sem arquitetura/escopo de conformidade PCI formalmente validada. Substituir os campos atualmente existentes em /doar2 por fluxo tokenizado/hospedado do novo gateway.
 - Não alterar /doar em produção antes de testar e aprovar uma publicação separada.
 - Preservar arquivos/colunas Asaas até finalizar migração e conciliação do histórico.
 
@@ -43,6 +46,16 @@ nunca remover verificação TLS nem compartilhar a chave com o navegador.
 7. Webhook deve autenticar origem, buscar fatura na API Cora, conferir id, code, valor e pagamento; atualização idempotente.
 8. Notificações e somatórios somente após pagamento confirmado; evitar dados pessoais em eventos de analytics.
 
+## Regras do checkout e separação de provedores
+- ONE_TIME + PIX -> Cora Stage.
+- ONE_TIME + BOLETO -> Cora Stage.
+- ONE_TIME + CREDIT_CARD -> gateway complementar com checkout/tokenização, apenas quando homologado.
+- MONTHLY + BOLETO -> Cora com orquestração mensal própria.
+- MONTHLY + CREDIT_CARD ou MONTHLY + PIX -> rejeitar no frontend E no backend (na versão atual definida pelo cliente).
+- Se mudar de ÚNICO para MENSAL, selecionar BOLETO automaticamente, limpar quaisquer estados de cartão e esconder essa opção; ao retornar a ÚNICO, oferecer novamente as três opções.
+- Não habilitar botão/pagamento do cartão antes da integração real e dos callbacks seguros.
+- O frontend NÃO deve decidir o provedor; o backend faz o roteamento por type/payment_method e rejeita combinações inválidas.
+
 ## Mensalidades por boleto
 - Cadastro donation_recurrences ACTIVE com project_id, documento e e-mail de contato.
 - Emissão do boleto do mês atual e salvamento do código/ID da cobrança.
@@ -60,7 +73,8 @@ nunca remover verificação TLS nem compartilhar a chave com o navegador.
 2. Garantir scripts de migração aditivos, políticas RLS e dados existentes.
 3. Testar cancelamento, expirado, tentativa repetida, race conditions, timeout, PII.
 4. Adicionar dashboards de conciliação e registros de falhas; monitorar webhook.
-5. Somente após aprovação, cadastrar credenciais Production e ativar /doar com rollout reversível.
+5. Selecionar, configurar e homologar gateway de cartão avulso; substituir coleta direta de PAN/CVV por hosted fields/tokenização e validar webhooks de pagamento.
+6. Somente após aprovação, cadastrar credenciais Production e ativar /doar com rollout reversível.
 
 ## Referências
 https://developers.cora.com.br/docs/client-credentials-int-direta
