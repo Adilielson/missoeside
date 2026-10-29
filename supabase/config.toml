@@ -6,3 +6,9 @@ verify_jwt = false
 
 [functions.send-notification]
 verify_jwt = false
+
+[functions.donation-status]
+verify_jwt = false
+
+[functions.asaas-webhook]
+verify_jwt = false # autenticado por asaas-access-token, validado na função
