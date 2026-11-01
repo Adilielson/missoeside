@@ -6,3 +6,7 @@ verify_jwt = false
 
 [functions.send-notification]
 verify_jwt = false
+
+# Asaas envia o token proprio no header asaas-access-token (sem JWT Supabase).
+[functions.asaas-webhook]
+verify_jwt = false
