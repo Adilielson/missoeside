@@ -13,3 +13,7 @@ verify_jwt = false
 
 [functions.admin-asaas-reconcile]
 verify_jwt = false # autentica via JWT de usuario e papel admin dentro da função
+
+# JWT enviado pelo usuário é verificado DENTRO da função, com role admin.
+[functions.campaign-whatsapp]
+verify_jwt = false
