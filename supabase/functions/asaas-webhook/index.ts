@@ -74,6 +74,9 @@ Deno.serve(async (req) => {
       "PAYMENT_RECEIVED_IN_CASH",
       "PAYMENT_REFUNDED",
       "PAYMENT_DELETED",
+      "PAYMENT_OVERDUE",
+      "PAYMENT_CREATED",
+      "PAYMENT_UPDATED",
     ]);
     if (!relevant.has(event.event)) return json({ received: true, ignored: true });
     const paymentId = String(event.payment?.id || "");
@@ -135,6 +138,25 @@ Deno.serve(async (req) => {
     }
 
     const state = String(payment.status || "").toUpperCase();
+    // Uma assinatura possui diversos boletos: cada pay_ fica registrado individualmente.
+    const dueDate = /^\\d{4}-\\d{2}-\\d{2}$/.test(String(payment.dueDate || "")) ? payment.dueDate : null;
+    const paymentPaid = ["CONFIRMED", "RECEIVED", "RECEIVED_IN_CASH"].includes(state);
+    const { error: cycleError } = await supabase.from("asaas_payment_cycles").upsert({
+      payment_id: paymentId,
+      donation_id: donation.id,
+      subscription_id: typeof payment.subscription === "string" ? payment.subscription : null,
+      due_date: dueDate,
+      amount: Number(payment.value),
+      status: state,
+      paid_at: paymentPaid ? (payment.paymentDate || payment.confirmedDate || new Date().toISOString()) : null,
+      last_verified_at: new Date().toISOString(),
+    }, { onConflict: "payment_id" });
+    if (cycleError) throw cycleError;
+    // O vencimento mestre só é seguro em cobrança única: mensalidade tem vários vencimentos.
+    if (donation.type === "ONE_TIME" && dueDate) {
+      const { error: dueErr } = await supabase.from("donations").update({ due_date: dueDate }).eq("id", donation.id);
+      if (dueErr) throw dueErr;
+    }
     let newStatus: "CONFIRMED" | "RECEIVED" | "CANCELLED" | "REFUNDED" | null = null;
     if (state === "CONFIRMED") newStatus = "CONFIRMED";
     else if (state === "RECEIVED" || state === "RECEIVED_IN_CASH") newStatus = "RECEIVED";
