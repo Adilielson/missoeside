@@ -66,6 +66,7 @@ function DashboardPage() {
   const [projects, setProjects] = useState<Project[]>([]);
   const [eventsLimited, setEventsLimited] = useState(false);
   const [paymentsLimited, setPaymentsLimited] = useState(false);
+  const [financeAvailable, setFinanceAvailable] = useState(false);
   const admin = account?.role === "admin";
   const permitted = (id: string, adminOnly = false) =>
     Boolean(account && (!adminOnly || admin) &&
@@ -75,6 +76,7 @@ function DashboardPage() {
   const load = useCallback(async () => {
     setLoading(true);
     setError(null);
+    setFinanceAvailable(false);
     try {
       const { data: { user }, error: userError } = await supabase.auth.getUser();
       if (userError || !user) throw new Error("Faça login novamente para carregar o painel.");
@@ -128,13 +130,16 @@ function DashboardPage() {
         setCounts({ ...nextCounts });
         // Sem permissão RLS, não exibe números financeiros presumidos.
         if (paymentResponse.error) {
+          setFinanceAvailable(false);
           setPayments([]);
           setError("Os indicadores financeiros não estão disponíveis. Confira suas permissões de administrador.");
         } else {
+          setFinanceAvailable(true);
           setPayments((paymentResponse.data ?? []) as PaymentRecord[]);
           setPaymentsLimited((paymentResponse.data ?? []).length === 2000);
         }
       } else {
+        setFinanceAvailable(false);
         setPayments([]);
         setPaymentsLimited(false);
       }
@@ -199,7 +204,7 @@ function DashboardPage() {
   const visibleSections = sections.filter(section => permitted(section.id, "adminOnly" in section && section.adminOnly));
   const valueFor = (id: string) => {
     if (id === "analytics") return events.length.toLocaleString("pt-BR") + (eventsLimited ? "+" : "");
-    if (id === "donations") return String(stats.completed) + " pagas*";
+    if (id === "donations") return financeAvailable ? String(stats.completed) + " pagas*" : "Indisponível";
     if (id === "history") return "Acessar";
     const count = counts[id as CountKey];
     return count === undefined ? "—" : count.toLocaleString("pt-BR");
@@ -229,7 +234,7 @@ function DashboardPage() {
         <Indicator label={"Visitas (" + period + " dias)"} value={stats.views.toLocaleString("pt-BR")} icon={Activity} note={eventsLimited ? "Amostra de até 2.000 eventos" : "Páginas visualizadas"} />
         <Indicator label={"Cliques em apoiar (" + period + " dias)"} value={stats.clicks.toLocaleString("pt-BR")} icon={BarChart3} note="Interesse, não é pagamento" />
         {admin
-          ? <Indicator label="Doações únicas confirmadas*" value={money(stats.gross)} icon={HandCoins} note="Bruto • cobranças dos últimos 6 meses" accent />
+          ? <Indicator label="Doações únicas confirmadas*" value={financeAvailable ? money(stats.gross) : "—"} icon={HandCoins} note={financeAvailable ? "Bruto • cobranças dos últimos 6 meses" : "Sem acesso aos dados financeiros"} accent />
           : <Indicator label="Notícias publicadas" value={counts.posts === undefined ? "—" : String(counts.posts)} icon={FileText} note="Conteúdo institucional" accent />}
       </section>
 
@@ -272,7 +277,7 @@ function DashboardPage() {
           </div>
           <div className="h-64 sm:h-72 mt-5">
             {admin ? (
-              topProjects.length ? <ResponsiveContainer width="100%" height="100%">
+              !financeAvailable ? <EmptyState text="Dados financeiros indisponíveis para este perfil ou consulta."/> : topProjects.length ? <ResponsiveContainer width="100%" height="100%">
                 <BarChart data={topProjects} layout="vertical" margin={{ top: 0, right: 4, bottom: 0, left: 0 }}>
                   <CartesianGrid horizontal={false} stroke="#ffffff13" strokeDasharray="3 3"/>
                   <XAxis type="number" stroke="#94a3b8" fontSize={10} tickFormatter={v => "R$ " + Number(v).toLocaleString("pt-BR", {notation:"compact"})} />
