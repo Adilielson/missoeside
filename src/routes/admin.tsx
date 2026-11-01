@@ -14,6 +14,7 @@ import {
   BarChart3,
   LayoutDashboard,
   HandCoins,
+  Megaphone,
   Mail
 } from "lucide-react";
 import { Logo } from "@/components/Logo";
@@ -34,6 +35,7 @@ const menuItems = [
   { id: "team", label: "Equipe", icon: UserCircle, path: "/admin/team" },
   { id: "analytics", label: "Acompanhamento", icon: BarChart3, path: "/admin/analytics" },
   { id: "donations", label: "Doações por Projeto", icon: HandCoins, path: "/admin/donations", adminOnly: true },
+  { id: "campaigns", label: "Campanhas", icon: Megaphone, path: "/admin/campaigns", adminOnly: true },
   { id: "history", label: "Histórico", icon: Shield, path: "/admin/history" },
   { id: "newsletter", label: "Newsletter", icon: Mail, path: "/admin/newsletter", adminOnly: true },
   { id: "users", label: "Usuários", icon: Users, path: "/admin/users" },
@@ -116,6 +118,9 @@ function AdminLayout() {
         // Relatórios financeiros exigem papel admin e RLS de donations.
         if (profile.role === 'admin' && !permissions.includes('donations')) {
           permissions = [...permissions, 'donations'];
+        }
+        if (profile.role === 'admin' && !permissions.includes('campaigns')) {
+          permissions = [...permissions, 'campaigns'];
         }
         setUserPermissions(permissions);
         
