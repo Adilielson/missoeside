@@ -58,6 +58,7 @@ function DoarPage() {
   const [birth, setBirth] = useState("");
   const [postalCode, setPostalCode] = useState("");
   const [isAnonymous, setIsAnonymous] = useState(false);
+  const [marketingConsent, setMarketingConsent] = useState(false);
 
   // card
   const [cardNumber, setCardNumber] = useState("");
@@ -119,6 +120,7 @@ function DoarPage() {
           donor_phone: phone,
           donor_cpf: cpf,
           is_anonymous: isAnonymous,
+          donor_marketing_consent: marketingConsent,
           donor_birthdate: birth,
           donor_postal_code: postalCode,
           amount: finalAmount,
@@ -339,6 +341,12 @@ function DoarPage() {
               </div>
             )}
           </Section>
+
+          <label className="flex items-start gap-2 mt-5 text-xs text-white/60 cursor-pointer">
+            <input type="checkbox" checked={marketingConsent} onChange={e=>setMarketingConsent(e.target.checked)}
+              className="mt-0.5 accent-brand-orange"/>
+            <span>Quero receber novidades dos projetos, campanhas e convites da IDE por e-mail e WhatsApp. Este aceite é opcional e posso solicitar a interrupção das mensagens a qualquer momento.</span>
+          </label>
 
           {/* Terms */}
           <label className="flex items-start gap-2 mt-6 text-sm text-white/70 cursor-pointer">
