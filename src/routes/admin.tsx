@@ -12,6 +12,7 @@ import {
   FileText,
   UserCircle,
   BarChart3,
+  LayoutDashboard,
   HandCoins,
   Mail
 } from "lucide-react";
@@ -26,6 +27,7 @@ export const Route = createFileRoute("/admin")({
 
 
 const menuItems = [
+  { id: "dashboard", label: "Visão Geral", icon: LayoutDashboard, path: "/admin" },
   { id: "projects", label: "Projetos / Missões", icon: Briefcase, path: "/admin/projects" },
   { id: "events", label: "Eventos", icon: Calendar, path: "/admin/events" },
   { id: "posts", label: "News", icon: FileText, path: "/admin/posts" },
@@ -101,8 +103,7 @@ function AdminLayout() {
           permissions = [...permissions, 'history'];
         }
 
-        // Se o usuário não tem permissão explicitamente para 'dashboard', mas está logado, 
-        // damos a ele acesso à base /admin se ele tiver QUALQUER outra permissão
+        // O Dashboard é a página inicial de qualquer pessoa autenticada no painel.
         if (permissions.length > 0 && !permissions.includes('dashboard')) {
           permissions = ['dashboard', ...permissions];
         }
@@ -131,18 +132,7 @@ function AdminLayout() {
         if (currentPathNormalized.startsWith("/admin") && currentPathNormalized !== "/admin/login") {
           const currentItem = menuItems.find(item => normalizePath(item.path) === currentPathNormalized);
           
-          // Especial para a rota raiz /admin (index)
-          if (currentPathNormalized === "/admin") {
-            // Se ele não tem permissão de projects (que é para onde o index redireciona por padrão)
-            // mas tem outras permissões, redirecionamos para a primeira disponível
-            if (!permissions.includes('projects')) {
-              const firstRestrictedItem = menuItems.find(item => item.id !== 'dashboard' && permissions.includes(item.id));
-              if (firstRestrictedItem) {
-                navigate({ to: firstRestrictedItem.path as any });
-                return;
-              }
-            }
-          }
+          // /admin permanece na Visão Geral, mesmo quando o perfil não pode editar Projetos.
 
           // Se estamos em outra rota específica e ele não tem permissão
           if (currentItem && currentItem.id !== 'dashboard' && !permissions.includes(currentItem.id)) {
@@ -255,13 +245,13 @@ function AdminLayout() {
                 onClick={() => setSidebarOpen(false)}
                 className={cn(
                   "flex items-center justify-between gap-3 px-4 py-3 rounded-xl transition-all group",
-                  location.pathname === item.path
+                  location.pathname.replace(/\/$/, "") === item.path
                     ? "bg-[#e8440c] text-white shadow-lg shadow-[#e8440c]/20"
                     : "text-white/60 hover:bg-white/5 hover:text-white"
                 )}
               >
                 <div className="flex items-center gap-3">
-                  <item.icon className={cn("w-5 h-5", location.pathname === item.path ? "text-white" : "text-white/40 group-hover:text-white/80")} />
+                  <item.icon className={cn("w-5 h-5", location.pathname.replace(/\/$/, "") === item.path ? "text-white" : "text-white/40 group-hover:text-white/80")} />
                   <span className="font-medium">{item.label}</span>
                 </div>
               </Link>
