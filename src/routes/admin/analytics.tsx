@@ -71,7 +71,21 @@ function dayKeyBR(date: string) {
 }
 
 function AnalyticsPage() {
-  const [activeTab, setActiveTab] = useState<"donors" | "traffic">("donors");
+  const [activeTab, setActiveTab] = useState<"donors" | "traffic">("traffic");
+  const [canSeeDonors, setCanSeeDonors] = useState(false);
+  useEffect(() => {
+    let alive = true;
+    (async () => {
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user) return;
+      const profile = await supabase.from("profiles").select("role").eq("id", user.id).single();
+      if (alive && !profile.error && profile.data?.role === "admin") {
+        setCanSeeDonors(true);
+        setActiveTab("donors");
+      }
+    })();
+    return () => { alive = false; };
+  }, []);
   const [loading, setLoading] = useState(true);
   const [events, setEvents] = useState<EventRow[]>([]);
   const [period, setPeriod] = useState(7);
@@ -197,16 +211,16 @@ function AnalyticsPage() {
       </div>
 
       <nav className="flex gap-2 flex-wrap" aria-label="Seções de acompanhamento">
-        <button onClick={() => setActiveTab("donors")} aria-current={activeTab === "donors" ? "page" : undefined}
+        {canSeeDonors && <button onClick={() => setActiveTab("donors")} aria-current={activeTab === "donors" ? "page" : undefined}
           className={"px-4 py-2.5 rounded-xl font-semibold text-sm border " + (activeTab === "donors" ? "bg-[#e8440c] border-[#e8440c]" : "border-white/15 bg-white/5")}>
           Doadores e pagamentos
-        </button>
+        </button>}
         <button onClick={() => setActiveTab("traffic")} aria-current={activeTab === "traffic" ? "page" : undefined}
           className={"px-4 py-2.5 rounded-xl font-semibold text-sm border " + (activeTab === "traffic" ? "bg-[#e8440c] border-[#e8440c]" : "border-white/15 bg-white/5")}>
           Visitas e engajamento
         </button>
       </nav>
-      {activeTab === "donors" ? <DonorTracking /> : <div className="space-y-6">
+      {activeTab === "donors" && canSeeDonors ? <DonorTracking /> : <div className="space-y-6">
       {/* Period filter */}
       <div className="flex flex-wrap gap-2">
         {PERIODS.map((p) => (
