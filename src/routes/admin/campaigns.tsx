@@ -1,9 +1,9 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useEffect, useMemo, useState } from "react";
 import {
-  Archive, CalendarClock, CheckCircle2, ClipboardCopy, FilePenLine, HeartHandshake,
+  Archive, CheckCircle2, ClipboardCopy, FilePenLine,
   Loader2, Mail, Megaphone, MessageCircle, Plus, RefreshCw, Save, ShieldCheck,
-  Target, Trash2, Users, X,
+  Target, X,
 } from "lucide-react";
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
