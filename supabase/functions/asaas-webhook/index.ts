@@ -140,6 +140,7 @@ Deno.serve(async (req) => {
     const state = String(payment.status || "").toUpperCase();
     // Uma assinatura possui diversos boletos: cada pay_ fica registrado individualmente.
     const dueDate = /^\\d{4}-\\d{2}-\\d{2}$/.test(String(payment.dueDate || "")) ? payment.dueDate : null;
+    if (Deno.env.get("DONOR_TRACKING_ENABLED") === "true") {
     const paymentPaid = ["CONFIRMED", "RECEIVED", "RECEIVED_IN_CASH"].includes(state);
     const { error: cycleError } = await supabase.from("asaas_payment_cycles").upsert({
       payment_id: paymentId,
@@ -156,6 +157,7 @@ Deno.serve(async (req) => {
     if (donation.type === "ONE_TIME" && dueDate) {
       const { error: dueErr } = await supabase.from("donations").update({ due_date: dueDate }).eq("id", donation.id);
       if (dueErr) throw dueErr;
+    }
     }
     let newStatus: "CONFIRMED" | "RECEIVED" | "CANCELLED" | "REFUNDED" | null = null;
     if (state === "CONFIRMED") newStatus = "CONFIRMED";
