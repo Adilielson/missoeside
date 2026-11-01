@@ -1,6 +1,7 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useEffect, useMemo, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
+import { DonorTracking } from "@/components/admin/DonorTracking";
 import {
   BarChart3,
   Eye,
@@ -70,6 +71,7 @@ function dayKeyBR(date: string) {
 }
 
 function AnalyticsPage() {
+  const [activeTab, setActiveTab] = useState<"donors" | "traffic">("donors");
   const [loading, setLoading] = useState(true);
   const [events, setEvents] = useState<EventRow[]>([]);
   const [period, setPeriod] = useState(7);
@@ -182,7 +184,7 @@ function AnalyticsPage() {
           <div>
             <h1 className="text-2xl font-black">Acompanhamento</h1>
             <p className="text-white/40 text-sm">
-              Visitas e cliques no site — horário de Brasília (America/Sao_Paulo)
+              Doadores, cobranças e desempenho digital — horário de Brasília
             </p>
           </div>
         </div>
@@ -194,6 +196,17 @@ function AnalyticsPage() {
         </button>
       </div>
 
+      <nav className="flex gap-2 flex-wrap" aria-label="Seções de acompanhamento">
+        <button onClick={() => setActiveTab("donors")} aria-current={activeTab === "donors" ? "page" : undefined}
+          className={"px-4 py-2.5 rounded-xl font-semibold text-sm border " + (activeTab === "donors" ? "bg-[#e8440c] border-[#e8440c]" : "border-white/15 bg-white/5")}>
+          Doadores e pagamentos
+        </button>
+        <button onClick={() => setActiveTab("traffic")} aria-current={activeTab === "traffic" ? "page" : undefined}
+          className={"px-4 py-2.5 rounded-xl font-semibold text-sm border " + (activeTab === "traffic" ? "bg-[#e8440c] border-[#e8440c]" : "border-white/15 bg-white/5")}>
+          Visitas e engajamento
+        </button>
+      </nav>
+      {activeTab === "donors" ? <DonorTracking /> : <div className="space-y-6">
       {/* Period filter */}
       <div className="flex flex-wrap gap-2">
         {PERIODS.map((p) => (
@@ -349,6 +362,7 @@ function AnalyticsPage() {
           </div>
         )}
       </div>
+      </div>}
     </div>
   );
 }
