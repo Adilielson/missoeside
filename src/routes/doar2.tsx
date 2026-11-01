@@ -12,7 +12,7 @@ import bgImage from "@/assets/africa-xai-xai.png";
 
 export const Route = createFileRoute("/doar2")({
   validateSearch: (search: Record<string, unknown>) => ({
-    project: typeof search.project === "string" && /^[\\p{L}\\p{N}-]{1,160}$/u.test(search.project)
+    project: typeof search.project === "string" && /^[\p{L}\p{N}-]{1,160}$/u.test(search.project)
       ? search.project : undefined,
   }),
   head: () => ({
