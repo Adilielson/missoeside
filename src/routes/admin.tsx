@@ -12,6 +12,7 @@ import {
   FileText,
   UserCircle,
   BarChart3,
+  HandCoins,
   Mail
 } from "lucide-react";
 import { Logo } from "@/components/Logo";
@@ -30,6 +31,7 @@ const menuItems = [
   { id: "posts", label: "News", icon: FileText, path: "/admin/posts" },
   { id: "team", label: "Equipe", icon: UserCircle, path: "/admin/team" },
   { id: "analytics", label: "Acompanhamento", icon: BarChart3, path: "/admin/analytics" },
+  { id: "donations", label: "Doações por Projeto", icon: HandCoins, path: "/admin/donations", adminOnly: true },
   { id: "history", label: "Histórico", icon: Shield, path: "/admin/history" },
   { id: "newsletter", label: "Newsletter", icon: Mail, path: "/admin/newsletter", adminOnly: true },
   { id: "users", label: "Usuários", icon: Users, path: "/admin/users" },
@@ -110,6 +112,10 @@ function AdminLayout() {
           permissions = [...permissions, 'analytics'];
         }
 
+        // Relatórios financeiros exigem papel admin e RLS de donations.
+        if (profile.role === 'admin' && !permissions.includes('donations')) {
+          permissions = [...permissions, 'donations'];
+        }
         setUserPermissions(permissions);
         
         // Se estiver em uma rota que não tem permissão, redireciona para a primeira permitida

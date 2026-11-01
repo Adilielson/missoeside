@@ -61,19 +61,31 @@ Deno.serve(async (req) => {
     const payload: DonationPayload = await req.json();
 
     // 0. Get Project ID and Name
-    let projectName = payload.project_name || payload.campaign || "Geral";
+    // O projeto vem do banco, nunca do nome enviado pelo navegador.
+    // Impede que uma doacao de projeto inexistente seja registrada como geral.
+    let projectName = "Geral";
     let projectId: string | null = null;
-    
-    if (payload.campaign) {
-      const { data: proj } = await supabase
+
+    if (payload.campaign && payload.campaign !== "Geral") {
+      const { data: proj, error: projectError } = await supabase
         .from("projects")
         .select("id, name")
         .eq("slug", payload.campaign)
-        .single();
-      if (proj) {
-        projectName = proj.name;
-        projectId = proj.id;
+        .eq("status", "PUBLISHED")
+        .maybeSingle();
+
+      if (projectError) {
+        return new Response(JSON.stringify({ error: "Falha ao identificar o projeto" }), {
+          status: 503, headers: { ...corsHeaders, "Content-Type": "application/json" },
+        });
       }
+      if (!proj) {
+        return new Response(JSON.stringify({ error: "Projeto selecionado não encontrado ou indisponível" }), {
+          status: 400, headers: { ...corsHeaders, "Content-Type": "application/json" },
+        });
+      }
+      projectName = proj.name;
+      projectId = proj.id;
     }
 
     // 1. Create or fetch customer
