@@ -48,6 +48,7 @@ function CampaignsPage(){
   const [error,setError]=useState("");
   const [campaigns,setCampaigns]=useState<Campaign[]>([]);
   const [projects,setProjects]=useState<Project[]>([]);
+  const [audienceCounts,setAudienceCounts]=useState({newsletter:0,donors:0,limited:false});
   const [selectedId,setSelectedId]=useState<string|null>(null);
   const [form,setForm]=useState({...defaultForm});
   const [editing,setEditing]=useState(false);
@@ -61,14 +62,21 @@ function CampaignsPage(){
       if(p.error||p.data?.role!=="admin") throw new Error("Acesso exclusivo para administradores.");
       setAuthorized(true);
       const db=supabase as any;
-      const [campaignResult,projectResult]=await Promise.all([
+      const [campaignResult,projectResult,newsletterResult,optedDonorsResult]=await Promise.all([
         db.from("communication_campaigns").select("id,name,objective,channel,audience,subject,content,project_id,status,created_at").order("created_at",{ascending:false}).limit(200),
         supabase.from("projects").select("id,name").eq("status","PUBLISHED").order("name"),
+        supabase.from("newsletter_subscribers").select("id",{count:"exact",head:true}),
+        db.from("donations").select("donor_email").eq("donor_marketing_consent",true).limit(3000),
       ]);
       if(campaignResult.error)throw campaignResult.error;
       if(projectResult.error)throw projectResult.error;
       setCampaigns((campaignResult.data??[]) as Campaign[]);
       setProjects((projectResult.data??[]) as Project[]);
+      setAudienceCounts({
+        newsletter:newsletterResult.error?0:(newsletterResult.count??0),
+        donors:optedDonorsResult.error?0:new Set((optedDonorsResult.data??[]).map((x:{donor_email:string})=>x.donor_email.trim().toLowerCase())).size,
+        limited:(optedDonorsResult.data??[]).length>=3000,
+      });
     }catch(e){setError(e instanceof Error?e.message:"Não foi possível carregar campanhas. A migração pode estar pendente.");}
     finally{setLoading(false);}
   }
@@ -159,6 +167,14 @@ function CampaignsPage(){
         <p className="text-white/60 mt-1">Esta área salva campanhas, mas não faz disparos automáticos. Para ativar envios, é necessário configurar provedor, consentimento por canal, descadastro, templates de WhatsApp aprovados e registro de entregas. Não transformar dados de doações em lista promocional sem autorização.</p>
       </div>
     </div>
+    <section className="space-y-3">
+      <h2 className="text-xl font-bold">Públicos com autorização de comunicação</h2>
+      <div className="grid sm:grid-cols-2 gap-3">
+        <div className="rounded-xl p-4 bg-white/[.035] border border-white/10"><div className="flex gap-2 items-center text-xs text-white/50"><Mail className="w-4 h-4"/> Inscritos na newsletter</div><div className="text-2xl font-black mt-2">{audienceCounts.newsletter.toLocaleString("pt-BR")}</div></div>
+        <div className="rounded-xl p-4 bg-white/[.035] border border-white/10"><div className="flex gap-2 items-center text-xs text-white/50"><HeartHandshake className="w-4 h-4"/> Doadores com aceite de comunicação</div><div className="text-2xl font-black mt-2">{audienceCounts.donors.toLocaleString("pt-BR")}{audienceCounts.limited?"+":""}</div></div>
+      </div>
+      <p className="text-xs text-white/40">Contagens informativas, não listas prontas para disparo. É necessário eliminar duplicatas, validar consentimento por canal e respeitar descadastro.</p>
+    </section>
     <section className="space-y-3">
       <h2 className="text-xl font-bold">Comece por um objetivo</h2>
       <div className="grid sm:grid-cols-2 xl:grid-cols-4 gap-3">
