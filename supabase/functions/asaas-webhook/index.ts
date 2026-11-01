@@ -61,7 +61,8 @@ Deno.serve(async (req) => {
       return json({ error: "Invalid JSON" }, 400);
     }
 
-    if (!event || typeof event.event !== "string" || !asaasIdentifier(event.payment?.id)) {
+    const paymentId = String(event?.payment?.id || "");
+    if (!event || typeof event.event !== "string" || !asaasIdentifier(paymentId)) {
       return json({ error: "Invalid event payload" }, 400);
     }
 
@@ -85,7 +86,6 @@ Deno.serve(async (req) => {
       : "https://api-sandbox.asaas.com/v3";
 
     // Confirma o estado atual diretamente no Asaas: o body do evento nao altera o banco sozinho.
-    const paymentId = event.payment.id;
     const apiResponse = await fetch(baseUrl + "/payments/" + encodeURIComponent(paymentId), {
       method: "GET",
       headers: { access_token: apiKey, "User-Agent": "IDE-Missoes/1.0" },
