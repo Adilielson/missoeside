@@ -61,11 +61,12 @@ Deno.serve(async (req) => {
       return json({ error: "Invalid JSON" }, 400);
     }
 
-    const paymentId = String(event?.payment?.id || "");
-    if (!event || typeof event.event !== "string" || !asaasIdentifier(paymentId)) {
+    if (!event || typeof event.event !== "string") {
       return json({ error: "Invalid event payload" }, 400);
     }
 
+    // Outros recursos (assinatura, conta, etc.) podem nao conter payment.
+    // Ignoramos eventos que nao alteram a confirmacao de uma doacao.
     // PAYMENT_AUTHORIZED sozinho NAO confirma uma doacao: pode exigir captura.
     const relevant = new Set([
       "PAYMENT_CONFIRMED",
@@ -75,6 +76,8 @@ Deno.serve(async (req) => {
       "PAYMENT_DELETED",
     ]);
     if (!relevant.has(event.event)) return json({ received: true, ignored: true });
+    const paymentId = String(event.payment?.id || "");
+    if (!asaasIdentifier(paymentId)) return json({ error: "Invalid payment identifier" }, 400);
 
     const apiKey = String(settings.ASAAS_API_KEY || Deno.env.get("ASAAS_API_KEY") || "");
     const env = String(settings.ASAAS_ENV || Deno.env.get("ASAAS_ENV") || "").toLowerCase();
