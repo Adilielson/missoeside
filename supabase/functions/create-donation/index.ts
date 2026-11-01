@@ -25,6 +25,7 @@ interface DonationPayload {
   };
   campaign?: string;
   project_name?: string;
+  donor_marketing_consent?: boolean;
 }
 
 Deno.serve(async (req) => {
@@ -277,6 +278,9 @@ Deno.serve(async (req) => {
         donor_phone: payload.donor_phone,
         donor_cpf: payload.donor_cpf,
         amount: payload.amount,
+        donor_marketing_consent: payload.donor_marketing_consent === true,
+        donor_marketing_consent_at: payload.donor_marketing_consent === true ? new Date().toISOString() : null,
+        due_date: payload.type === "ONE_TIME" ? paymentBody.dueDate : null,
         type: payload.type,
         payment_method: payload.payment_method,
         status: initialStatus,
