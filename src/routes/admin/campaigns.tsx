@@ -52,6 +52,10 @@ function CampaignsPage(){
   const [selectedId,setSelectedId]=useState<string|null>(null);
   const [form,setForm]=useState({...defaultForm});
   const [editing,setEditing]=useState(false);
+  const [waBusy,setWaBusy]=useState<string|null>(null);
+  const [waPreviews,setWaPreviews]=useState<Record<string,{eligible:number;attempted:number;remaining:number;sendingEnabled:boolean;batchSize:number}>>({});
+  const [waOutcome,setWaOutcome]=useState("");
+  const [optOutPhone,setOptOutPhone]=useState("");
 
   async function load(){
     setLoading(true);setError("");
@@ -136,6 +140,56 @@ function CampaignsPage(){
     if(r.error){toast.error(r.error.message);return;}
     toast.success("Campanha arquivada.");await load();
   }
+  async function campaignWhatsapp(c:Campaign,action:"preview"|"send"){
+    if(waBusy)return;
+    if(action==="send"){
+      const p=waPreviews[c.id];
+      if(!p || !p.sendingEnabled || !p.remaining){
+        toast.error("Faça a prévia e confirme que há contatos autorizados e a integração está ativa.");return;
+      }
+      if(!confirm("Confirma enviar até 5 mensagens de WhatsApp a doadores que autorizaram comunicações? O envio é real e não pode ser desfeito."))return;
+    }
+    setWaBusy(c.id);setWaOutcome("");
+    try {
+      const {data,error}=await supabase.functions.invoke("campaign-whatsapp",{
+        body:{action,campaignId:c.id,...(action==="send"?{confirmation:"CONFIRMO_ENVIO_WHATSAPP"}:{})},
+      });
+      if(error||data?.error)throw new Error(data?.error||error?.message||"WhatsApp indisponível");
+      if(action==="preview"){
+        setWaPreviews(o=>({...o,[c.id]:{eligible:Number(data.eligible||0),attempted:Number(data.attempted||0),
+          remaining:Number(data.remaining||0),sendingEnabled:Boolean(data.sendingEnabled),batchSize:Number(data.batchSize||5)}}));
+      }else{
+        setWaOutcome("Campanha "+c.name+": "+data.sent+" aceite(s) pelo provedor, "+data.rejected+" rejeitado(s), "+data.unknown+" resultado(s) desconhecido(s).");
+        toast.success("Lote processado. Confira o resumo antes de repetir.");
+        const preview=await supabase.functions.invoke("campaign-whatsapp",{body:{action:"preview",campaignId:c.id}});
+        if(!preview.error&&preview.data?.success){
+          const d=preview.data;
+          setWaPreviews(o=>({...o,[c.id]:{eligible:d.eligible,attempted:d.attempted,remaining:d.remaining,
+            sendingEnabled:d.sendingEnabled,batchSize:d.batchSize}}));
+        }
+      }
+    }catch(e){toast.error(e instanceof Error?e.message:"Falha na UazAPI");}
+    finally{setWaBusy(null);}
+  }
+
+  async function registerOptOut(){
+    if(waBusy)return;
+    if(!/^\+?[0-9()\s-]{10,22}$/.test(optOutPhone)){
+      toast.error("Informe um telefone com DDI e DDD.");return;
+    }
+    if(!confirm("Confirma registrar o descadastro deste número para mensagens WhatsApp?"))return;
+    setWaBusy("optout");
+    try{
+      const {data,error}=await supabase.functions.invoke("campaign-whatsapp",{
+        body:{action:"optout",phone:optOutPhone},
+      });
+      if(error||data?.error)throw new Error(data?.error||error?.message||"Erro");
+      toast.success("Número incluído na lista de descadastro.");
+      setOptOutPhone("");setWaPreviews({});
+    }catch(e){toast.error(e instanceof Error?e.message:"Falha ao registrar descadastro");}
+    finally{setWaBusy(null);}
+  }
+
   function copy(){
     if(!form.content.trim())return;
     void navigator.clipboard.writeText(form.content).then(()=>toast.success("Texto copiado. Revise consentimento antes de usar."))
@@ -164,7 +218,7 @@ function CampaignsPage(){
     <div className="rounded-xl p-4 border border-sky-500/20 bg-sky-500/5 flex gap-3 text-sm">
       <ShieldCheck className="w-5 h-5 text-sky-300 shrink-0 mt-0.5"/>
       <div><strong>Etapa atual: planejamento, segmentação e revisão.</strong>
-        <p className="text-white/60 mt-1">Esta área salva campanhas, mas não faz disparos automáticos. Para ativar envios, é necessário configurar provedor, consentimento por canal, descadastro, templates de WhatsApp aprovados e registro de entregas. Não transformar dados de doações em lista promocional sem autorização.</p>
+        <p className="text-white/60 mt-1">Rascunhos não fazem disparos. Para campanhas WhatsApp, há prévia e envio manual de até 5 mensagens por ação, condicionado à conexão UazAPI, aos aceites registrados e à habilitação no servidor. Status "aceito" não comprova entrega.</p>
       </div>
     </div>
     <section className="space-y-3">
@@ -197,12 +251,39 @@ function CampaignsPage(){
               <h3 className="font-bold mt-3">{c.name}</h3>
               <p className="text-white/45 text-sm mt-1">{c.objective}</p>
               <p className="text-white/30 text-xs mt-2">Criada em {new Date(c.created_at).toLocaleDateString("pt-BR")}</p>
-              <div className="flex gap-2 mt-4">
+              <div className="flex gap-2 mt-4 flex-wrap">
                 <button className="flex gap-2 items-center text-sm px-3 py-2 rounded-lg bg-[#e8440c] hover:bg-[#d03a0b]" onClick={()=>open(c)}><FilePenLine className="w-4 h-4"/> Editar</button>
                 {c.status!=="ARCHIVED"&&<button className="flex gap-2 items-center text-sm px-3 py-2 rounded-lg border border-white/15" onClick={()=>void archive(c)}><Archive className="w-4 h-4"/> Arquivar</button>}
               </div>
+              {["WHATSAPP","MULTICHANNEL"].includes(c.channel)&&<div className="border-t border-white/10 mt-4 pt-3 space-y-2">
+                <button disabled={!!waBusy} onClick={()=>void campaignWhatsapp(c,"preview")}
+                  className="px-3 py-2 text-xs rounded-lg border border-white/15 disabled:opacity-40 flex items-center gap-2">
+                  <MessageCircle className="w-4 h-4"/> Ver público WhatsApp
+                </button>
+                {waPreviews[c.id]&&<div className="rounded-lg bg-black/20 p-3 text-xs text-white/60 space-y-1">
+                  <p>{waPreviews[c.id].eligible} elegível(is); {waPreviews[c.id].attempted} já tentado(s); {waPreviews[c.id].remaining} restante(s).</p>
+                  <p>{waPreviews[c.id].sendingEnabled?"Envio habilitado no servidor.":"Envio desabilitado: UAZAPI_CAMPAIGN_ENABLED não ativado."}</p>
+                  <button onClick={()=>void campaignWhatsapp(c,"send")}
+                    disabled={!!waBusy||c.status!=="READY"||!waPreviews[c.id].sendingEnabled||!waPreviews[c.id].remaining}
+                    className="px-3 py-2 mt-2 rounded-md bg-[#e8440c] text-white font-semibold disabled:opacity-40">
+                    Enviar próximo lote (até 5)
+                  </button>
+                  {c.status!=="READY"&&<p>Para enviar, salve a campanha com status “Pronta para revisão”.</p>}
+                </div>}
+              </div>}
             </div>)}
           </div>}
+    </section>
+    {waOutcome&&<div role="status" className="rounded-xl bg-white/5 border border-white/10 p-4 text-sm">{waOutcome}</div>}
+    <section className="space-y-3">
+      <h2 className="text-xl font-bold">Descadastro de WhatsApp</h2>
+      <p className="text-sm text-white/50">Se alguém responder SAIR ou solicitar interrupção, registre o número. Ele será excluído de novos envios.</p>
+      <div className="flex flex-wrap gap-2">
+        <input aria-label="Número para descadastro" value={optOutPhone} onChange={e=>setOptOutPhone(e.target.value)}
+          placeholder="55 27 99999-9999" className="px-3 py-2.5 text-sm rounded-lg bg-[#142943] border border-white/15 min-w-[220px]"/>
+        <button onClick={()=>void registerOptOut()} disabled={!authorized||!!waBusy||!optOutPhone}
+          className="rounded-lg px-4 py-2.5 border border-white/15 text-sm disabled:opacity-40">Registrar descadastro</button>
+      </div>
     </section>
     <section className="space-y-2">
       <h2 className="text-xl font-bold">Próximas automações recomendadas</h2>
