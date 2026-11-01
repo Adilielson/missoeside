@@ -2,7 +2,7 @@ import { createFileRoute, Link } from "@tanstack/react-router";
 import { useCallback, useEffect, useMemo, useState } from "react";
 import {
   Activity, ArrowUpRight, BarChart3, Briefcase, CalendarDays, ChevronRight,
-  FileText, HandCoins, History, LayoutDashboard, Loader2, Mail, RefreshCw,
+  FileText, HandCoins, History, LayoutDashboard, Loader2, Mail, Megaphone, RefreshCw,
   ShieldCheck, UserCircle, Users,
 } from "lucide-react";
 import {
@@ -42,8 +42,9 @@ const sections = [
   { id: "events", title: "Eventos", description: "Agenda, encontros e programações", href: "/admin/events", icon: CalendarDays, metric: "Eventos publicados" },
   { id: "posts", title: "Notícias", description: "Conteúdos e atualizações missionárias", href: "/admin/posts", icon: FileText, metric: "Notícias publicadas" },
   { id: "team", title: "Equipe", description: "Missionários e colaboradores", href: "/admin/team", icon: UserCircle, metric: "Perfis publicados" },
-  { id: "analytics", title: "Acompanhamento", description: "Visitas, cliques e interesse pelos projetos", href: "/admin/analytics", icon: BarChart3, metric: "Eventos registrados" },
+  { id: "analytics", title: "Acompanhamento", description: "Doadores, pagamentos vencidos, visitas e cliques", href: "/admin/analytics", icon: BarChart3, metric: "Eventos registrados" },
   { id: "donations", title: "Doações por projeto", description: "Conciliação, status e exportação", href: "/admin/donations", icon: HandCoins, metric: "Exclusivo administradores", adminOnly: true },
+  { id: "campaigns", title: "Campanhas", description: "E-mail, WhatsApp e newsletter com consentimento", href: "/admin/campaigns", icon: Megaphone, metric: "Planejamento de comunicação", adminOnly: true },
   { id: "history", title: "Histórico", description: "Registro de alterações e ações", href: "/admin/history", icon: History, metric: "Auditoria" },
   { id: "newsletter", title: "Newsletter", description: "Inscritos e lista de contatos", href: "/admin/newsletter", icon: Mail, metric: "Inscritos", adminOnly: true },
   { id: "users", title: "Usuários", description: "Acessos, papéis e permissões", href: "/admin/users", icon: Users, metric: "Usuários cadastrados" },
@@ -205,7 +206,7 @@ function DashboardPage() {
   const valueFor = (id: string) => {
     if (id === "analytics") return events.length.toLocaleString("pt-BR") + (eventsLimited ? "+" : "");
     if (id === "donations") return financeAvailable ? String(stats.completed) + " pagas*" : "Indisponível";
-    if (id === "history") return "Acessar";
+    if (id === "history" || id === "campaigns") return "Acessar";
     const count = counts[id as CountKey];
     return count === undefined ? "—" : count.toLocaleString("pt-BR");
   };
