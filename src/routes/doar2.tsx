@@ -272,7 +272,7 @@ export function DoarCheckout({ projectSlug }: { projectSlug?: string }) {
                 <span className="font-semibold text-white">Sua doação será destinada a: <strong className="text-brand-orange">{projectData.name}</strong></span>
               )}
             </div>
-          )
+          )}
 
           {/* Type */}
           <Section title="SELECIONE TIPO DA DOAÇÃO">
