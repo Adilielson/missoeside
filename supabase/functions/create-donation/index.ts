@@ -194,57 +194,66 @@ Deno.serve(async (req) => {
       });
     }
 
-    let actualPaymentId = payment.id;
+    // A assinatura pode ser criada antes de o Asaas disponibilizar sua primeira cobrança.
+    // Nunca enviar sub_... para o endpoint /payments/{id}/pixQrCode.
+    let actualPaymentId: string | null = payload.type === "MONTHLY" ? null : payment.id;
+    let firstPayment: Record<string, unknown> | null = null;
 
-    // Se for assinatura, precisamos pegar o ID do primeiro pagamento para gerar o PIX
     if (payload.type === "MONTHLY") {
-      console.log(`Buscando pagamentos da assinatura ${payment.id}...`);
-      const subPaymentsRes = await fetch(`${baseUrl}/subscriptions/${payment.id}/payments`, {
-        headers: { access_token: apiKey },
-      });
-      const subPayments = await subPaymentsRes.json();
-      if (subPaymentsRes.ok && subPayments.data && subPayments.data.length > 0) {
-        actualPaymentId = subPayments.data[0].id;
-        console.log(`Primeiro pagamento da assinatura: ${actualPaymentId}`);
+      try {
+        const subPaymentsRes = await fetch(`${baseUrl}/subscriptions/${payment.id}/payments`, {
+          headers: { access_token: apiKey },
+        });
+        if (subPaymentsRes.ok) {
+          const subPayments = await subPaymentsRes.json();
+          if (Array.isArray(subPayments.data) && subPayments.data.length > 0) {
+            firstPayment = subPayments.data[0];
+            actualPaymentId = typeof firstPayment?.id === "string" ? firstPayment.id : null;
+          }
+        } else {
+          console.warn("Asaas: primeira cobrança da assinatura ainda não disponível", subPaymentsRes.status);
+        }
+      } catch (listError) {
+        console.warn("Asaas: não foi possível consultar a primeira cobrança da assinatura",
+          listError instanceof Error ? listError.message : "unknown");
       }
     }
 
-    // 3. Get PIX QR if applicable
+    // O Asaas já pode ter criado a cobrança. Uma falha de QR Code não deve
+    // devolver erro que induza o doador a criar uma assinatura duplicada.
     let pixQrcode: string | null = null;
     let pixPayload: string | null = null;
     let boletoUrl: string | null = null;
+    let pixPending = false;
 
     if (billingType === "PIX") {
-      console.log(`Buscando QR Code para pagamento ${actualPaymentId}...`);
-      // Pequeno delay para garantir que o Asaas processou a cobrança (comum em sandbox)
-      await new Promise(resolve => setTimeout(resolve, 1000));
-      
-      const qrRes = await fetch(`${baseUrl}/payments/${actualPaymentId}/pixQrCode`, {
-        headers: { access_token: apiKey },
-      });
-      
-      const qrData = await qrRes.json();
-      console.log("Resposta QR Code Asaas:", JSON.stringify(qrData));
-      
-      if (qrRes.ok) {
-        pixQrcode = qrData.encodedImage ? `data:image/png;base64,${qrData.encodedImage}` : null;
-        pixPayload = qrData.payload ?? null;
+      if (!actualPaymentId || !actualPaymentId.startsWith("pay_")) {
+        pixPending = true;
+        console.warn("Asaas: PIX aguarda geração da primeira cobrança", payment.id);
       } else {
-        console.error("Erro ao buscar QR Code:", qrData);
-        if (qrData.errors?.[0]?.code === "invalid_action") {
-          return new Response(
-            JSON.stringify({ 
-              error: "O Asaas retornou que esta conta não pode gerar PIX no momento. Verifique se você possui uma chave PIX cadastrada no painel do Asaas (Sandbox/Produção).",
-              details: qrData 
-            }),
-            { status: 400, headers: { ...corsHeaders, "Content-Type": "application/json" } }
-          );
+        try {
+          const qrRes = await fetch(`${baseUrl}/payments/${actualPaymentId}/pixQrCode`, {
+            headers: { access_token: apiKey },
+          });
+          if (qrRes.ok) {
+            const qrData = await qrRes.json();
+            pixQrcode = qrData.encodedImage ? `data:image/png;base64,${qrData.encodedImage}` : null;
+            pixPayload = qrData.payload ?? null;
+            pixPending = !pixQrcode && !pixPayload;
+          } else {
+            pixPending = true;
+            console.warn("Asaas: QR Code temporariamente indisponível", qrRes.status, actualPaymentId);
+          }
+        } catch (qrError) {
+          pixPending = true;
+          console.warn("Asaas: falha ao consultar QR Code",
+            qrError instanceof Error ? qrError.message : "unknown");
         }
       }
     }
 
     if (billingType === "BOLETO") {
-      boletoUrl = payment.bankSlipUrl ?? payment.invoiceUrl ?? null;
+      boletoUrl = String(firstPayment?.bankSlipUrl ?? firstPayment?.invoiceUrl ?? payment.bankSlipUrl ?? payment.invoiceUrl ?? "") || null;
     }
 
     // 4. Project Name already fetched at step 0
@@ -300,7 +309,11 @@ Deno.serve(async (req) => {
       .single();
 
     if (dbError) {
-      return new Response(JSON.stringify({ error: dbError.message }), {
+      console.error("Asaas criou cobrança, mas falhou registro da doação:", dbError.code, dbError.message);
+      return new Response(JSON.stringify({
+        error: "A cobrança pode ter sido criada no Asaas, mas não foi registrada no site. Não tente novamente antes de consultar o Asaas.",
+        code: "CHARGE_CREATED_RECORD_FAILED",
+      }), {
         status: 500,
         headers: { ...corsHeaders, "Content-Type": "application/json" },
       });
@@ -329,8 +342,9 @@ Deno.serve(async (req) => {
         donation,
         pix_qrcode: pixQrcode,
         pix_payload: pixPayload,
+        pix_pending: pixPending,
         boleto_url: boletoUrl,
-        invoice_url: payment.invoiceUrl,
+        invoice_url: firstPayment?.invoiceUrl ?? payment.invoiceUrl ?? null,
       }),
       { headers: { ...corsHeaders, "Content-Type": "application/json" } }
     );
