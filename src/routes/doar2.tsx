@@ -3,6 +3,7 @@ import { useEffect, useState } from "react";
 import { Heart, Loader2, Lock, QrCode, CreditCard, FileText, Copy, Check } from "lucide-react";
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
+import { FunctionsHttpError } from "@supabase/supabase-js";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
@@ -51,6 +52,8 @@ export function DoarCheckout({ projectSlug }: { projectSlug?: string }) {
   const [method, setMethod] = useState<Method>("PIX");
   const [accepted, setAccepted] = useState(false);
   const [loading, setLoading] = useState(false);
+  const [paymentCreated, setPaymentCreated] = useState(false);
+  const [paymentError, setPaymentError] = useState<string | null>(null);
   const [projectData, setProjectData] = useState<{ name: string; cover_image: string | null; short_description: string | null } | null>(null);
   const [projectLoading, setProjectLoading] = useState(Boolean(projectSlug));
   const [projectError, setProjectError] = useState(false);
@@ -73,7 +76,13 @@ export function DoarCheckout({ projectSlug }: { projectSlug?: string }) {
   const [cardCvv, setCardCvv] = useState("");
 
   // result modals
-  const [pixData, setPixData] = useState<{ qr: string | null; payload: string | null; donationId?: string } | null>(null);
+  const [pixData, setPixData] = useState<{
+    qr: string | null;
+    payload: string | null;
+    donationId?: string;
+    reference?: string;
+    pending?: boolean;
+  } | null>(null);
   const [copied, setCopied] = useState(false);
   const [checkingStatus, setCheckingStatus] = useState(false);
 
@@ -111,6 +120,8 @@ export function DoarCheckout({ projectSlug }: { projectSlug?: string }) {
   const progress = Math.min(100, (raised / META) * 100);
 
   async function handleSubmit() {
+    if (loading || paymentCreated) return;
+    setPaymentError(null);
     if (projectSlug && (projectLoading || projectError || !projectData)) {
       return toast.error("Não foi possível identificar o projeto. Atualize a página ou escolha novamente a missão.");
     }
@@ -159,18 +170,40 @@ export function DoarCheckout({ projectSlug }: { projectSlug?: string }) {
               : undefined,
         },
       });
-      if (error) throw error;
-      if ((data as any)?.error) throw new Error((data as any).error);
+      if (error) {
+        // Supabase encapsula respostas 4xx/5xx numa mensagem genérica.
+        // Mostrar apenas o campo "error" devolvido pelo backend, sem detalhes
+        // financeiros, CPF, chave de API ou resposta bruta no navegador.
+        if (error instanceof FunctionsHttpError) {
+          let details: { error?: unknown; code?: unknown } | null = null;
+          try {
+            details = await error.context.clone().json();
+          } catch {
+            // Ex.: gateway responde texto puro antes de executar a função.
+          }
+          const message = typeof details?.error === "string" ? details.error : null;
+          throw new Error(message || `Não foi possível processar a solicitação (HTTP ${error.context.status}). Confira o registro no Asaas antes de tentar novamente.`);
+        }
+        throw new Error("Não foi possível conectar ao sistema de pagamentos. Verifique a conexão e consulte o Asaas antes de tentar novamente.");
+      }
+      if (data?.error) throw new Error(String(data.error));
 
-      toast.success("Doação registrada! Obrigado 💛");
+      setPaymentCreated(true);
+      toast.success("Cobrança registrada no Asaas. A doação será confirmada após o pagamento.");
 
       if (method === "PIX") {
-        setPixData({ 
-          qr: data.pix_qrcode, 
-          payload: data.pix_payload, 
-          donationId: data.donation?.id 
+        const pixReady = Boolean(data.pix_qrcode || data.pix_payload);
+        setPixData({
+          qr: data.pix_qrcode,
+          payload: data.pix_payload,
+          donationId: data.donation?.id,
+          reference: data.donation?.asaas_id,
+          pending: data.pix_pending || !pixReady,
         });
-        setCheckingStatus(true);
+        setCheckingStatus(pixReady);
+        if (!pixReady) {
+          toast.warning("A cobrança foi criada, mas o QR Code PIX ainda não está disponível. Não faça outra doação.");
+        }
       } else if (method === "BOLETO" && data.boleto_url) {
         window.open(data.boleto_url, "_blank");
         navigate({ 
@@ -195,7 +228,9 @@ export function DoarCheckout({ projectSlug }: { projectSlug?: string }) {
         }
       }
     } catch (e: any) {
-      toast.error(e.message || "Erro ao processar doação.");
+      const message = e instanceof Error ? e.message : "Não foi possível processar a doação.";
+      setPaymentError(message);
+      toast.error(message);
     } finally {
       setLoading(false);
     }
@@ -389,13 +424,23 @@ export function DoarCheckout({ projectSlug }: { projectSlug?: string }) {
             <span>Li e aceito as Políticas de Privacidade</span>
           </label>
 
+          {paymentError && (
+            <div role="alert" className="mt-5 rounded-xl border border-red-400/40 bg-red-500/10 px-4 py-3 text-sm text-red-100">
+              <strong>Não foi possível finalizar a solicitação.</strong>
+              <p className="mt-1">{paymentError}</p>
+              <p className="mt-2 text-xs">Antes de repetir, confirme no Asaas se uma assinatura ou cobrança foi criada.</p>
+            </div>
+          )}
+
           <Button
             onClick={handleSubmit}
-            disabled={loading}
+            disabled={loading || paymentCreated}
             className="w-full mt-5 h-14 text-base font-black bg-[#e8440c] hover:bg-[#c93a09] text-white rounded-xl shadow-lg shadow-[#e8440c]/30"
           >
             {loading ? (
               <Loader2 className="w-5 h-5 animate-spin" />
+            ) : paymentCreated ? (
+              <>Cobrança registrada — não envie novamente</>
             ) : (
               <>
                 <Heart className="w-5 h-5 fill-white" />
@@ -461,7 +506,14 @@ export function DoarCheckout({ projectSlug }: { projectSlug?: string }) {
             {pixData?.qr ? (
               <img src={pixData.qr} alt="QR Code PIX" className="w-64 h-64 rounded-lg border" />
             ) : (
-              <p className="text-sm text-slate-500">QR Code indisponível.</p>
+              <p className="text-sm text-slate-600 text-center">
+                {pixData?.pending
+                  ? "A cobrança foi criada no Asaas, mas o QR Code PIX ainda não está disponível. Não repita a doação. Consulte a cobrança na sua conta Asaas."
+                  : "QR Code indisponível."}
+              </p>
+            )}
+            {pixData?.reference && (
+              <p className="text-xs text-slate-500 break-all">Referência da cobrança: {pixData.reference}</p>
             )}
             {pixData?.payload && (
               <>
