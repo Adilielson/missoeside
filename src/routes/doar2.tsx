@@ -23,8 +23,13 @@ export const Route = createFileRoute("/doar2")({
       { property: "og:description", content: "Sua doação transforma vidas. Contribua hoje." },
     ],
   }),
-  component: DoarPage,
+  component: Doar2Entry,
 });
+
+function Doar2Entry() {
+  const search = Route.useSearch();
+  return <DoarCheckout projectSlug={search.project} />;
+}
 
 const META = 500000;
 const PRESETS = [200, 100, 75, 50, 25];
@@ -35,10 +40,8 @@ function brl(v: number) {
   return v.toLocaleString("pt-BR", { style: "currency", currency: "BRL" });
 }
 
-function DoarPage() {
+export function DoarCheckout({ projectSlug }: { projectSlug?: string }) {
   const navigate = useNavigate();
-  const search = Route.useSearch() as { project?: string };
-  const projectSlug = search.project;
 
   const [raised, setRaised] = useState(0);
   const [type, setType] = useState<DonationType>("ONE_TIME");
@@ -49,6 +52,8 @@ function DoarPage() {
   const [accepted, setAccepted] = useState(false);
   const [loading, setLoading] = useState(false);
   const [projectData, setProjectData] = useState<{ name: string; cover_image: string | null; short_description: string | null } | null>(null);
+  const [projectLoading, setProjectLoading] = useState(Boolean(projectSlug));
+  const [projectError, setProjectError] = useState(false);
 
   // form
   const [name, setName] = useState("");
@@ -81,22 +86,34 @@ function DoarPage() {
       if (data) setRaised(data.reduce((s: number, d: { amount: number | string | null }) => s + Number(d.amount || 0), 0));
     })();
 
+    let active = true;
+    setProjectData(null);
+    setProjectError(false);
+    setProjectLoading(Boolean(projectSlug));
     if (projectSlug) {
       (async () => {
-        const { data } = await supabase
+        const { data, error } = await supabase
           .from("projects")
           .select("name, cover_image, short_description")
           .eq("slug", projectSlug)
-          .single();
-        if (data) setProjectData(data);
+          .eq("status", "PUBLISHED")
+          .maybeSingle();
+        if (!active) return;
+        if (error || !data) setProjectError(true);
+        else setProjectData(data);
+        setProjectLoading(false);
       })();
     }
+    return () => { active = false; };
   }, [projectSlug]);
 
   const finalAmount = customMode ? Number(customValue.replace(",", ".")) || 0 : amount;
   const progress = Math.min(100, (raised / META) * 100);
 
   async function handleSubmit() {
+    if (projectSlug && (projectLoading || projectError || !projectData)) {
+      return toast.error("Não foi possível identificar o projeto. Atualize a página ou escolha novamente a missão.");
+    }
     if (!accepted) return toast.error("Aceite as Políticas de Privacidade.");
     if (!name || !phone || !cpf || !postalCode) return toast.error("Preencha os campos obrigatórios (incluindo o CEP).");
     if (finalAmount < 5) return toast.error("Valor mínimo: R$ 5,00");
@@ -245,6 +262,17 @@ function DoarPage() {
         <div className="max-w-xl w-full mx-auto bg-white/5 backdrop-blur-sm rounded-3xl shadow-2xl border border-white/10 p-6 sm:p-8">
           <h1 className="text-2xl sm:text-3xl font-black text-white">Faça uma Doação Agora</h1>
           <p className="text-white/60 mt-1">Sua doação transforma vidas!</p>
+          {projectSlug && (
+            <div className="mt-4 rounded-xl border border-brand-orange/40 bg-brand-orange/10 px-4 py-3 text-sm">
+              {projectLoading ? (
+                <span className="inline-flex items-center gap-2 text-white/70"><Loader2 className="h-4 w-4 animate-spin" /> Identificando o projeto...</span>
+              ) : projectError || !projectData ? (
+                <span className="text-red-200">Projeto não encontrado ou indisponível. Escolha outra missão em Nossos Projetos.</span>
+              ) : (
+                <span className="font-semibold text-white">Sua doação será destinada a: <strong className="text-brand-orange">{projectData.name}</strong></span>
+              )}
+            </div>
+          )}
 
           {/* Type */}
           <Section title="SELECIONE TIPO DA DOAÇÃO">
@@ -437,10 +465,7 @@ function DoarPage() {
             )}
             {pixData?.payload && (
               <>
-                <p className="text-[10px] text-amber-600 bg-amber-50 px-2 py-1 rounded border border-amber-100 mb-1">
-                  Ambiente de Teste (Sandbox)
-                </p>
-                <p className="text-xs text-slate-500 break-all bg-slate-50 p-3 rounded font-mono">
+                 <p className="text-xs text-slate-500 break-all bg-slate-50 p-3 rounded font-mono">
                   {pixData.payload}
                 </p>
                 <Button onClick={copyPix} className="w-full bg-[#e8440c] hover:bg-[#c93a09]">
