@@ -187,6 +187,9 @@ export function DoarCheckout({ projectSlug }: { projectSlug?: string }) {
         throw new Error("Não foi possível conectar ao sistema de pagamentos. Verifique a conexão e consulte o Asaas antes de tentar novamente.");
       }
       if (data?.error) throw new Error(String(data.error));
+      if (!data?.success || !data?.donation?.id) {
+        throw new Error("O servidor não confirmou o registro da cobrança. Consulte o Asaas antes de tentar novamente.");
+      }
 
       setPaymentCreated(true);
       toast.success("Cobrança registrada no Asaas. A doação será confirmada após o pagamento.");
