@@ -2,6 +2,7 @@ import { motion } from "framer-motion";
 import { useEffect, useState } from "react";
 import { Heart, ChevronRight } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { Link } from "@tanstack/react-router";
 import hero2 from "@/assets/hero-2.png";
 
 const heroImages = [
@@ -132,12 +133,12 @@ export function Hero() {
               asChild
               className="bg-brand-gradient hover:opacity-90 text-white text-base font-bold px-7 py-6 rounded-full group shadow-lg shadow-brand-orange/30 w-full sm:w-auto cursor-pointer"
             >
-              <a href="#missoes">
+              <Link to="/doar">
                 <span className="w-7 h-7 rounded-full bg-white/20 flex items-center justify-center mr-2">
                   <ChevronRight className="w-4 h-4" />
                 </span>
                 Fazer Doação
-              </a>
+              </Link>
             </Button>
 
             <div className="flex items-center gap-4">
