@@ -45,7 +45,7 @@ Deno.serve(async (req) => {
 
     const settingsMap = Object.fromEntries((settings ?? []).map((s) => [s.key, s.value]));
     const apiKey = settingsMap.ASAAS_API_KEY || Deno.env.get("ASAAS_API_KEY");
-    const env = (settingsMap.ASAAS_ENV || Deno.env.get("ASAAS_ENV") || "sandbox").toLowerCase();
+    const env = String(settingsMap.ASAAS_ENV || Deno.env.get("ASAAS_ENV") || "").trim().toLowerCase();
 
     if (!apiKey) {
       return new Response(
@@ -54,10 +54,27 @@ Deno.serve(async (req) => {
       );
     }
 
-    const baseUrl =
-      env === "production" || env === "prod"
-        ? "https://api.asaas.com/v3"
-        : "https://api-sandbox.asaas.com/v3";
+    // Nunca presumir sandbox quando a credencial do Asaas é de produção.
+    // As chaves dos ambientes são diferentes; rejeitar incompatibilidade antes
+    // de qualquer criação de cliente/assinatura ou pagamento.
+    if (!["production", "prod", "sandbox"].includes(env)) {
+      return new Response(JSON.stringify({
+        error: "Ambiente do Asaas ausente ou inválido. No Superadmin, configure ASAAS_ENV como production ou sandbox.",
+        code: "INVALID_ASAAS_ENV",
+      }), { status: 503, headers: { ...corsHeaders, "Content-Type": "application/json" } });
+    }
+    const production = env === "production" || env === "prod";
+    if ((production && apiKey.startsWith("$aact_hmlg_"))
+      || (!production && apiKey.startsWith("$aact_prod_"))) {
+      return new Response(JSON.stringify({
+        error: "A chave API do Asaas não pertence ao ambiente selecionado. Confira ASAAS_ENV e a chave no Superadmin.",
+        code: "ASAAS_ENV_KEY_MISMATCH",
+      }), { status: 503, headers: { ...corsHeaders, "Content-Type": "application/json" } });
+    }
+
+    const baseUrl = production
+      ? "https://api.asaas.com/v3"
+      : "https://api-sandbox.asaas.com/v3";
 
     const payload: DonationPayload = await req.json();
 
