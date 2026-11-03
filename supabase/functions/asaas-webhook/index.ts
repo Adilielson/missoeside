@@ -139,7 +139,7 @@ Deno.serve(async (req) => {
 
     const state = String(payment.status || "").toUpperCase();
     // Uma assinatura possui diversos boletos: cada pay_ fica registrado individualmente.
-    const dueDate = /^\\d{4}-\\d{2}-\\d{2}$/.test(String(payment.dueDate || "")) ? payment.dueDate : null;
+    const dueDate = /^\d{4}-\d{2}-\d{2}$/.test(String(payment.dueDate || "")) ? payment.dueDate : null;
     // Cobrança disponível: orientar o apoiador ANTES do pagamento, sem afirmar
     // que a contribuição foi recebida. O worker consulta o Asaas novamente,
     // exige consentimento, valida vínculo com a doação e impede duplicidades.
