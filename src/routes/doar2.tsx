@@ -67,8 +67,7 @@ export function DoarCheckout({ projectSlug }: { projectSlug?: string }) {
   const [postalCode, setPostalCode] = useState("");
   const [isAnonymous, setIsAnonymous] = useState(false);
   const [marketingConsent, setMarketingConsent] = useState(false);
-  // Não apresentar aceite que ainda não possa ser persistido no backend.
-  const marketingEnabled = import.meta.env.VITE_DONOR_TRACKING_ENABLED === "true";
+  // O aceite opcional é persistido pelo backend após aplicar a migração de automações.
 
   // card
   const [cardNumber, setCardNumber] = useState("");
@@ -150,7 +149,7 @@ export function DoarCheckout({ projectSlug }: { projectSlug?: string }) {
           donor_phone: phone,
           donor_cpf: cpf,
           is_anonymous: isAnonymous,
-          donor_marketing_consent: marketingEnabled && marketingConsent,
+          donor_marketing_consent: marketingConsent,
           donor_birthdate: birth,
           donor_postal_code: postalCode,
           amount: finalAmount,

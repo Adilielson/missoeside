@@ -17,3 +17,7 @@ verify_jwt = false # autentica via JWT de usuario e papel admin dentro da funç�
 # JWT enviado pelo usuário é verificado DENTRO da função, com role admin.
 [functions.campaign-whatsapp]
 verify_jwt = false
+
+# JWT/admin role validated inside the function; internal events require service-role key.
+[functions.whatsapp-automation]
+verify_jwt = false

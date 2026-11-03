@@ -336,6 +336,34 @@ Deno.serve(async (req) => {
       });
     }
 
+    // Salvar consentimento também quando o restante do rastreamento financeiro
+    // não estiver habilitado. Se a migração ainda não foi implantada, a cobrança
+    // permanece íntegra e nenhuma mensagem será enviada.
+    if (Deno.env.get("DONOR_TRACKING_ENABLED") !== "true" && payload.donor_marketing_consent === true) {
+      const consentSave = await supabase.from("donations").update({
+        donor_marketing_consent: true,
+        donor_marketing_consent_at: new Date().toISOString(),
+      }).eq("id", donation.id);
+      if (consentSave.error) console.warn("Consentimento WhatsApp pendente de migração", consentSave.error.code);
+    }
+
+    // Boas-vindas à solicitação de apoio, jamais confirmação antecipada.
+    // O motor possui chave única por doação, chave geral de segurança e consentimento.
+    try {
+      const serviceKey = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY") || "";
+      const serviceUrl = Deno.env.get("SUPABASE_URL") || "";
+      if (serviceKey && serviceUrl && payload.donor_marketing_consent === true) {
+        const response = await fetch(serviceUrl + "/functions/v1/whatsapp-automation", {
+          method: "POST",
+          headers: { "Content-Type": "application/json", authorization: "Bearer " + serviceKey, apikey: serviceKey },
+          body: JSON.stringify({ action: "event", eventType: "welcome",
+            eventKey: "welcome:" + donation.id, donationId: donation.id }),
+          signal: AbortSignal.timeout(15000),
+        });
+        if (!response.ok) console.warn("Boas-vindas WhatsApp indisponíveis", response.status);
+      }
+    } catch { console.warn("Boas-vindas WhatsApp não processadas"); }
+
     // 6. Send automatic notification (WhatsApp/Email)
     try {
       const message = `Olá ${payload.donor_name}, obrigado pela sua doação de R$ ${payload.amount.toFixed(2).replace('.', ',')} para o projeto ${projectName}. Sua ajuda transforma vidas! 💛`;
