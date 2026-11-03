@@ -104,6 +104,17 @@ Deno.serve(async(req) => {
     if(token.length<8 || !phone(config.UAZAPI_PHONE)) return json({error:"Configure token e telefone institucional no Superadmin"},503);
     const gate=Deno.env.get("IDE_WHATSAPP_AUTOMATION_ENABLED")==="true";
     if(!test && !gate) return json({ok:true,skipped:"Envio desativado"});
+    // Verificar a conexão real, não apenas a existência de token no banco.
+    try {
+      const connection = await fetch("https://ipazua.uazapi.com/instance/status", {
+        headers: {token},signal:AbortSignal.timeout(8000),redirect:"error"
+      });
+      if (!connection.ok) return json({error:"UazAPI não confirmou status da instância"},503);
+      const state = await connection.json().catch(()=>({}));
+      const connected = state.connected===true || state.instance?.connected===true
+        || String(state.instance?.status||state.status||"").toLowerCase()==="connected";
+      if (!connected) return json({error:"WhatsApp institucional desconectado"},409);
+    } catch { return json({error:"Não foi possível confirmar conexão com WhatsApp"},503); }
     // Limite global e reserva atômica antes da chamada: nunca repetir um envio incerto.
     const since=new Date(Date.now()-86400000).toISOString();
     const used=await db.from("whatsapp_automation_deliveries").select("id",{count:"exact",head:true}).gte("attempted_at",since);
@@ -120,7 +131,7 @@ Deno.serve(async(req) => {
     try {
       const response=await fetch("https://ipazua.uazapi.com/send/text",{
         method:"POST",headers:{"Content-Type":"application/json",token},
-        body:JSON.stringify({number:dest,text:render(model.content,vars)}),
+        body:JSON.stringify({number:dest,text:(test ? "[TESTE INTERNO — nenhum pagamento real foi realizado]\\n\\n" : "") + render(model.content,vars)}),
         redirect:"error",signal:AbortSignal.timeout(12000)
       });
       const result=await response.json().catch(()=>({}));
