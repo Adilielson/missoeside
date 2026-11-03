@@ -120,6 +120,7 @@ Deno.serve(async (req) => {
       const recent=await db.from("donations")
         .select("id,donor_name,donor_phone,amount,type,campaign,project_id,asaas_id,asaas_customer,donor_marketing_consent,donor_marketing_consent_at,payment_method")
         .eq("payment_method",body.method).eq("type","ONE_TIME")
+        .eq("status","PENDING")
         .order("created_at",{ascending:false}).limit(25);
       if(recent.error) return json({error:"Não foi possível buscar cobranças de teste"},503);
       donation=(recent.data||[]).find((d:any)=>asaasId(d.asaas_id));
