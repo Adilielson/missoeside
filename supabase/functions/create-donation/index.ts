@@ -185,12 +185,8 @@ Deno.serve(async (req) => {
     const dueDate = new Date();
     dueDate.setDate(dueDate.getDate() + (payload.payment_method === "BOLETO" ? 3 : 1));
 
-    const billingType =
-      payload.payment_method === "PIX"
-        ? "PIX"
-        : payload.payment_method === "BOLETO"
-        ? "BOLETO"
-        : "CREDIT_CARD";
+    // Boleto hibrido: um unico ID Asaas para PDF e PIX copia e cola.
+    const billingType = payload.payment_method === "CREDIT_CARD" ? "CREDIT_CARD" : "BOLETO";
 
     const paymentBody: Record<string, unknown> = {
       customer: customerId,
@@ -275,7 +271,7 @@ Deno.serve(async (req) => {
     let boletoUrl: string | null = null;
     let pixPending = false;
 
-    if (billingType === "PIX") {
+    if (billingType === "BOLETO" || billingType === "PIX") {
       if (!actualPaymentId || !actualPaymentId.startsWith("pay_")) {
         pixPending = true;
         console.warn("Asaas: PIX aguarda geração da primeira cobrança", payment.id);
@@ -381,8 +377,7 @@ Deno.serve(async (req) => {
       if (consentSave.error) console.warn("Consentimento WhatsApp pendente de migração", consentSave.error.code);
     }
 
-    // Instruções de pagamento, diferentes da confirmação de pagamento.
-    // PIX: dois textos (orientação + código puro), BOLETO: PDF de fato, sem link.
+    // Instrucao de pagamento: PDF e PIX da MESMA cobranca Asaas, sem link no WhatsApp.
     // O worker consulta a cobrança no Asaas e exige aceite registrado.
     if ((billingType === "PIX" || billingType === "BOLETO") &&
         actualPaymentId?.startsWith("pay_") && payload.donor_payment_notification_consent === true) {
