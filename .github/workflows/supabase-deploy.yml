@@ -34,7 +34,7 @@ jobs:
           version: latest
       - name: Publicar Edge Functions (sem migrações)
         if: github.event_name == 'push' || inputs.deploy_target == 'functions'
-        run: supabase functions deploy --project-ref "$SUPABASE_PROJECT_REF"
+        run: supabase functions deploy --remote="$SUPABASE_PROJECT_REF" --yes
       - name: Aplicar migrações (somente execução manual explícita)
         if: github.event_name == 'workflow_dispatch' && inputs.deploy_target == 'migrations'
         run: |
