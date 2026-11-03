@@ -119,7 +119,8 @@ Deno.serve(async (req) => {
       });
       const searchData = await searchRes.json();
       if (searchRes.ok && searchData.data && searchData.data.length > 0) {
-        customerId = searchData.data[0].id;
+        const exactMatch = searchData.data.find((candidate: any) => String(candidate.name || "").trim().toLowerCase() === String(payload.donor_name || "").trim().toLowerCase());
+        customerId = exactMatch?.id || null;
       }
     }
 
