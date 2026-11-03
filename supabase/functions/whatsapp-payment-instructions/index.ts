@@ -156,6 +156,12 @@ Deno.serve(async (req) => {
     });
     if(!payResponse.ok) return json({error:"Não foi possível consultar a cobrança no Asaas"},503);
     const payment=await payResponse.json();
+    // Asaas keeps returning removed charges (deleted=true) with their old status,
+    // but their boleto/PIX is no longer available.
+    if(payment.deleted===true)
+      return json({error:test
+        ?"A cobrança de teste mais recente de "+body.method+" foi removida no Asaas. Crie uma nova doação de teste por "+(body.method==="BOLETO"?"boleto":"PIX")+" em /doar2 e tente novamente."
+        :"Esta cobrança foi removida no Asaas"},409);
     if(payment.id!==paymentId || payment.customer!==donation.asaas_customer ||
        !Number.isFinite(Number(payment.value)) ||
        Math.abs(Number(payment.value)-Number(donation.amount))>=0.01 ||
