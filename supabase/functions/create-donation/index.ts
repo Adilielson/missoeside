@@ -151,6 +151,22 @@ Deno.serve(async (req) => {
       customerId = customer.id;
     }
 
+    // A customer may already exist from earlier payments. Switch off
+    // automatic Asaas charge notifications before new payments are created.
+    if (customerId) {
+      const updateNotifications = await fetch(`${baseUrl}/customers/${encodeURIComponent(customerId)}`, {
+        method: "PUT",
+        headers: { access_token: apiKey, "Content-Type": "application/json" },
+        body: JSON.stringify({ notificationDisabled: true }),
+      });
+      if (!updateNotifications.ok) {
+        console.error("Asaas notification update failed", updateNotifications.status);
+        return new Response(JSON.stringify({
+          error: "Não foi possível desativar as notificações do Asaas. Nenhuma nova cobrança foi criada."
+        }), { status: 503, headers: { ...corsHeaders, "Content-Type": "application/json" } });
+      }
+    }
+
     // 2. Create payment
     const customer = { id: customerId }; // Mocking for the rest of the flow
     const dueDate = new Date();
