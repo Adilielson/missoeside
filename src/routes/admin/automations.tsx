@@ -58,7 +58,8 @@ function AutomationsPage() {
       });
       if(error) {
         const context=(error as any)?.context;
-        const info=await context?.clone?.().json?.().catch(()=>null);
+        let info: {error?:string}|null=null;
+        try { if (context?.clone) info=await context.clone().json(); } catch { /* response without JSON */ }
         throw new Error(info?.error||error.message);
       }
       if(data?.error) throw new Error(data.error);
