@@ -213,7 +213,7 @@ export function DoarCheckout({ projectSlug }: { projectSlug?: string }) {
         window.open(data.boleto_url, "_blank");
         navigate({ 
           to: "/obrigado", 
-          search: { name: name, project: projectData?.name || "IDE Missões" } 
+          search: { name: name, project: projectData?.name || "IDE Missões", pending: true } 
         });
       } else if (method === "CREDIT_CARD") {
         const status = (data.donation?.status || "").toUpperCase();
@@ -412,6 +412,11 @@ export function DoarCheckout({ projectSlug }: { projectSlug?: string }) {
             )}
           </Section>
 
+          <label className="flex items-start gap-2 mt-5 text-sm text-white/80 cursor-pointer">
+            <input type="checkbox" checked={paymentWhatsAppConsent} onChange={(e)=>setPaymentWhatsAppConsent(e.target.checked)}
+              className="mt-1 accent-brand-orange"/>
+            <span>Quero receber avisos de cobrança e confirmação de pagamento pelo WhatsApp informado, incluindo boleto PDF ou código PIX. Aceite opcional; posso interromper as mensagens quando desejar.</span>
+          </label>
           {marketingEnabled && <label className="flex items-start gap-2 mt-5 text-xs text-white/60 cursor-pointer">
             <input type="checkbox" checked={marketingConsent} onChange={e=>setMarketingConsent(e.target.checked)}
               className="mt-0.5 accent-brand-orange"/>
