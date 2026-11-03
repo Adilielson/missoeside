@@ -18,6 +18,8 @@ import {
   Clock,
   Quote,
   ShieldAlert,
+  RefreshCw,
+  QrCode,
 } from "lucide-react";
 import { format } from "date-fns";
 import { ptBR } from "date-fns/locale";
@@ -79,9 +81,8 @@ const GROUPS: GroupDef[] = [
     icon: MessageCircle,
     service: "uazapi",
     fields: [
-      { key: "UAZAPI_URL", label: "URL da Instância", description: "URL completa da sua instância UazAPI.", placeholder: "https://free.uazapi.com" },
       { key: "UAZAPI_TOKEN", label: "Token", description: "Token de autenticação da instância." },
-      { key: "UAZAPI_INSTANCE", label: "Nome da Instância", description: "Identificador da instância configurada." },
+      { key: "UAZAPI_PHONE", label: "Telefone institucional", description: "Número do WhatsApp Business que será conectado, com DDI e DDD.", placeholder: "+55 22 99999-9999" },
     ],
   },
 ];
@@ -99,6 +100,9 @@ function SuperadminPage() {
   const [show, setShow] = useState<Record<string, boolean>>({});
   const [savingKey, setSavingKey] = useState<string | null>(null);
   const [testingSvc, setTestingSvc] = useState<string | null>(null);
+  const [waConnection, setWaConnection] = useState<{ connected: boolean; status: string; qrcode?: string | null } | null>(null);
+  const [waBusy, setWaBusy] = useState(false);
+  const [waError, setWaError] = useState("");
   const [logs, setLogs] = useState<any[]>([]);
   const [logsLoading, setLogsLoading] = useState(false);
 
@@ -158,6 +162,7 @@ function SuperadminPage() {
     setSavingKey(key);
     try {
       await call("save", { key, value: values[key] });
+      if (key === "UAZAPI_TOKEN") { setWaConnection(null); setWaError(""); }
       toast.success(`${key} salvo`);
       setValues((v) => ({ ...v, [key]: "" }));
       await refresh();
@@ -180,6 +185,42 @@ function SuperadminPage() {
       setTestingSvc(null);
     }
   }
+
+  async function checkWhatsApp(silent = false) {
+    if (!silent) setWaBusy(true);
+    try {
+      const r = await call("uazapi-status");
+      if (!r.ok) throw new Error(r.message || "Falha ao consultar o WhatsApp");
+      setWaConnection(prev => ({ connected: !!r.connected, status: r.status || "disconnected",
+        qrcode: r.connected ? null : prev?.qrcode }));
+      setWaError("");
+    } catch (e: any) {
+      if (!silent) setWaError(e.message || "Falha na consulta");
+    } finally {
+      if (!silent) setWaBusy(false);
+    }
+  }
+
+  async function connectWhatsApp() {
+    setWaBusy(true);
+    setWaError("");
+    try {
+      const r = await call("uazapi-connect");
+      if (!r.ok) throw new Error(r.message || "Não foi possível gerar o QR Code");
+      setWaConnection({ connected: !!r.connected, status: r.status || "connecting", qrcode: r.qrcode });
+      if (!r.connected && !r.qrcode) setWaError("A instância não retornou um QR Code. Confira o token e tente novamente.");
+    } catch (e: any) {
+      setWaError(e.message || "Falha ao conectar");
+    } finally {
+      setWaBusy(false);
+    }
+  }
+
+  useEffect(() => {
+    if (!authed || activeGroup !== "uazapi" || !waConnection?.qrcode || waConnection.connected) return;
+    const timer = setInterval(() => { void checkWhatsApp(true); }, 15000);
+    return () => clearInterval(timer);
+  }, [authed, activeGroup, waConnection?.qrcode, waConnection?.connected, password]);
 
   function logout() {
     setAuthed(false);
@@ -473,7 +514,7 @@ function SuperadminPage() {
                 {groupConfigured ? <CheckCircle2 className="w-3.5 h-3.5" /> : <AlertCircle className="w-3.5 h-3.5" />}
                 {groupConfigured ? "Tudo configurado" : "Pendente"}
               </span>
-              {group.service && (
+              {group.service && group.id !== "uazapi" && (
                 <Button
                   type="button"
                   size="sm"
@@ -487,6 +528,42 @@ function SuperadminPage() {
               )}
             </div>
           </div>
+          )}
+
+          {group?.id === "uazapi" && (
+            <div className="mb-6 rounded-2xl border border-white/10 bg-white/[0.03] p-6 space-y-5">
+              <div>
+                <h3 className="text-xl font-bold text-white">Conectar WhatsApp institucional</h3>
+                <p className="text-sm text-white/55 mt-1">Use o WhatsApp Business do número que enviará as mensagens aos apoiadores.</p>
+              </div>
+              <div className="flex flex-wrap items-center gap-3">
+                <span className={cn("rounded-full px-3 py-1 text-xs font-semibold border",
+                  waConnection?.connected ? "border-emerald-500/30 text-emerald-400 bg-emerald-500/10" : "border-amber-500/30 text-amber-400 bg-amber-500/10")}>
+                  {waConnection?.connected ? "WhatsApp conectado" : waConnection ? "Aguardando conexão" : "Conexão não verificada"}
+                </span>
+                <span className="text-xs text-white/45">Servidor: ipazua.uazapi.com</span>
+              </div>
+              {waConnection?.qrcode && !waConnection.connected && (
+                <div className="flex flex-col items-center gap-3 rounded-xl bg-white p-5 max-w-xs mx-auto">
+                  <img src={waConnection.qrcode} alt="QR Code para conectar o WhatsApp institucional" className="w-56 h-56 object-contain" />
+                  <p className="text-xs text-center text-slate-700">No WhatsApp Business: Aparelhos conectados → Conectar aparelho → Escaneie este código.</p>
+                </div>
+              )}
+              {waError && <p role="alert" className="text-sm text-amber-300">{waError}</p>}
+              <div className="flex flex-wrap gap-2">
+                <Button onClick={connectWhatsApp} disabled={waBusy || !settings.UAZAPI_TOKEN?.configured}
+                  className="bg-[#e8440c] hover:bg-[#c93a09] font-semibold">
+                  {waBusy ? <Loader2 className="w-4 h-4 animate-spin mr-2" /> : <QrCode className="w-4 h-4 mr-2" />}
+                  {waConnection?.connected ? "Gerar novo QR Code" : "Conectar por QR Code"}
+                </Button>
+                <Button onClick={() => checkWhatsApp()} disabled={waBusy || !settings.UAZAPI_TOKEN?.configured}
+                  className="bg-white/5 border border-white/15 text-white hover:bg-white/10">
+                  <RefreshCw className="w-4 h-4 mr-2" /> Verificar status
+                </Button>
+              </div>
+              {!settings.UAZAPI_TOKEN?.configured && <p className="text-xs text-amber-200">Primeiro acesso: informe abaixo o token de uma instância já criada. Depois, a conexão é feita pelo QR Code.</p>}
+              <p className="text-xs text-white/40">O número cadastrado deve corresponder ao telefone que escaneará o QR Code. A conexão não é criada apenas digitando o número.</p>
+            </div>
           )}
 
           {/* Fields */}

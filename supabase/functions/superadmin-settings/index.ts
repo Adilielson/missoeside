@@ -16,6 +16,7 @@ const KEYS = [
   "UAZAPI_URL",
   "UAZAPI_TOKEN",
   "UAZAPI_INSTANCE",
+  "UAZAPI_PHONE",
 ];
 
 function mask(v: string | null | undefined) {
@@ -113,6 +114,40 @@ Deno.serve(async (req) => {
         return json({ error: "Serviço desconhecido" }, 400);
       } catch (e) {
         return json({ ok: false, message: (e as Error).message }, 200);
+      }
+    }
+
+    // Instância já provisionada: apenas token de instância, nunca credenciais administrativas.
+    if (action === "uazapi-status" || action === "uazapi-connect") {
+      const { data: rows, error: settingsError } = await supabase.from("system_settings")
+        .select("key,value").eq("key", "UAZAPI_TOKEN");
+      if (settingsError) throw settingsError;
+      const token = rows?.find((row) => row.key === "UAZAPI_TOKEN")?.value?.trim();
+      if (!token) return json({ error: "Cadastre o token da instância uma única vez para habilitar o QR Code." }, 400);
+
+      const endpoint = action === "uazapi-status" ? "/instance/status" : "/instance/connect";
+      try {
+        const response = await fetch("https://ipazua.uazapi.com" + endpoint, {
+          method: action === "uazapi-status" ? "GET" : "POST",
+          headers: { token, "Content-Type": "application/json" },
+          ...(action === "uazapi-connect" ? { body: "{}" } : {}),
+        });
+        if (!response.ok) {
+          return json({ ok: false, message: response.status === 401 || response.status === 403
+            ? "Token da instância inválido ou sem permissão."
+            : "Não foi possível consultar a instância (" + response.status + ")." });
+        }
+        const result = await response.json().catch(() => ({}));
+        const instance = result.instance || result;
+        const status = String(instance.status || result.status || "").toLowerCase();
+        const connected = result.connected === true || instance.connected === true || status === "connected";
+        const qr = instance.qrcode || result.qrcode || null;
+        const qrcode = typeof qr === "string" && (qr.startsWith("data:image/") || /^[A-Za-z0-9+/=]+$/.test(qr))
+          ? (qr.startsWith("data:image/") ? qr : "data:image/png;base64," + qr) : null;
+        return json({ ok: true, connected, status: connected ? "connected" : status || "disconnected",
+          qrcode: action === "uazapi-connect" ? qrcode : null });
+      } catch {
+        return json({ ok: false, message: "Não foi possível comunicar com a UazAPI. Verifique o serviço." });
       }
     }
 
