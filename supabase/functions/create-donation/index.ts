@@ -136,6 +136,7 @@ Deno.serve(async (req) => {
           email: payload.donor_email,
           mobilePhone: payload.donor_phone?.replace(/\D/g, ""),
           cpfCnpj: cpfCnpj,
+          notificationDisabled: true,
         }),
       });
       const customer = await customerRes.json();
