@@ -107,6 +107,19 @@ Deno.serve(async (req) => {
       projectId = proj.id;
     }
 
+    // Check required DB schema BEFORE creating any Asaas charge, to avoid
+    // orphaned subscriptions when migrations were not deployed.
+    const schemaReady = await supabase.from("donations")
+      .select("id,donor_payment_notification_consent,donor_payment_notification_consent_at")
+      .limit(0);
+    if (schemaReady.error) {
+      console.error("Donations schema out of date", schemaReady.error.code);
+      return new Response(JSON.stringify({
+        error: "O cadastro de doações ainda não foi atualizado no Supabase. Nenhuma nova cobrança foi criada.",
+        code: "DONATION_SCHEMA_NOT_READY"
+      }), { status: 503, headers: { ...corsHeaders, "Content-Type": "application/json" } });
+    }
+
     // 1. Create or fetch customer
     const cpfCnpj = payload.donor_cpf?.replace(/\D/g, "");
     
@@ -119,7 +132,8 @@ Deno.serve(async (req) => {
       });
       const searchData = await searchRes.json();
       if (searchRes.ok && searchData.data && searchData.data.length > 0) {
-        customerId = searchData.data[0].id;
+        const exactMatch = searchData.data.find((candidate: any) => String(candidate.name || "").trim().toLowerCase() === String(payload.donor_name || "").trim().toLowerCase());
+        customerId = exactMatch?.id || null;
       }
     }
 
@@ -135,6 +149,7 @@ Deno.serve(async (req) => {
           email: payload.donor_email,
           mobilePhone: payload.donor_phone?.replace(/\D/g, ""),
           cpfCnpj: cpfCnpj,
+          notificationDisabled: true,
         }),
       });
       const customer = await customerRes.json();
@@ -147,6 +162,22 @@ Deno.serve(async (req) => {
         });
       }
       customerId = customer.id;
+    }
+
+    // A customer may already exist from earlier payments. Switch off
+    // automatic Asaas charge notifications before new payments are created.
+    if (customerId) {
+      const updateNotifications = await fetch(`${baseUrl}/customers/${encodeURIComponent(customerId)}`, {
+        method: "PUT",
+        headers: { access_token: apiKey, "Content-Type": "application/json" },
+        body: JSON.stringify({ notificationDisabled: true }),
+      });
+      if (!updateNotifications.ok) {
+        console.error("Asaas notification update failed", updateNotifications.status);
+        return new Response(JSON.stringify({
+          error: "Não foi possível desativar as notificações do Asaas. Nenhuma nova cobrança foi criada."
+        }), { status: 503, headers: { ...corsHeaders, "Content-Type": "application/json" } });
+      }
     }
 
     // 2. Create payment
