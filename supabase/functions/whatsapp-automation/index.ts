@@ -1,0 +1,144 @@
+import { createClient } from "https://esm.sh/@supabase/supabase-js@2.45.0";
+
+const cors = { "Access-Control-Allow-Origin": "*", "Access-Control-Allow-Headers": "authorization,apikey,content-type,x-client-info", "Access-Control-Allow-Methods": "POST,OPTIONS" };
+const json = (body: unknown, status=200) => new Response(JSON.stringify(body), { status, headers: { ...cors, "Content-Type": "application/json", "Cache-Control": "no-store" } });
+const allowed = new Set(["welcome","payment_confirmed","new_subscriber","monthly_renewal","upcoming_due","payment_overdue","anniversary","project_updates"]);
+const fixedTestPhone = "5527981392914";
+function phone(raw: unknown) {
+  if (typeof raw !== "string") return null;
+  let n = raw.replace(/\D/g, "");
+  if (n.length === 10 || n.length === 11) n = "55" + n;
+  return /^55\d{10,11}$/.test(n) ? n : null;
+}
+const brl = (v: unknown) => Number(v || 0).toLocaleString("pt-BR", { style: "currency", currency: "BRL" });
+function render(template: string, vars: Record<string,string>) {
+  return template.replace(/{{(nome|projeto|valor|modalidade|vencimento)}}/g, (_, key) => vars[key] || "-");
+}
+function safeId(id: unknown) { return typeof id === "string" && /^[0-9a-f-]{36}$/i.test(id); }
+
+Deno.serve(async(req) => {
+  if(req.method === "OPTIONS") return new Response(null, {headers:cors});
+  if(req.method !== "POST") return json({error:"Método inválido"},405);
+  try {
+    const url=Deno.env.get("SUPABASE_URL")||"";
+    const service=Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")||"";
+    const anon=Deno.env.get("SUPABASE_ANON_KEY")||"";
+    if(!url || !service || !anon) return json({error:"Configuração Supabase ausente"},503);
+    const db=createClient(url,service);
+    const body=await req.json().catch(()=>({}));
+    const action=String(body.action||"");
+    const bearer=(req.headers.get("authorization")||"").replace(/^Bearer\s+/i,"").trim();
+    const internal= bearer.length===service.length && bearer===service;
+    if(action==="event") {
+      if(!internal) return json({error:"Não autorizado"},401);
+    } else {
+      if(!bearer || internal) return json({error:"Acesso restrito ao admin autenticado"},401);
+      const auth=createClient(url,anon);
+      const {data: identity,error:authError}=await auth.auth.getUser(bearer);
+      if(authError || !identity.user) return json({error:"Sessão inválida"},401);
+      const {data:profile}=await db.from("profiles").select("role").eq("id",identity.user.id).maybeSingle();
+      if(profile?.role!=="admin") return json({error:"Somente administradores"},403);
+    }
+    if(action==="list") {
+      const [t,d]=await Promise.all([
+        db.from("whatsapp_automation_templates").select("event_type,label,enabled,content").order("label"),
+        db.from("whatsapp_automation_deliveries").select("event_type,status,phone_e164,attempted_at").order("attempted_at",{ascending:false}).limit(30)
+      ]);
+      if(t.error || d.error) return json({error:"Migração de automações não aplicada no Supabase"},503);
+      return json({templates:t.data,deliveries:d.data,enabled:Deno.env.get("IDE_WHATSAPP_AUTOMATION_ENABLED")==="true"});
+    }
+    if(action==="save") {
+      const type=String(body.eventType||"");
+      const content=String(body.content||"").trim();
+      if(!allowed.has(type)||content.length<1||content.length>3500||typeof body.enabled!=="boolean") return json({error:"Modelo inválido"},400);
+      const {error}=await db.from("whatsapp_automation_templates").update({
+        content,enabled:body.enabled,updated_at:new Date().toISOString()
+      }).eq("event_type",type);
+      if(error) return json({error:"Não foi possível salvar o modelo"},503);
+      return json({ok:true});
+    }
+    const test=action==="test";
+    if(action!=="event" && !test) return json({error:"Ação não permitida"},400);
+    if(test && body.confirmation!=="CONFIRMO_TESTE_WHATSAPP") return json({error:"Confirmação explícita obrigatória"},400);
+    if(!test && Deno.env.get("IDE_WHATSAPP_AUTOMATION_ENABLED")!=="true") return json({ok:true,skipped:"Automação desativada no servidor"});
+
+    const type=test?"payment_confirmed":String(body.eventType||"");
+    if(!allowed.has(type)) return json({error:"Evento inválido"},400);
+    if(!test && type==="project_updates") return json({ok:true,skipped:"Novidades requerem aprovação editorial separada"});
+    const eventKey=test?"test:"+crypto.randomUUID():String(body.eventKey||"");
+    if(!test && !/^[a-z0-9:_-]{8,200}$/i.test(eventKey)) return json({error:"Chave do evento inválida"},400);
+    const {data:model,error:modelErr}=await db.from("whatsapp_automation_templates").select("enabled,content").eq("event_type",type).single();
+    if(modelErr || !model) return json({error:"Modelo não encontrado"},503);
+    if(!test && !model.enabled) return json({ok:true,skipped:"Modelo desativado"});
+
+    let dest=fixedTestPhone;
+    let donationId: string|null=null;
+    let vars={nome:"Apoiador de teste",projeto:"Projeto de teste",valor:"R$ 5,00",modalidade:"Doação única",vencimento:"—"};
+    if(!test) {
+      if(!safeId(body.donationId)) return json({error:"Doação inválida"},400);
+      donationId=body.donationId;
+      const {data:d,error:dErr}=await db.from("donations")
+        .select("id,donor_name,donor_phone,amount,type,campaign,project_id,donor_marketing_consent,donor_marketing_consent_at")
+        .eq("id",donationId).single();
+      if(dErr||!d) return json({error:"Doação não encontrada"},404);
+      // Política conservadora: todos os envios exigem aceitação registrada.
+      if(d.donor_marketing_consent!==true || !d.donor_marketing_consent_at) return json({ok:true,skipped:"Doador sem autorização"});
+      dest=phone(d.donor_phone)||"";
+      if(!dest) return json({ok:true,skipped:"Telefone inválido"});
+      const blocked=await db.from("communication_opt_outs").select("phone_e164").eq("phone_e164",dest).maybeSingle();
+      if(blocked.error) return json({error:"Não foi possível validar descadastro"},503);
+      if(blocked.data) return json({ok:true,skipped:"Descadastro registrado"});
+      let project=d.campaign||"Missões IDE";
+      if(d.project_id) {
+        const p=await db.from("projects").select("name").eq("id",d.project_id).maybeSingle();
+        if(p.data?.name) project=p.data.name;
+      }
+      vars={nome:d.donor_name==="Doador Anônimo"?"apoiador":String(d.donor_name||"apoiador").split(/\s+/)[0].slice(0,70),
+        projeto:project,valor:brl(d.amount),modalidade:d.type==="MONTHLY"?"Mensal":"Única",
+        vencimento:typeof body.dueDate==="string" && /^\d{4}-\d{2}-\d{2}$/.test(body.dueDate)?body.dueDate.split("-").reverse().join("/"):"—"};
+    }
+    const configResult=await db.from("system_settings").select("key,value").in("key",["UAZAPI_TOKEN","UAZAPI_PHONE"]);
+    if(configResult.error) return json({error:"Configuração UazAPI indisponível"},503);
+    const config=Object.fromEntries((configResult.data||[]).map(x=>[x.key,x.value]));
+    const token=String(config.UAZAPI_TOKEN||"");
+    if(token.length<8 || !phone(config.UAZAPI_PHONE)) return json({error:"Configure token e telefone institucional no Superadmin"},503);
+    const gate=Deno.env.get("IDE_WHATSAPP_AUTOMATION_ENABLED")==="true";
+    if(!test && !gate) return json({ok:true,skipped:"Envio desativado"});
+    // Limite global e reserva atômica antes da chamada: nunca repetir um envio incerto.
+    const since=new Date(Date.now()-86400000).toISOString();
+    const used=await db.from("whatsapp_automation_deliveries").select("id",{count:"exact",head:true}).gte("attempted_at",since);
+    if(used.error) return json({error:"Não foi possível validar cota"},503);
+    if((used.count||0)>=40) return json({error:"Limite diário de 40 tentativas atingido"},429);
+    const reservation=await db.from("whatsapp_automation_deliveries").insert({
+      event_key:eventKey,event_type:test?"test":type,donation_id:donationId,phone_e164:dest,status:"RESERVED"
+    }).select("id").single();
+    if(reservation.error) {
+      if(reservation.error.code==="23505") return json({ok:true,skipped:"Evento já processado"});
+      return json({error:"Reserva do envio indisponível"},503);
+    }
+    let status="UNKNOWN",providerMessageId:null|string=null;
+    try {
+      const response=await fetch("https://ipazua.uazapi.com/send/text",{
+        method:"POST",headers:{"Content-Type":"application/json",token},
+        body:JSON.stringify({number:dest,text:render(model.content,vars)}),
+        redirect:"error",signal:AbortSignal.timeout(12000)
+      });
+      const result=await response.json().catch(()=>({}));
+      if(response.ok && !result.error) {
+        status="ACCEPTED";
+        const id=result.messageid||result.id||result.message?.id;
+        if(typeof id==="string") providerMessageId=id.slice(0,120);
+      } else status="REJECTED";
+    } catch { status="UNKNOWN"; }
+    const saved=await db.from("whatsapp_automation_deliveries").update({
+      status,provider_message_id:providerMessageId,completed_at:new Date().toISOString()
+    }).eq("id",reservation.data.id);
+    if(saved.error) console.error("whatsapp-automation delivery logging failed",saved.error.code);
+    return json({ok:status==="ACCEPTED",status,phone:test?dest:undefined,
+      message:status==="ACCEPTED"?"Aceito pela UazAPI (entrega ainda não confirmada)":
+        status==="UNKNOWN"?"Resultado incerto: não reenviar automaticamente":"UazAPI rejeitou a solicitação"});
+  } catch(e) {
+    console.error("whatsapp-automation failed",e instanceof Error?e.message:"unknown");
+    return json({error:"Erro ao processar solicitação"},500);
+  }
+});
