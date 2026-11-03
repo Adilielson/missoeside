@@ -45,7 +45,7 @@ Deno.serve(async(req) => {
         db.from("whatsapp_automation_deliveries").select("event_type,status,phone_e164,attempted_at").order("attempted_at",{ascending:false}).limit(30)
       ]);
       if(t.error || d.error) return json({error:"Migração de automações não aplicada no Supabase"},503);
-      return json({templates:t.data,deliveries:d.data,enabled:Deno.env.get("IDE_WHATSAPP_AUTOMATION_ENABLED")==="true"});
+      return json({templates:t.data,deliveries:d.data,enabled:Deno.env.get("IDE_WHATSAPP_AUTOMATION_ENABLED")==="true",sandboxTestEnabled:Deno.env.get("IDE_WHATSAPP_SANDBOX_TEST_ENABLED")==="true"});
     }
     if(action==="save") {
       const type=String(body.eventType||"");
@@ -60,7 +60,7 @@ Deno.serve(async(req) => {
     const test=action==="test";
     if(action!=="event" && !test) return json({error:"Ação não permitida"},400);
     if(test && body.confirmation!=="CONFIRMO_TESTE_WHATSAPP") return json({error:"Confirmação explícita obrigatória"},400);
-    if(!test && Deno.env.get("IDE_WHATSAPP_AUTOMATION_ENABLED")!=="true") return json({ok:true,skipped:"Automação desativada no servidor"});
+    if(!test && Deno.env.get("IDE_WHATSAPP_AUTOMATION_ENABLED")!=="true" && Deno.env.get("IDE_WHATSAPP_SANDBOX_TEST_ENABLED")!=="true") return json({ok:true,skipped:"Automação desativada no servidor"});
 
     const type=test?"payment_confirmed":String(body.eventType||"");
     if(!allowed.has(type)) return json({error:"Evento inválido"},400);
@@ -78,11 +78,16 @@ Deno.serve(async(req) => {
       if(!safeId(body.donationId)) return json({error:"Doação inválida"},400);
       donationId=body.donationId;
       const {data:d,error:dErr}=await db.from("donations")
-        .select("id,donor_name,donor_phone,amount,type,campaign,project_id,donor_marketing_consent,donor_marketing_consent_at")
+        .select("id,donor_name,donor_phone,amount,type,campaign,project_id,donor_marketing_consent,donor_marketing_consent_at,donor_payment_notification_consent,donor_payment_notification_consent_at,asaas_id,asaas_customer")
         .eq("id",donationId).single();
       if(dErr||!d) return json({error:"Doação não encontrada"},404);
-      // Política conservadora: todos os envios exigem aceitação registrada.
-      if(d.donor_marketing_consent!==true || !d.donor_marketing_consent_at) return json({ok:true,skipped:"Doador sem autorização"});
+      // Avisos financeiros precisam de consentimento transacional explícito;
+      // mensagens de relacionamento exigem o aceite de marketing distinto.
+      const financial = ["payment_confirmed","new_subscriber","monthly_renewal","payment_overdue"].includes(type);
+      const consent = financial
+        ? d.donor_payment_notification_consent===true && !!d.donor_payment_notification_consent_at
+        : d.donor_marketing_consent===true && !!d.donor_marketing_consent_at;
+      if(!consent) return json({ok:true,skipped:"Doador sem autorização para este tipo de mensagem"});
       dest=phone(d.donor_phone)||"";
       if(!dest) return json({ok:true,skipped:"Telefone inválido"});
       const blocked=await db.from("communication_opt_outs").select("phone_e164").eq("phone_e164",dest).maybeSingle();
@@ -97,13 +102,41 @@ Deno.serve(async(req) => {
         projeto:project,valor:brl(d.amount),modalidade:d.type==="MONTHLY"?"Mensal":"Única",
         vencimento:typeof body.dueDate==="string" && /^\d{4}-\d{2}-\d{2}$/.test(body.dueDate)?body.dueDate.split("-").reverse().join("/"):"—"};
     }
-    const configResult=await db.from("system_settings").select("key,value").in("key",["UAZAPI_TOKEN","UAZAPI_PHONE"]);
+    const configResult=await db.from("system_settings").select("key,value").in("key",["UAZAPI_TOKEN","UAZAPI_PHONE","ASAAS_ENV","ASAAS_API_KEY"]);
     if(configResult.error) return json({error:"Configuração UazAPI indisponível"},503);
     const config=Object.fromEntries((configResult.data||[]).map(x=>[x.key,x.value]));
     const token=String(config.UAZAPI_TOKEN||"");
     if(token.length<8 || !phone(config.UAZAPI_PHONE)) return json({error:"Configure token e telefone institucional no Superadmin"},503);
     const gate=Deno.env.get("IDE_WHATSAPP_AUTOMATION_ENABLED")==="true";
-    if(!test && !gate) return json({ok:true,skipped:"Envio desativado"});
+    const environment=String(config.ASAAS_ENV||Deno.env.get("ASAAS_ENV")||"").trim().toLowerCase();
+    const pilot=environment==="sandbox" && dest===fixedTestPhone &&
+      Deno.env.get("IDE_WHATSAPP_SANDBOX_TEST_ENABLED")==="true";
+    if(!test && !gate && !pilot) return json({ok:true,skipped:"Envio desativado para este destinatário"});
+    if(!test && ["payment_confirmed","new_subscriber","monthly_renewal"].includes(type)) {
+      // Revalidar o estado do boleto no Asaas: 'autorizado' não é pagamento.
+      const paymentId=eventKey.startsWith("paid:")?eventKey.slice(5):"";
+      if(!/^pay_[A-Za-z0-9_-]{4,128}$/.test(paymentId) || !donationId)
+        return json({error:"Identificador de pagamento inválido"},400);
+      const key=String(config.ASAAS_API_KEY||Deno.env.get("ASAAS_API_KEY")||"");
+      if(!key || !["sandbox","production"].includes(environment))
+        return json({error:"Asaas não configurado"},503);
+      const base=environment==="sandbox"?"https://api-sandbox.asaas.com/v3":"https://api.asaas.com/v3";
+      const proof=await fetch(base+"/payments/"+encodeURIComponent(paymentId),{
+        headers:{access_token:key},signal:AbortSignal.timeout(10000),redirect:"error"
+      });
+      if(!proof.ok) return json({error:"Pagamento não pôde ser verificado no Asaas"},503);
+      const verified=await proof.json();
+      const donation=await db.from("donations")
+        .select("amount,asaas_customer,asaas_id,type").eq("id",donationId).single();
+      const matches=donation.data && verified.id===paymentId &&
+        verified.customer===donation.data.asaas_customer &&
+        Number.isFinite(Number(verified.value)) &&
+        Math.abs(Number(verified.value)-Number(donation.data.amount))<0.01 &&
+        (verified.id===donation.data.asaas_id ||
+          (donation.data.type==="MONTHLY" && verified.subscription===donation.data.asaas_id));
+      if(!matches || !["CONFIRMED","RECEIVED","RECEIVED_IN_CASH"].includes(String(verified.status||"").toUpperCase()))
+        return json({ok:true,skipped:"Pagamento não confirmado pelo Asaas"});
+    }
     // Verificar a conexão real, não apenas a existência de token no banco.
     try {
       const connection = await fetch("https://ipazua.uazapi.com/instance/status", {
