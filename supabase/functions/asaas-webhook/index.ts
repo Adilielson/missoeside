@@ -140,6 +140,22 @@ Deno.serve(async (req) => {
     const state = String(payment.status || "").toUpperCase();
     // Uma assinatura possui diversos boletos: cada pay_ fica registrado individualmente.
     const dueDate = /^\\d{4}-\\d{2}-\\d{2}$/.test(String(payment.dueDate || "")) ? payment.dueDate : null;
+    // Cobrança disponível: orientar o apoiador ANTES do pagamento, sem afirmar
+    // que a contribuição foi recebida. O worker consulta o Asaas novamente,
+    // exige consentimento, valida vínculo com a doação e impede duplicidades.
+    if (["PENDING", "OVERDUE"].includes(state) &&
+        ["PIX", "BOLETO"].includes(String(payment.billingType || "").toUpperCase())) {
+      try {
+        const notice = await fetch(url + "/functions/v1/whatsapp-payment-instructions", {
+          method: "POST",
+          headers: { "Content-Type": "application/json",
+            authorization: "Bearer " + serviceKey, apikey: serviceKey },
+          body: JSON.stringify({ action: "event", donationId: donation.id, paymentId }),
+          signal: AbortSignal.timeout(25000),
+        });
+        if (!notice.ok) console.warn("Asaas webhook: payment instructions worker unavailable", notice.status);
+      } catch { console.warn("Asaas webhook: payment instructions worker timed out"); }
+    }
     if (Deno.env.get("DONOR_TRACKING_ENABLED") === "true") {
     const paymentPaid = ["CONFIRMED", "RECEIVED", "RECEIVED_IN_CASH"].includes(state);
     const { error: cycleError } = await supabase.from("asaas_payment_cycles").upsert({
