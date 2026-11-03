@@ -108,7 +108,8 @@ Deno.serve(async (req) => {
     }else return json({error:"Ação inválida"},400);
 
     const test=action==="test";
-    if(!test && Deno.env.get("IDE_WHATSAPP_AUTOMATION_ENABLED")!=="true")
+    if(!test && Deno.env.get("IDE_WHATSAPP_AUTOMATION_ENABLED")!=="true" &&
+        Deno.env.get("IDE_WHATSAPP_SANDBOX_TEST_ENABLED")!=="true")
       return json({ok:true,skipped:"Envio automático desativado"});
     if(test && !["PIX","BOLETO"].includes(body.method)) return json({error:"Escolha PIX ou Boleto"},400);
 
@@ -118,7 +119,7 @@ Deno.serve(async (req) => {
     let paymentId:unknown=body.paymentId;
     if(test){
       const recent=await db.from("donations")
-        .select("id,donor_name,donor_phone,amount,type,campaign,project_id,asaas_id,asaas_customer,donor_marketing_consent,donor_marketing_consent_at,payment_method")
+        .select("id,donor_name,donor_phone,amount,type,campaign,project_id,asaas_id,asaas_customer,donor_payment_notification_consent,donor_payment_notification_consent_at,payment_method")
         .eq("payment_method",body.method).eq("type","ONE_TIME")
         .eq("status","PENDING")
         .order("created_at",{ascending:false}).limit(25);
@@ -129,11 +130,11 @@ Deno.serve(async (req) => {
     }else{
       if(!uuid(body.donationId)||!asaasId(paymentId)) return json({error:"Doação ou cobrança inválida"},400);
       const found=await db.from("donations")
-        .select("id,donor_name,donor_phone,amount,type,campaign,project_id,asaas_id,asaas_customer,donor_marketing_consent,donor_marketing_consent_at,payment_method")
+        .select("id,donor_name,donor_phone,amount,type,campaign,project_id,asaas_id,asaas_customer,donor_payment_notification_consent,donor_payment_notification_consent_at,payment_method")
         .eq("id",body.donationId).maybeSingle();
       if(found.error||!found.data) return json({error:"Doação não encontrada"},404);
       donation=found.data;
-      if(donation.donor_marketing_consent!==true||!donation.donor_marketing_consent_at)
+      if(donation.donor_payment_notification_consent!==true||!donation.donor_payment_notification_consent_at)
         return json({ok:true,skipped:"Apoiador não autorizou mensagens"});
     }
     if(!asaasId(paymentId)) return json({error:"Cobrança Asaas inválida"},400);
@@ -170,6 +171,11 @@ Deno.serve(async (req) => {
 
     const dest=test?TEST_PHONE:phone(donation.donor_phone);
     if(!dest) return json({ok:true,skipped:"Telefone do apoiador inválido"});
+    // Sandbox pilot: only the authorized number can receive automated payment notices.
+    const pilot = environment==="sandbox" && dest===TEST_PHONE &&
+      Deno.env.get("IDE_WHATSAPP_SANDBOX_TEST_ENABLED")==="true";
+    if(!test && !pilot && Deno.env.get("IDE_WHATSAPP_AUTOMATION_ENABLED")!=="true")
+      return json({ok:true,skipped:"Automação desativada para este destinatário"});
     if(!test){
       const blocked=await db.from("communication_opt_outs").select("phone_e164")
         .eq("phone_e164",dest).maybeSingle();
