@@ -107,6 +107,19 @@ Deno.serve(async (req) => {
       projectId = proj.id;
     }
 
+    // Check required DB schema BEFORE creating any Asaas charge, to avoid
+    // orphaned subscriptions when migrations were not deployed.
+    const schemaReady = await supabase.from("donations")
+      .select("id,donor_payment_notification_consent,donor_payment_notification_consent_at")
+      .limit(0);
+    if (schemaReady.error) {
+      console.error("Donations schema out of date", schemaReady.error.code);
+      return new Response(JSON.stringify({
+        error: "O cadastro de doações ainda não foi atualizado no Supabase. Nenhuma nova cobrança foi criada.",
+        code: "DONATION_SCHEMA_NOT_READY"
+      }), { status: 503, headers: { ...corsHeaders, "Content-Type": "application/json" } });
+    }
+
     // 1. Create or fetch customer
     const cpfCnpj = payload.donor_cpf?.replace(/\D/g, "");
     
