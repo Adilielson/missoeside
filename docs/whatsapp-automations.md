@@ -93,3 +93,12 @@ O piloto automático só opera se `ASAAS_ENV=sandbox` **e** o telefone destinat�
 No Superadmin, alterar para `ASAAS_ENV=production` e inserir a chave API **de Produção**. Configurar o webhook na conta Asaas de Produção e validar sua autenticação. A operação de envio continuará usando **o mesmo número institucional UazAPI**. Desabilitar o piloto Sandbox e, **somente após homologação e aprovação**, configurar `IDE_WHATSAPP_AUTOMATION_ENABLED=true` no Supabase. Os modelos permanecem editáveis na interface.
 
 A chave do Sandbox não funciona em Produção. **Trocar o seletor não migra webhooks nem credenciais automaticamente.** O recurso WhatsApp aqui é próprio da UazAPI, não a notificação nativa do Asaas.
+
+
+## Destinatário do WhatsApp por doação
+
+O **remetente** é sempre a conta WhatsApp já conectada no Superadmin pela UazAPI. O **destinatário das mensagens automáticas** é exclusivamente o telefone que **cada doador informou no cadastro**, normalizado para o formato 55 + DDD + telefone. O token da instância nunca define o destinatário e o usuário não pode sobrescrever o telefone por parâmetros externos.
+
+Para testar cadastros reais em **Asaas Sandbox**, o segredo `IDE_WHATSAPP_SANDBOX_TEST_ENABLED=true` libera os gatilhos habilitados apenas no Sandbox, para números de doadores distintos que marcaram a autorização opcional de comunicação financeira e não pediram descadastro. Não há mais lista fixa de números do piloto. O envio exige cobrança conferida no Asaas, deduplicação e limite de tentativas. Com a chave global desativada, clientes em Produção não recebem disparos automáticos.
+
+**Atenção:** os botões de teste manual do painel administrativo ainda utilizam o telefone técnico fixo, para evitar disparos arbitrários. O teste de fluxo completo consiste em fazer uma nova doação de Sandbox com o próprio número de cada participante. Cada um deve consentir com as notificações no formulário. Não reutilizar CPFs de outras pessoas: cadastro com dados reais e corretos do próprio testador, conforme regras do provedor e do Sandbox.

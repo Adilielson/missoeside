@@ -13,7 +13,6 @@ const json = (body: unknown, status = 200) => new Response(JSON.stringify(body),
 });
 const API = "https://ipazua.uazapi.com";
 const TEST_PHONE = "5527981392914";
-const sandboxAllowedPhones = new Set(["5527981392914", "5527996173789"]);
 const LIMIT_BYTES = 5 * 1024 * 1024;
 type Method = "PIX" | "BOLETO";
 function phone(raw: unknown): string | null {
@@ -172,8 +171,9 @@ Deno.serve(async (req) => {
 
     const dest=test?TEST_PHONE:phone(donation.donor_phone);
     if(!dest) return json({ok:true,skipped:"Telefone do apoiador inválido"});
-    // Sandbox pilot: only the authorized number can receive automated payment notices.
-    const pilot = environment==="sandbox" && sandboxAllowedPhones.has(dest) &&
+    // Sandbox pilot: each opted-in donor receives messages on their own registration phone.
+    // Manual admin test actions still use the fixed admin-only test number.
+    const pilot = environment==="sandbox" && !test && Boolean(dest) &&
       Deno.env.get("IDE_WHATSAPP_SANDBOX_TEST_ENABLED")==="true";
     if(!test && !pilot && Deno.env.get("IDE_WHATSAPP_AUTOMATION_ENABLED")!=="true")
       return json({ok:true,skipped:"Automação desativada para este destinatário"});
