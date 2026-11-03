@@ -15,6 +15,7 @@ function AutomationsPage() {
   const [loading,setLoading]=useState(true);
   const [saving,setSaving]=useState<string|null>(null);
   const [testing,setTesting]=useState(false);
+  const [paymentTesting,setPaymentTesting]=useState<"PIX"|"BOLETO"|null>(null);
   const [serverEnabled,setServerEnabled]=useState(false);
   const [error,setError]=useState("");
   async function call(action:string,other:Record<string,unknown>={}) {
@@ -46,6 +47,27 @@ function AutomationsPage() {
       await load();
     }catch(e:any){toast.error(e.message)}finally{setTesting(false)}
   }
+  async function testPayment(method:"PIX"|"BOLETO") {
+    if(!window.confirm("Teste em ambiente Asaas Sandbox. Enviar "+
+      (method==="PIX"?"instruções e código PIX copia e cola":"boleto PDF anexado")+
+      " apenas ao WhatsApp +55 27 98139-2914? NÃO pague uma cobrança de testes.")) return;
+    setPaymentTesting(method);
+    try{
+      const {data,error}=await supabase.functions.invoke("whatsapp-payment-instructions",{
+        body:{action:"test",method,confirmation:"CONFIRMO_TESTE_COBRANCA"}
+      });
+      if(error) {
+        const context=(error as any)?.context;
+        const info=await context?.clone?.().json?.().catch(()=>null);
+        throw new Error(info?.error||error.message);
+      }
+      if(data?.error) throw new Error(data.error);
+      if(!data?.ok) throw new Error(data?.message||"Um dos envios não foi aceito pela UazAPI");
+      toast.success(method==="PIX"?"Orientação e código PIX aceitos pela UazAPI":"PDF do boleto aceito pela UazAPI");
+      await load();
+    }catch(e:any){toast.error(e.message||"Falha no teste de cobrança")}
+    finally{setPaymentTesting(null)}
+  }
   return <div className="max-w-5xl mx-auto text-white space-y-6">
     <header className="flex flex-wrap justify-between items-center gap-4">
       <div><h1 className="text-3xl font-bold">Comunicação · Automações</h1>
@@ -64,6 +86,24 @@ function AutomationsPage() {
         {testing?<Loader2 className="w-4 h-4 mr-2 animate-spin"/>:<Send className="w-4 h-4 mr-2"/>}
         Enviar mensagem de teste
       </Button>
+    </div>
+    <div className="rounded-2xl border border-white/10 bg-white/[0.03] p-5 space-y-3">
+      <h2 className="text-xl font-bold">Teste das formas de pagamento</h2>
+      <p className="text-sm text-white/60">Envio restrito a <b>+55 27 98139-2914</b>, usando o telefone remetente conectado no Superadmin.
+        São utilizadas cobranças de teste existentes no <b>Asaas Sandbox</b>. Nenhum link é enviado ao destinatário.</p>
+      <div className="grid gap-3 sm:grid-cols-2">
+        <Button onClick={()=>testPayment("PIX")} disabled={!!paymentTesting||loading||!!error}
+          className="bg-[#e8440c] hover:bg-[#c93a09]">
+          {paymentTesting==="PIX"?<Loader2 className="w-4 h-4 mr-2 animate-spin"/>:<Send className="w-4 h-4 mr-2"/>}
+          Testar PIX copia e cola
+        </Button>
+        <Button onClick={()=>testPayment("BOLETO")} disabled={!!paymentTesting||loading||!!error}
+          className="bg-white/10 hover:bg-white/20 border border-white/20">
+          {paymentTesting==="BOLETO"?<Loader2 className="w-4 h-4 mr-2 animate-spin"/>:<Send className="w-4 h-4 mr-2"/>}
+          Testar boleto PDF anexado
+        </Button>
+      </div>
+      <p className="text-xs text-amber-200/80">O botão de teste não gera cobranças nem altera pagamentos. Se não existir uma cobrança avulsa pendente desse tipo no Sandbox, crie uma no formulário de doação antes do teste. O PDF será enviado como arquivo, não como link.</p>
     </div>
     {error&&<div role="alert" className="rounded-lg border border-red-500/40 p-4 text-red-300">{error}. Confirme a migração e o deploy da função whatsapp-automation no Supabase.</div>}
     {loading?<div className="flex gap-2 items-center"><Loader2 className="w-5 h-5 animate-spin"/>Carregando modelos...</div>:null}
