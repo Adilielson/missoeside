@@ -67,6 +67,7 @@ export function DoarCheckout({ projectSlug }: { projectSlug?: string }) {
   const [postalCode, setPostalCode] = useState("");
   const [isAnonymous, setIsAnonymous] = useState(false);
   const [marketingConsent, setMarketingConsent] = useState(false);
+  const [paymentWhatsAppConsent, setPaymentWhatsAppConsent] = useState(false);
   // O aceite opcional é persistido pelo backend após aplicar a migração de automações (já aplicada).
   const marketingEnabled = true;
 
@@ -151,6 +152,7 @@ export function DoarCheckout({ projectSlug }: { projectSlug?: string }) {
           donor_cpf: cpf,
           is_anonymous: isAnonymous,
           donor_marketing_consent: marketingConsent,
+          donor_payment_notification_consent: paymentWhatsAppConsent,
           donor_birthdate: birth,
           donor_postal_code: postalCode,
           amount: finalAmount,
