@@ -7,6 +7,7 @@ import { z } from "zod";
 const obrigadoSearchSchema = z.object({
   name: z.string().optional(),
   project: z.string().optional(),
+  pending: z.boolean().optional(),
 });
 
 export const Route = createFileRoute("/obrigado")({
@@ -15,9 +16,10 @@ export const Route = createFileRoute("/obrigado")({
 });
 
 function ObrigadoPage() {
-  const search = Route.useSearch() as { name?: string; project?: string };
+  const search = Route.useSearch() as { name?: string; project?: string; pending?: boolean };
   const nome = search.name || "Doador";
   const projeto = search.project || "IDE Missões";
+  const pending = search.pending === true;
 
   return (
     <main className="min-h-screen flex flex-col items-center justify-center bg-brand-dark px-6 py-12 relative overflow-hidden">
@@ -38,14 +40,15 @@ function ObrigadoPage() {
           </div>
 
           <h1 className="text-3xl sm:text-4xl font-black text-white leading-tight">
-            Obrigado {nome}, o IDE Missões agradece sua doação.
+            {pending ? `Obrigado, ${nome}! Sua contribuição para ${projeto} foi registrada.` : `Obrigado, ${nome}! Sua doação foi confirmada.`}
           </h1>
 
           <div className="space-y-4">
             <p className="text-xl font-semibold text-brand-orange">
-              Juntos somos todos missionários.
+              {pending ? "Estamos aguardando o pagamento para confirmar sua doação." : "Juntos somos todos missionários."}
             </p>
             
+            {pending && <p className="text-white/75 text-base">Confira o boleto gerado e o vencimento. Se você autorizou avisos de pagamento pelo WhatsApp, poderá receber o boleto em PDF e a confirmação após o pagamento.</p>}
             <div className="py-6 border-t border-white/10">
               <p className="text-white/80 italic text-lg leading-relaxed">
                 "Novamente Jesus disse: 'Paz seja com vocês! Assim como o Pai me enviou, eu os envio.'"
