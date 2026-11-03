@@ -6,6 +6,15 @@ on:
       - "supabase/**"
       - ".github/workflows/supabase-deploy.yml"
   workflow_dispatch:
+    inputs:
+      deploy_target:
+        description: "O que publicar?"
+        required: true
+        type: choice
+        default: functions
+        options:
+          - functions
+          - migrations
 
 jobs:
   deploy:
@@ -17,33 +26,18 @@ jobs:
     steps:
       - uses: actions/checkout@v4
       - name: Verificar configuração
-        id: config
         run: |
-          if [ -n "$SUPABASE_ACCESS_TOKEN" ] && [ -n "$SUPABASE_PROJECT_REF" ]; then
-            echo "ready=true" >> "$GITHUB_OUTPUT"
-          else
-            echo "ready=false" >> "$GITHUB_OUTPUT"
-            echo "::warning::Configure SUPABASE_ACCESS_TOKEN (secret) e SUPABASE_PROJECT_REF (variable) no repositório para publicar Edge Functions."
-          fi
+          test -n "$SUPABASE_ACCESS_TOKEN" || { echo "::error::SUPABASE_ACCESS_TOKEN ausente"; exit 1; }
+          test -n "$SUPABASE_PROJECT_REF" || { echo "::error::SUPABASE_PROJECT_REF ausente"; exit 1; }
       - uses: supabase/setup-cli@v1
-        if: steps.config.outputs.ready == 'true'
         with:
           version: latest
-      - name: Aplicar migrações
-        if: steps.config.outputs.ready == 'true' && env.SUPABASE_DB_PASSWORD != ''
-        run: |
-          supabase link --project-ref "$SUPABASE_PROJECT_REF" --password "$SUPABASE_DB_PASSWORD"
-          supabase db push --linked --yes
-      - name: Bloquear deploy sem migrações
-        id: migration
-        if: steps.config.outputs.ready == 'true'
-        run: |
-          if [ -z "$SUPABASE_DB_PASSWORD" ]; then
-            echo "::warning::SUPABASE_DB_PASSWORD ausente: Edge Functions não serão publicadas para evitar incompatibilidade com migrações."
-            echo "ready=false" >> "$GITHUB_OUTPUT"
-          else
-            echo "ready=true" >> "$GITHUB_OUTPUT"
-          fi
-      - name: Publicar Edge Functions
-        if: steps.migration.outputs.ready == 'true'
+      - name: Publicar Edge Functions (sem migrações)
+        if: github.event_name == 'push' || inputs.deploy_target == 'functions'
         run: supabase functions deploy --project-ref "$SUPABASE_PROJECT_REF"
+      - name: Aplicar migrações (somente execução manual explícita)
+        if: github.event_name == 'workflow_dispatch' && inputs.deploy_target == 'migrations'
+        run: |
+          test -n "$SUPABASE_DB_PASSWORD" || { echo "::error::SUPABASE_DB_PASSWORD ausente"; exit 1; }
+          supabase link --project-ref "$SUPABASE_PROJECT_REF"
+          supabase db push --remote --yes
