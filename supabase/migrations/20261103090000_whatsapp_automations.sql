@@ -26,12 +26,28 @@ ALTER TABLE public.whatsapp_automation_templates ENABLE ROW LEVEL SECURITY;
 ALTER TABLE public.whatsapp_automation_deliveries ENABLE ROW LEVEL SECURITY;
 -- No client RLS policies: only the service-role backend manages templates and delivery records.
 INSERT INTO public.whatsapp_automation_templates(event_type,label,content) VALUES
- ('welcome','Boas-vindas ao apoiador','Olá, {{nome}}! Recebemos seu cadastro para apoiar {{projeto}}. Obrigado por caminhar com a Missões IDE! Sua cobrança ainda pode estar aguardando pagamento.\n\nPara não receber novas mensagens, responda SAIR.'),
- ('payment_confirmed','Pagamento confirmado','Olá, {{nome}}! Confirmamos seu apoio de {{valor}} ao projeto {{projeto}}. Muito obrigado por participar desta missão!\n\nPara não receber novas mensagens, responda SAIR.'),
- ('new_subscriber','Novo assinante mensal','Olá, {{nome}}! Seu primeiro pagamento mensal de {{valor}} para {{projeto}} foi confirmado. Obrigado por se tornar apoiador recorrente!\n\nPara não receber novas mensagens, responda SAIR.'),
- ('monthly_renewal','Renovação mensal','Olá, {{nome}}! Recebemos sua contribuição mensal de {{valor}} ao projeto {{projeto}}. Muito obrigado pela continuidade!\n\nPara não receber novas mensagens, responda SAIR.'),
- ('upcoming_due','Lembrete de vencimento','Olá, {{nome}}! Sua contribuição de {{valor}} para {{projeto}} vence em {{vencimento}}. Consulte o link de pagamento recebido do Asaas.\n\nPara não receber novas mensagens, responda SAIR.'),
- ('payment_overdue','Pagamento atrasado','Olá, {{nome}}! Consta uma cobrança de {{valor}} para {{projeto}} vencida em {{vencimento}}. Caso já tenha efetuado o pagamento, desconsidere.\n\nPara não receber novas mensagens, responda SAIR.'),
- ('anniversary','Aniversário de apoio','Olá, {{nome}}! Hoje celebramos mais um ano desde seu primeiro apoio ao projeto {{projeto}}. A Missões IDE agradece por sua caminhada!\n\nPara não receber novas mensagens, responda SAIR.'),
- ('project_updates','Novidades do projeto','Olá, {{nome}}! Temos novidades sobre {{projeto}}. Acompanhe nossos canais oficiais para saber mais!\n\nPara não receber novas mensagens, responda SAIR.')
+ ('welcome','Boas-vindas ao apoiador','Olá, {{nome}}! Recebemos seu cadastro para apoiar {{projeto}}. Obrigado por caminhar com a Missões IDE! Sua cobrança ainda pode estar aguardando pagamento.
+
+Para não receber novas mensagens, responda SAIR.'),
+ ('payment_confirmed','Pagamento confirmado','Olá, {{nome}}! Confirmamos seu apoio de {{valor}} ao projeto {{projeto}}. Muito obrigado por participar desta missão!
+
+Para não receber novas mensagens, responda SAIR.'),
+ ('new_subscriber','Novo assinante mensal','Olá, {{nome}}! Seu primeiro pagamento mensal de {{valor}} para {{projeto}} foi confirmado. Obrigado por se tornar apoiador recorrente!
+
+Para não receber novas mensagens, responda SAIR.'),
+ ('monthly_renewal','Renovação mensal','Olá, {{nome}}! Recebemos sua contribuição mensal de {{valor}} ao projeto {{projeto}}. Muito obrigado pela continuidade!
+
+Para não receber novas mensagens, responda SAIR.'),
+ ('upcoming_due','Lembrete de vencimento','Olá, {{nome}}! Sua contribuição de {{valor}} para {{projeto}} vence em {{vencimento}}. Consulte o link de pagamento recebido do Asaas.
+
+Para não receber novas mensagens, responda SAIR.'),
+ ('payment_overdue','Pagamento atrasado','Olá, {{nome}}! Consta uma cobrança de {{valor}} para {{projeto}} vencida em {{vencimento}}. Caso já tenha efetuado o pagamento, desconsidere.
+
+Para não receber novas mensagens, responda SAIR.'),
+ ('anniversary','Aniversário de apoio','Olá, {{nome}}! Hoje celebramos mais um ano desde seu primeiro apoio ao projeto {{projeto}}. A Missões IDE agradece por sua caminhada!
+
+Para não receber novas mensagens, responda SAIR.'),
+ ('project_updates','Novidades do projeto','Olá, {{nome}}! Temos novidades sobre {{projeto}}. Acompanhe nossos canais oficiais para saber mais!
+
+Para não receber novas mensagens, responda SAIR.')
 ON CONFLICT (event_type) DO NOTHING;
