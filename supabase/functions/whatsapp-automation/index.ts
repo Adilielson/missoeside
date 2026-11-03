@@ -3,6 +3,8 @@ import { createClient } from "https://esm.sh/@supabase/supabase-js@2.45.0";
 const cors = { "Access-Control-Allow-Origin": "*", "Access-Control-Allow-Headers": "authorization,apikey,content-type,x-client-info", "Access-Control-Allow-Methods": "POST,OPTIONS" };
 const json = (body: unknown, status=200) => new Response(JSON.stringify(body), { status, headers: { ...cors, "Content-Type": "application/json", "Cache-Control": "no-store" } });
 const allowed = new Set(["welcome","payment_confirmed","new_subscriber","monthly_renewal","upcoming_due","payment_overdue","anniversary","project_updates"]);
+// PIX/boleto templates are sent by whatsapp-payment-instructions, but are edited on the same admin page.
+const editable = new Set([...allowed, "pix_instructions", "boleto_instructions"]);
 const fixedTestPhone = "5527981392914";
 function phone(raw: unknown) {
   if (typeof raw !== "string") return null;
@@ -50,7 +52,7 @@ Deno.serve(async(req) => {
     if(action==="save") {
       const type=String(body.eventType||"");
       const content=String(body.content||"").trim();
-      if(!allowed.has(type)||content.length<1||content.length>3500||typeof body.enabled!=="boolean") return json({error:"Modelo inválido"},400);
+      if(!editable.has(type)||content.length<1||content.length>3500||typeof body.enabled!=="boolean") return json({error:"Modelo inválido"},400);
       const {error}=await db.from("whatsapp_automation_templates").update({
         content,enabled:body.enabled,updated_at:new Date().toISOString()
       }).eq("event_type",type);
