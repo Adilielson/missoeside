@@ -6,6 +6,7 @@ const allowed = new Set(["welcome","payment_confirmed","new_subscriber","monthly
 // PIX/boleto templates are sent by whatsapp-payment-instructions, but are edited on the same admin page.
 const editable = new Set([...allowed, "pix_instructions", "boleto_instructions"]);
 const fixedTestPhone = "5527981392914";
+const sandboxAllowedPhones = new Set(["5527981392914", "5527996173789"]);
 function phone(raw: unknown) {
   if (typeof raw !== "string") return null;
   let n = raw.replace(/\D/g, "");
@@ -111,7 +112,7 @@ Deno.serve(async(req) => {
     if(token.length<8 || !phone(config.UAZAPI_PHONE)) return json({error:"Configure token e telefone institucional no Superadmin"},503);
     const gate=Deno.env.get("IDE_WHATSAPP_AUTOMATION_ENABLED")==="true";
     const environment=String(config.ASAAS_ENV||Deno.env.get("ASAAS_ENV")||"").trim().toLowerCase();
-    const pilot=environment==="sandbox" && dest===fixedTestPhone &&
+    const pilot=environment==="sandbox" && sandboxAllowedPhones.has(dest) &&
       Deno.env.get("IDE_WHATSAPP_SANDBOX_TEST_ENABLED")==="true";
     if(!test && !gate && !pilot) return json({ok:true,skipped:"Envio desativado para este destinatário"});
     if(!test && ["payment_confirmed","new_subscriber","monthly_renewal"].includes(type)) {
