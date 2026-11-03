@@ -35,6 +35,9 @@ import { Route as AdminNewsletterRouteImport } from './routes/admin/newsletter'
 import { Route as AdminLoginRouteImport } from './routes/admin/login'
 import { Route as AdminHistoryRouteImport } from './routes/admin/history'
 import { Route as AdminEventsRouteImport } from './routes/admin/events'
+import { Route as AdminDonationsRouteImport } from './routes/admin/donations'
+import { Route as AdminCampaignsRouteImport } from './routes/admin/campaigns'
+import { Route as AdminAutomationsRouteImport } from './routes/admin/automations'
 import { Route as AdminAnalyticsRouteImport } from './routes/admin/analytics'
 
 const SuperadminRoute = SuperadminRouteImport.update({
@@ -167,6 +170,21 @@ const AdminEventsRoute = AdminEventsRouteImport.update({
   path: '/events',
   getParentRoute: () => AdminRoute,
 } as any)
+const AdminDonationsRoute = AdminDonationsRouteImport.update({
+  id: '/donations',
+  path: '/donations',
+  getParentRoute: () => AdminRoute,
+} as any)
+const AdminCampaignsRoute = AdminCampaignsRouteImport.update({
+  id: '/campaigns',
+  path: '/campaigns',
+  getParentRoute: () => AdminRoute,
+} as any)
+const AdminAutomationsRoute = AdminAutomationsRouteImport.update({
+  id: '/automations',
+  path: '/automations',
+  getParentRoute: () => AdminRoute,
+} as any)
 const AdminAnalyticsRoute = AdminAnalyticsRouteImport.update({
   id: '/analytics',
   path: '/analytics',
@@ -186,6 +204,9 @@ export interface FileRoutesByFullPath {
   '/sobre': typeof SobreRoute
   '/superadmin': typeof SuperadminRoute
   '/admin/analytics': typeof AdminAnalyticsRoute
+  '/admin/automations': typeof AdminAutomationsRoute
+  '/admin/campaigns': typeof AdminCampaignsRoute
+  '/admin/donations': typeof AdminDonationsRoute
   '/admin/events': typeof AdminEventsRoute
   '/admin/history': typeof AdminHistoryRoute
   '/admin/login': typeof AdminLoginRoute
@@ -212,6 +233,9 @@ export interface FileRoutesByTo {
   '/sobre': typeof SobreRoute
   '/superadmin': typeof SuperadminRoute
   '/admin/analytics': typeof AdminAnalyticsRoute
+  '/admin/automations': typeof AdminAutomationsRoute
+  '/admin/campaigns': typeof AdminCampaignsRoute
+  '/admin/donations': typeof AdminDonationsRoute
   '/admin/events': typeof AdminEventsRoute
   '/admin/history': typeof AdminHistoryRoute
   '/admin/login': typeof AdminLoginRoute
@@ -242,6 +266,9 @@ export interface FileRoutesById {
   '/sobre': typeof SobreRoute
   '/superadmin': typeof SuperadminRoute
   '/admin/analytics': typeof AdminAnalyticsRoute
+  '/admin/automations': typeof AdminAutomationsRoute
+  '/admin/campaigns': typeof AdminCampaignsRoute
+  '/admin/donations': typeof AdminDonationsRoute
   '/admin/events': typeof AdminEventsRoute
   '/admin/history': typeof AdminHistoryRoute
   '/admin/login': typeof AdminLoginRoute
@@ -273,6 +300,9 @@ export interface FileRouteTypes {
     | '/sobre'
     | '/superadmin'
     | '/admin/analytics'
+    | '/admin/automations'
+    | '/admin/campaigns'
+    | '/admin/donations'
     | '/admin/events'
     | '/admin/history'
     | '/admin/login'
@@ -299,6 +329,9 @@ export interface FileRouteTypes {
     | '/sobre'
     | '/superadmin'
     | '/admin/analytics'
+    | '/admin/automations'
+    | '/admin/campaigns'
+    | '/admin/donations'
     | '/admin/events'
     | '/admin/history'
     | '/admin/login'
@@ -328,6 +361,9 @@ export interface FileRouteTypes {
     | '/sobre'
     | '/superadmin'
     | '/admin/analytics'
+    | '/admin/automations'
+    | '/admin/campaigns'
+    | '/admin/donations'
     | '/admin/events'
     | '/admin/history'
     | '/admin/login'
@@ -545,6 +581,27 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AdminEventsRouteImport
       parentRoute: typeof AdminRoute
     }
+    '/admin/donations': {
+      id: '/admin/donations'
+      path: '/donations'
+      fullPath: '/admin/donations'
+      preLoaderRoute: typeof AdminDonationsRouteImport
+      parentRoute: typeof AdminRoute
+    }
+    '/admin/campaigns': {
+      id: '/admin/campaigns'
+      path: '/campaigns'
+      fullPath: '/admin/campaigns'
+      preLoaderRoute: typeof AdminCampaignsRouteImport
+      parentRoute: typeof AdminRoute
+    }
+    '/admin/automations': {
+      id: '/admin/automations'
+      path: '/automations'
+      fullPath: '/admin/automations'
+      preLoaderRoute: typeof AdminAutomationsRouteImport
+      parentRoute: typeof AdminRoute
+    }
     '/admin/analytics': {
       id: '/admin/analytics'
       path: '/analytics'
@@ -557,6 +614,9 @@ declare module '@tanstack/react-router' {
 
 interface AdminRouteChildren {
   AdminAnalyticsRoute: typeof AdminAnalyticsRoute
+  AdminAutomationsRoute: typeof AdminAutomationsRoute
+  AdminCampaignsRoute: typeof AdminCampaignsRoute
+  AdminDonationsRoute: typeof AdminDonationsRoute
   AdminEventsRoute: typeof AdminEventsRoute
   AdminHistoryRoute: typeof AdminHistoryRoute
   AdminLoginRoute: typeof AdminLoginRoute
@@ -570,6 +630,9 @@ interface AdminRouteChildren {
 
 const AdminRouteChildren: AdminRouteChildren = {
   AdminAnalyticsRoute: AdminAnalyticsRoute,
+  AdminAutomationsRoute: AdminAutomationsRoute,
+  AdminCampaignsRoute: AdminCampaignsRoute,
+  AdminDonationsRoute: AdminDonationsRoute,
   AdminEventsRoute: AdminEventsRoute,
   AdminHistoryRoute: AdminHistoryRoute,
   AdminLoginRoute: AdminLoginRoute,
