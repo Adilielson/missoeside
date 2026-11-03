@@ -175,6 +175,8 @@ export type Database = {
           donor_marketing_consent: boolean
           donor_marketing_consent_at: string | null
           donor_name: string
+          donor_payment_notification_consent: boolean
+          donor_payment_notification_consent_at: string | null
           donor_phone: string | null
           due_date: string | null
           email_sent: boolean | null
@@ -204,6 +206,8 @@ export type Database = {
           donor_marketing_consent?: boolean
           donor_marketing_consent_at?: string | null
           donor_name: string
+          donor_payment_notification_consent?: boolean
+          donor_payment_notification_consent_at?: string | null
           donor_phone?: string | null
           due_date?: string | null
           email_sent?: boolean | null
@@ -233,6 +237,8 @@ export type Database = {
           donor_marketing_consent?: boolean
           donor_marketing_consent_at?: string | null
           donor_name?: string
+          donor_payment_notification_consent?: boolean
+          donor_payment_notification_consent_at?: string | null
           donor_phone?: string | null
           due_date?: string | null
           email_sent?: boolean | null
