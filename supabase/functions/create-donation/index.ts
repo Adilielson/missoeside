@@ -341,7 +341,7 @@ Deno.serve(async (req) => {
           due_date: payload.type === "ONE_TIME" ? paymentBody.dueDate : null,
         } : {}),
         type: payload.type,
-        payment_method: payload.payment_method,
+        payment_method: billingType,
         status: initialStatus,
         asaas_id: payment.id,
         asaas_customer: customer.id,
