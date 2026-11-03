@@ -15,6 +15,7 @@ import {
   LayoutDashboard,
   HandCoins,
   Megaphone,
+  MessageCircle,
   Mail
 } from "lucide-react";
 import { Logo } from "@/components/Logo";
@@ -36,6 +37,7 @@ const menuItems = [
   { id: "analytics", label: "Acompanhamento", icon: BarChart3, path: "/admin/analytics" },
   { id: "donations", label: "Doações por Projeto", icon: HandCoins, path: "/admin/donations", adminOnly: true },
   { id: "campaigns", label: "Campanhas", icon: Megaphone, path: "/admin/campaigns", adminOnly: true },
+  { id: "automations", label: "Comunicação · Automações", icon: MessageCircle, path: "/admin/automations", adminOnly: true },
   { id: "history", label: "Histórico", icon: Shield, path: "/admin/history" },
   { id: "newsletter", label: "Newsletter", icon: Mail, path: "/admin/newsletter", adminOnly: true },
   { id: "users", label: "Usuários", icon: Users, path: "/admin/users" },
@@ -121,6 +123,9 @@ function AdminLayout() {
         }
         if (profile.role === 'admin' && !permissions.includes('campaigns')) {
           permissions = [...permissions, 'campaigns'];
+        }
+        if (profile.role === 'admin' && !permissions.includes('automations')) {
+          permissions = [...permissions, 'automations'];
         }
         setUserPermissions(permissions);
         
