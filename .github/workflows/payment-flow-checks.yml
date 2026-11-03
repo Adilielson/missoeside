@@ -1,0 +1,21 @@
+name: Payment flow isolated checks
+on:
+  pull_request:
+    paths:
+      - 'supabase/functions/**'
+      - 'scripts/test-pr18.mjs'
+      - '.github/workflows/payment-flow-checks.yml'
+  push:
+    branches: ['dev/pr18-sandbox-validation']
+permissions:
+  contents: read
+jobs:
+  payment-tests:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '24'
+      - run: node --test scripts/test-pr18.mjs
+# No credentials, deploy, external HTTP requests or database migrations.

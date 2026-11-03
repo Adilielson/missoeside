@@ -1,0 +1,36 @@
+(node:14) ExperimentalWarning: stripTypeScriptTypes is an experimental feature and might change at any time
+(Use `node --trace-warnings ...` to show where the warning was created)
+✔ hybrid: exactly one charge, same ID for PIX and boleto response (40.805633ms)
+✔ simultaneous creation requests reserve one charge (5.317836ms)
+✔ ambiguous creation timeout blocks retry (4.899359ms)
+✔ missing reservation schema fails before external mutation (4.451888ms)
+✔ invalid amount fails before external calls (1.99577ms)
+✔ PDF first then raw PIX; same payment and donor; logs accepted (16.802688ms)
+✔ duplicate event sends neither item again (4.313061ms)
+✔ concurrent event cannot pass an in-flight PDF reservation (24.331597ms)
+✔ rejected PDF remains failed on retry and never sends PIX (7.305443ms)
+✔ ambiguous provider timeout blocks replay and PIX (7.307506ms)
+✔ provider 200 without message ID is not acceptance (5.429773ms)
+✔ failed audit update cannot authorize PIX or retry (6.545184ms)
+✔ noConsent sends nothing (2.912933ms)
+✔ optOut sends nothing (3.99191ms)
+✔ disabledTemplate sends nothing (2.770009ms)
+✔ unauthorizedPhone sends nothing (2.781687ms)
+✔ invalidPDF sends nothing (3.201004ms)
+✔ wrongCustomer sends nothing (2.379755ms)
+✔ paid sends nothing (2.810069ms)
+✔ disconnected sends nothing (2.32303ms)
+✔ keyMismatch sends nothing (3.659622ms)
+✔ production blocked with only sandbox flag, before API calls (3.520944ms)
+✔ second copy uses existing charge, once per day; no Asaas writes (8.776416ms)
+✔ second copy rejects non-admin (4.137438ms)
+✔ monthly second copy validates subscription and parcel identity (5.530494ms)
+✔ monthly second copy requires explicit payment ID (3.884849ms)
+ℹ tests 26
+ℹ suites 0
+ℹ pass 26
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 287.152319
