@@ -364,6 +364,29 @@ Deno.serve(async (req) => {
       }
     } catch { console.warn("Boas-vindas WhatsApp não processadas"); }
 
+    // Instruções de pagamento, diferentes da confirmação de pagamento.
+    // PIX: dois textos (orientação + código puro), BOLETO: PDF de fato, sem link.
+    // O worker consulta a cobrança no Asaas e exige aceite registrado.
+    if ((billingType === "PIX" || billingType === "BOLETO") &&
+        actualPaymentId?.startsWith("pay_") && payload.donor_marketing_consent === true) {
+      try {
+        const role = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY") || "";
+        const base = Deno.env.get("SUPABASE_URL") || "";
+        if (role && base) {
+          const dispatched = await fetch(base + "/functions/v1/whatsapp-payment-instructions", {
+            method: "POST",
+            headers: { "Content-Type": "application/json", authorization: "Bearer " + role, apikey: role },
+            body: JSON.stringify({ action: "event", donationId: donation.id, paymentId: actualPaymentId }),
+            signal: AbortSignal.timeout(25000),
+          });
+          if (!dispatched.ok) console.warn("WhatsApp: instrução de cobrança não entregue ao worker", dispatched.status);
+        }
+      } catch {
+        // Cobrança existente nunca deve ser recriada por falha no WhatsApp.
+        console.warn("WhatsApp: worker de cobrança temporariamente indisponível");
+      }
+    }
+
     // 6. Send automatic notification (WhatsApp/Email)
     try {
       const message = `Olá ${payload.donor_name}, obrigado pela sua doação de R$ ${payload.amount.toFixed(2).replace('.', ',')} para o projeto ${projectName}. Sua ajuda transforma vidas! 💛`;
