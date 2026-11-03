@@ -170,6 +170,25 @@ Deno.serve(async (req) => {
     if (donation.type === "MONTHLY" && (newStatus === "REFUNDED" || newStatus === "CANCELLED")) {
       return json({ received: true, ignored: true });
     }
+    // Apenas após a consulta autenticada ao Asaas: gatilhos de WhatsApp
+    // não podem depender do evento recebido sem conciliação.
+    const paidForThisCycle = ["CONFIRMED", "RECEIVED", "RECEIVED_IN_CASH"].includes(state);
+    const eventType = paidForThisCycle
+      ? (donation.type === "MONTHLY" ? (donation.paid_at ? "monthly_renewal" : "new_subscriber") : "payment_confirmed")
+      : state === "OVERDUE" ? "payment_overdue" : null;
+    if (eventType) {
+      try {
+        const response = await fetch(url + "/functions/v1/whatsapp-automation", {
+          method: "POST",
+          headers: { "Content-Type": "application/json", authorization: "Bearer " + serviceKey, apikey: serviceKey },
+          body: JSON.stringify({ action: "event", eventType,
+            eventKey: (paidForThisCycle ? "paid:" : "overdue:") + paymentId,
+            donationId: donation.id, dueDate }),
+          signal: AbortSignal.timeout(15000),
+        });
+        if (!response.ok) console.warn("Asaas webhook: WhatsApp automation unavailable", response.status);
+      } catch { console.warn("Asaas webhook: WhatsApp automation request failed"); }
+    }
     if (!newStatus || donation.status === newStatus) return json({ received: true });
 
     const paid = newStatus === "CONFIRMED" || newStatus === "RECEIVED";
