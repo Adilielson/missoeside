@@ -54,7 +54,7 @@ function AutomationsPage() {
   }
   async function testPayment(method:"PIX"|"BOLETO") {
     if(!window.confirm("Teste em ambiente Asaas Sandbox. Enviar "+
-      (method==="PIX"?"instruções e código PIX copia e cola":"boleto PDF anexado")+
+      (method==="PIX"?"instruções e código PIX copia e cola":"boleto PDF e código PIX da mesma cobrança")+
       " apenas ao WhatsApp +55 27 98139-2914? NÃO pague uma cobrança de testes.")) return;
     setPaymentTesting(method);
     try{
@@ -69,7 +69,7 @@ function AutomationsPage() {
       }
       if(data?.error) throw new Error(data.error);
       if(!data?.ok) throw new Error(data?.message||"Um dos envios não foi aceito pela UazAPI");
-      toast.success(method==="PIX"?"Orientação e código PIX aceitos pela UazAPI":"PDF do boleto aceito pela UazAPI");
+      toast.success(method==="PIX"?"Orientação e código PIX aceitos pela UazAPI":"PDF e PIX aceitos pela UazAPI (entrega não confirmada)");
       await load();
     }catch(e:any){toast.error(e.message||"Falha no teste de cobrança")}
     finally{setPaymentTesting(null)}
@@ -115,16 +115,11 @@ function AutomationsPage() {
       <h2 className="text-xl font-bold">Teste das formas de pagamento</h2>
       <p className="text-sm text-white/60">Envio restrito a <b>+55 27 98139-2914</b>, usando o telefone remetente conectado no Superadmin.
         São utilizadas cobranças de teste existentes no <b>Asaas Sandbox</b>. Nenhum link é enviado ao destinatário.</p>
-      <div className="grid gap-3 sm:grid-cols-2">
-        <Button onClick={()=>testPayment("PIX")} disabled={!!paymentTesting||loading||!!error}
-          className="bg-[#e8440c] hover:bg-[#c93a09]">
-          {paymentTesting==="PIX"?<Loader2 className="w-4 h-4 mr-2 animate-spin"/>:<Send className="w-4 h-4 mr-2"/>}
-          Testar PIX copia e cola
-        </Button>
+      <div className="grid gap-3">
         <Button onClick={()=>testPayment("BOLETO")} disabled={!!paymentTesting||loading||!!error}
-          className="bg-white/10 hover:bg-white/20 border border-white/20">
+          className="bg-[#e8440c] hover:bg-[#c93a09]">
           {paymentTesting==="BOLETO"?<Loader2 className="w-4 h-4 mr-2 animate-spin"/>:<Send className="w-4 h-4 mr-2"/>}
-          Testar boleto PDF anexado
+          Testar boleto PDF + PIX da mesma cobrança
         </Button>
       </div>
       <p className="text-xs text-amber-200/80">O teste não cria cobranças. Para novos boletos híbridos, o envio contém o PDF seguido do PIX copia e cola da mesma cobrança. Os testes administrativos continuam usando o telefone técnico fixo.</p>
