@@ -16,6 +16,9 @@ function AutomationsPage() {
   const [saving,setSaving]=useState<string|null>(null);
   const [testing,setTesting]=useState(false);
   const [paymentTesting,setPaymentTesting]=useState<"PIX"|"BOLETO"|null>(null);
+  const [secondCopyDonationId,setSecondCopyDonationId]=useState("");
+  const [secondCopyPaymentId,setSecondCopyPaymentId]=useState("");
+  const [resending,setResending]=useState(false);
   const [serverEnabled,setServerEnabled]=useState(false);
   const [sandboxTestEnabled,setSandboxTestEnabled]=useState(false);
   const [error,setError]=useState("");
@@ -51,7 +54,7 @@ function AutomationsPage() {
   }
   async function testPayment(method:"PIX"|"BOLETO") {
     if(!window.confirm("Teste em ambiente Asaas Sandbox. Enviar "+
-      (method==="PIX"?"instruções e código PIX copia e cola":"boleto PDF anexado")+
+      (method==="PIX"?"instruções e código PIX copia e cola":"boleto PDF e código PIX da mesma cobrança")+
       " apenas ao WhatsApp +55 27 98139-2914? NÃO pague uma cobrança de testes.")) return;
     setPaymentTesting(method);
     try{
@@ -66,10 +69,28 @@ function AutomationsPage() {
       }
       if(data?.error) throw new Error(data.error);
       if(!data?.ok) throw new Error(data?.message||"Um dos envios não foi aceito pela UazAPI");
-      toast.success(method==="PIX"?"Orientação e código PIX aceitos pela UazAPI":"PDF do boleto aceito pela UazAPI");
+      toast.success(method==="PIX"?"Orientação e código PIX aceitos pela UazAPI":"PDF e PIX aceitos pela UazAPI (entrega não confirmada)");
       await load();
     }catch(e:any){toast.error(e.message||"Falha no teste de cobrança")}
     finally{setPaymentTesting(null)}
+  }
+  async function secondCopy() {
+    if(!/^[a-f0-9-]{36}$/i.test(secondCopyDonationId.trim())) return toast.error("Informe o ID da doação.");
+    if(secondCopyPaymentId.trim() && !/^pay_[A-Za-z0-9_-]{4,128}$/.test(secondCopyPaymentId.trim())) return toast.error("ID da cobrança inválido.");
+    if(!window.confirm("Reenviar a SEGUNDA VIA do boleto PDF e PIX da mesma cobrança ao telefone cadastrado e autorizado? Não cria nova cobrança. No máximo uma segunda via por cobrança a cada dia UTC."))return;
+    setResending(true);
+    try {
+      const {data,error}=await supabase.functions.invoke("whatsapp-payment-instructions",{
+        body:{action:"resend",donationId:secondCopyDonationId.trim(),
+          ...(secondCopyPaymentId.trim()?{paymentId:secondCopyPaymentId.trim()}:{}),
+          confirmation:"CONFIRMO_SEGUNDA_VIA"}
+      });
+      if(error){let message=error.message;try{const r=await (error as any).context?.clone?.().json();message=r?.error||message}catch{}throw new Error(message)}
+      if(data?.error)throw new Error(data.error);
+      if(!data?.ok)throw new Error(data?.message||"Segunda via não aceita pela UazAPI");
+      toast.success("Boleto e PIX aceitos pela UazAPI. Confirme a entrega no WhatsApp.");
+      await load();
+    }catch(e:any){toast.error(e.message||"Erro no reenvio")}finally{setResending(false)}
   }
   return <div className="max-w-5xl mx-auto text-white space-y-6">
     <header className="flex flex-wrap justify-between items-center gap-4">
@@ -94,20 +115,23 @@ function AutomationsPage() {
       <h2 className="text-xl font-bold">Teste das formas de pagamento</h2>
       <p className="text-sm text-white/60">Envio restrito a <b>+55 27 98139-2914</b>, usando o telefone remetente conectado no Superadmin.
         São utilizadas cobranças de teste existentes no <b>Asaas Sandbox</b>. Nenhum link é enviado ao destinatário.</p>
-      <div className="grid gap-3 sm:grid-cols-2">
-        <Button onClick={()=>testPayment("PIX")} disabled={!!paymentTesting||loading||!!error}
-          className="bg-[#e8440c] hover:bg-[#c93a09]">
-          {paymentTesting==="PIX"?<Loader2 className="w-4 h-4 mr-2 animate-spin"/>:<Send className="w-4 h-4 mr-2"/>}
-          Testar PIX copia e cola
-        </Button>
+      <div className="grid gap-3">
         <Button onClick={()=>testPayment("BOLETO")} disabled={!!paymentTesting||loading||!!error}
-          className="bg-white/10 hover:bg-white/20 border border-white/20">
+          className="bg-[#e8440c] hover:bg-[#c93a09]">
           {paymentTesting==="BOLETO"?<Loader2 className="w-4 h-4 mr-2 animate-spin"/>:<Send className="w-4 h-4 mr-2"/>}
-          Testar boleto PDF anexado
+          Testar boleto PDF + PIX da mesma cobrança
         </Button>
       </div>
-      <p className="text-xs text-amber-200/80">O botão de teste não gera cobranças nem altera pagamentos. Se não existir uma cobrança avulsa pendente desse tipo no Sandbox, crie uma no formulário de doação antes do teste. O PDF será enviado como arquivo, não como link.</p>
+      <p className="text-xs text-amber-200/80">O teste não cria cobranças. Para novos boletos híbridos, o envio contém o PDF seguido do PIX copia e cola da mesma cobrança. Os testes administrativos continuam usando o telefone técnico fixo.</p>
     </div>
+    <section className="rounded-2xl border border-white/10 p-5 space-y-3">
+      <h2 className="text-xl font-bold">Enviar segunda via — boleto + PIX</h2>
+      <p className="text-white/60 text-sm">Reconsulta a mesma cobrança pendente no Asaas e envia ao telefone que autorizou mensagens na doação. Não cria nova cobrança. Restrito a administrador.</p>
+      <input className="w-full bg-black/30 border border-white/20 p-3 rounded-lg" placeholder="ID da doação (UUID)" value={secondCopyDonationId} onChange={e=>setSecondCopyDonationId(e.target.value)} />
+      <input className="w-full bg-black/30 border border-white/20 p-3 rounded-lg" placeholder="ID pay_... da parcela (opcional em doação única; obrigatório em mensalidade)" value={secondCopyPaymentId} onChange={e=>setSecondCopyPaymentId(e.target.value)} />
+      <Button disabled={resending || !secondCopyDonationId.trim()} onClick={secondCopy} className="bg-[#e8440c] hover:bg-[#c93a09]">{resending?<Loader2 className="w-4 h-4 mr-2 animate-spin"/>:<Send className="w-4 h-4 mr-2"/>}Enviar segunda via</Button>
+      <p className="text-xs text-white/50">Não reenviar quando a situação do pagamento estiver incerta. Tentativas deduplicadas por cobrança e dia.</p>
+    </section>
     {error&&<div role="alert" className="rounded-lg border border-red-500/40 p-4 text-red-300">{error}. Confirme a migração e o deploy da função whatsapp-automation no Supabase.</div>}
     {loading?<div className="flex gap-2 items-center"><Loader2 className="w-5 h-5 animate-spin"/>Carregando modelos...</div>:null}
     <section className="grid gap-4">

@@ -82,6 +82,7 @@ export function DoarCheckout({ projectSlug }: { projectSlug?: string }) {
     payload: string | null;
     donationId?: string;
     reference?: string;
+    boletoUrl?: string | null;
     pending?: boolean;
   } | null>(null);
   const [copied, setCopied] = useState(false);
@@ -203,6 +204,7 @@ export function DoarCheckout({ projectSlug }: { projectSlug?: string }) {
           payload: data.pix_payload,
           donationId: data.donation?.id,
           reference: data.donation?.asaas_id,
+          boletoUrl: data.boleto_url,
           pending: data.pix_pending || !pixReady,
         });
         setCheckingStatus(pixReady);
@@ -525,6 +527,7 @@ export function DoarCheckout({ projectSlug }: { projectSlug?: string }) {
             {pixData?.reference && (
               <p className="text-xs text-slate-500 break-all">Referência da cobrança: {pixData.reference}</p>
             )}
+            {pixData?.boletoUrl && (<a href={pixData.boletoUrl} target="_blank" rel="noopener noreferrer" className="text-sm text-[#e8440c] underline">Abrir boleto da mesma cobrança em PDF</a>)}
             {pixData?.payload && (
               <>
                  <p className="text-xs text-slate-500 break-all bg-slate-50 p-3 rounded font-mono">

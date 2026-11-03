@@ -97,17 +97,18 @@ Deno.serve(async (req) => {
     const internal=bearer && bearer.length===role.length && bearer===role;
     if(action==="event"){
       if(!internal) return json({error:"Não autorizado"},401);
-    }else if(action==="test"){
+    }else if(action==="test" || action==="resend"){
       if(!bearer||internal) return json({error:"Sessão administrativa obrigatória"},401);
       const auth=createClient(supabaseUrl,anon);
       const user=await auth.auth.getUser(bearer);
       if(user.error||!user.data.user) return json({error:"Sessão inválida"},401);
       const profile=await db.from("profiles").select("role").eq("id",user.data.user.id).maybeSingle();
       if(profile.error||profile.data?.role!=="admin") return json({error:"Acesso restrito"},403);
-      if(body.confirmation!=="CONFIRMO_TESTE_COBRANCA") return json({error:"Confirmação do teste obrigatória"},400);
+      if(body.confirmation!==(action==="test"?"CONFIRMO_TESTE_COBRANCA":"CONFIRMO_SEGUNDA_VIA")) return json({error:"Confirmação obrigatória"},400);
     }else return json({error:"Ação inválida"},400);
 
     const test=action==="test";
+    const resend=action==="resend";
     if(!test && Deno.env.get("IDE_WHATSAPP_AUTOMATION_ENABLED")!=="true" &&
         Deno.env.get("IDE_WHATSAPP_SANDBOX_TEST_ENABLED")!=="true")
       return json({ok:true,skipped:"Envio automático desativado"});
@@ -128,12 +129,13 @@ Deno.serve(async (req) => {
       if(!donation) return json({error:"Não há cobrança avulsa de "+body.method+" no Asaas. Crie uma doação de teste antes."},409);
       paymentId=donation.asaas_id;
     }else{
-      if(!uuid(body.donationId)||!asaasId(paymentId)) return json({error:"Doação ou cobrança inválida"},400);
+      if(!uuid(body.donationId) || (resend && paymentId && !asaasId(paymentId)) || (!resend && !asaasId(paymentId))) return json({error:"Doação ou cobrança inválida"},400);
       const found=await db.from("donations")
         .select("id,donor_name,donor_phone,amount,type,campaign,project_id,asaas_id,asaas_customer,donor_payment_notification_consent,donor_payment_notification_consent_at,payment_method")
         .eq("id",body.donationId).maybeSingle();
       if(found.error||!found.data) return json({error:"Doação não encontrada"},404);
       donation=found.data;
+      if(resend) paymentId=paymentId || donation.asaas_id;
       if(donation.donor_payment_notification_consent!==true||!donation.donor_payment_notification_consent_at)
         return json({ok:true,skipped:"Apoiador não autorizou mensagens"});
     }
@@ -166,6 +168,7 @@ Deno.serve(async (req) => {
     const method=String(payment.billingType||"") as Method;
     if(method!=="PIX"&&method!=="BOLETO") return json({ok:true,skipped:"Método de pagamento não suportado"});
     if(test&&method!==body.method) return json({error:"Método da cobrança não corresponde ao teste"},409);
+    if(resend && method!=="BOLETO") return json({error:"Segunda via disponivel apenas para cobrancas em boleto"},409);
     if(!["PENDING","OVERDUE"].includes(String(payment.status||"").toUpperCase()))
       return json({ok:true,skipped:"Cobrança já finalizada, cancelada ou indisponível"});
 
@@ -212,7 +215,7 @@ Deno.serve(async (req) => {
     // If Asaas does not return a valid PDF or Pix payload, nothing is sent.
     let payload="";
     let pdf="";
-    if(method==="PIX"){
+    if(method==="PIX" || method==="BOLETO"){
       const pix=await fetch(base+"/payments/"+encodeURIComponent(paymentId)+"/pixQrCode",{
         headers,signal:AbortSignal.timeout(10000),redirect:"error"
       });
@@ -220,7 +223,8 @@ Deno.serve(async (req) => {
       const data=await pix.json();
       payload=String(data.payload||"").trim();
       if(!payload||payload.length>2500||/\s/.test(payload)) return json({error:"Código PIX indisponível ou inválido"},503);
-    }else{
+    }
+    if(method==="BOLETO"){
       try { pdf=await getBoletoPdf(payment.bankSlipUrl); }
       catch(e){return json({error:e instanceof Error?e.message:"Não foi possível obter PDF"},503);}
     }
@@ -234,7 +238,9 @@ Deno.serve(async (req) => {
       // Key includes payment identity; duplicate webhooks cannot resend.
       const eventKey=test
         ?"test-payment:"+crypto.randomUUID()+":"+suffix
-        :"payment-instructions:"+paymentId+":"+suffix;
+        :resend
+          ?"second-copy:"+paymentId+":"+new Date().toISOString().slice(0,10)+":"+suffix
+          :"payment-instructions:"+paymentId+":"+suffix;
       const claim=await db.from("whatsapp_automation_deliveries").insert({
         event_key:eventKey,event_type:eventType,donation_id:donation.id,
         phone_e164:dest,status:"RESERVED"
@@ -272,7 +278,11 @@ Deno.serve(async (req) => {
       const second=await sendOnce("copy-code","text",payload);
       results=[first,second];
     }else {
-      results=[await sendOnce("pdf","document",message)];
+      const first=await sendOnce("pdf","document",message+"\n\nO PIX copia e cola desta mesma cobrança será enviado na próxima mensagem.");
+      if(first!=="ACCEPTED"&&first!=="ALREADY_ATTEMPTED")
+        return json({ok:false,method,results:[first],message:"Não foi possível enviar o boleto; código PIX não enviado."});
+      const second=await sendOnce("copy-code","text",payload);
+      results=[first,second];
     }
     return json({ok:results.every(x=>x==="ACCEPTED"||x==="ALREADY_ATTEMPTED"),
       method,results,phone:test?TEST_PHONE:undefined,
