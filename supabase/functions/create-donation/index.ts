@@ -26,6 +26,7 @@ interface DonationPayload {
   campaign?: string;
   project_name?: string;
   donor_marketing_consent?: boolean;
+  donor_payment_notification_consent?: boolean;
 }
 
 Deno.serve(async (req) => {
@@ -302,6 +303,8 @@ Deno.serve(async (req) => {
         is_anonymous: payload.is_anonymous || false,
         donor_email: payload.donor_email,
         donor_phone: payload.donor_phone,
+        donor_payment_notification_consent: payload.donor_payment_notification_consent === true,
+        donor_payment_notification_consent_at: payload.donor_payment_notification_consent === true ? new Date().toISOString() : null,
         donor_cpf: payload.donor_cpf,
         amount: payload.amount,
         // Ativar após aplicar a migração de acompanhamento financeiro no Supabase.
@@ -347,28 +350,11 @@ Deno.serve(async (req) => {
       if (consentSave.error) console.warn("Consentimento WhatsApp pendente de migração", consentSave.error.code);
     }
 
-    // Boas-vindas à solicitação de apoio, jamais confirmação antecipada.
-    // O motor possui chave única por doação, chave geral de segurança e consentimento.
-    try {
-      const serviceKey = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY") || "";
-      const serviceUrl = Deno.env.get("SUPABASE_URL") || "";
-      if (serviceKey && serviceUrl && payload.donor_marketing_consent === true) {
-        const response = await fetch(serviceUrl + "/functions/v1/whatsapp-automation", {
-          method: "POST",
-          headers: { "Content-Type": "application/json", authorization: "Bearer " + serviceKey, apikey: serviceKey },
-          body: JSON.stringify({ action: "event", eventType: "welcome",
-            eventKey: "welcome:" + donation.id, donationId: donation.id }),
-          signal: AbortSignal.timeout(15000),
-        });
-        if (!response.ok) console.warn("Boas-vindas WhatsApp indisponíveis", response.status);
-      }
-    } catch { console.warn("Boas-vindas WhatsApp não processadas"); }
-
     // Instruções de pagamento, diferentes da confirmação de pagamento.
     // PIX: dois textos (orientação + código puro), BOLETO: PDF de fato, sem link.
     // O worker consulta a cobrança no Asaas e exige aceite registrado.
     if ((billingType === "PIX" || billingType === "BOLETO") &&
-        actualPaymentId?.startsWith("pay_") && payload.donor_marketing_consent === true) {
+        actualPaymentId?.startsWith("pay_") && payload.donor_payment_notification_consent === true) {
       try {
         const role = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY") || "";
         const base = Deno.env.get("SUPABASE_URL") || "";
@@ -387,8 +373,8 @@ Deno.serve(async (req) => {
       }
     }
 
-    // 6. Send automatic notification (WhatsApp/Email)
-    try {
+    // 6. E-mail de agradecimento somente quando houve pagamento confirmado.
+    if (initialStatus === "CONFIRMED") try {
       const message = `Olá ${payload.donor_name}, obrigado pela sua doação de R$ ${payload.amount.toFixed(2).replace('.', ',')} para o projeto ${projectName}. Sua ajuda transforma vidas! 💛`;
       
       await supabase.functions.invoke("send-notification", {

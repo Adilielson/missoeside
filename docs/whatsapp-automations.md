@@ -64,3 +64,32 @@ Em `/admin/automations`, clique separadamente:
 
 ### Publicação automática
 Após homologação, habilite individualmente os modelos `pix_instructions` e `boleto_instructions` e a chave Supabase `IDE_WHATSAPP_AUTOMATION_ENABLED=true`. O envio aos doadores continua desativado até ambas as liberações serem feitas. Como a instância UazAPI é não oficial, podem ocorrer instabilidade, bloqueios e custos próprios da plataforma.
+
+## Dois momentos da comunicação — boleto mensal e confirmação
+
+O checkout passa a oferecer **aceite específico e opcional para mensagens de pagamento**. É separado do aceite de novidades e campanhas, e armazenado nas colunas `donor_payment_notification_consent` e `donor_payment_notification_consent_at`. Sem esse aceite, o sistema não envia boleto/PIX nem a confirmação pelo WhatsApp.
+
+**Etapa 1 — cobrança pendente:** depois do cadastro, o boleto/PIX é enviado pela instância UazAPI do Superadmin. O modelo editável deixa claro que a cobrança está **aguardando pagamento**, nunca que a doação está confirmada. A página `/obrigado?pending=true` também informa o estado pendente.
+
+**Etapa 2 — pagamento confirmado:** webhook validado `PAYMENT_CONFIRMED` ou `PAYMENT_RECEIVED` consulta o estado de cobrança no Asaas, associa ao cliente, valor e assinatura, e encaminha ao worker `whatsapp-automation`, que **revalida** o pagamento antes do envio. A deduplicação usa `paid:{paymentId}`: a mesma parcela não recebe dois agradecimentos. Mensagens para assinatura mensal usam `new_subscriber` no primeiro pagamento e `monthly_renewal` nos seguintes.
+
+O fluxo independe de `PAYMENT_AUTHORIZED` (autorização isolada não prova recebimento).
+
+### Piloto de ponta a ponta no Sandbox
+Após confirmar sucesso do workflow de migração e deploy:
+1. No Superadmin, manter `ASAAS_ENV=sandbox` com **chave da conta Sandbox**; manter o token UazAPI e o telefone institucional.
+2. Garantir que o webhook Asaas **dessa conta Sandbox** está configurado com a URL correta de `asaas-webhook` e seu `ASAAS_WEBHOOK_TOKEN` autenticado. Sem esse webhook, a mensagem de pagamento confirmado não será disparada.
+3. No **Supabase Edge Function Secrets**, definir `IDE_WHATSAPP_SANDBOX_TEST_ENABLED=true` e **manter** `IDE_WHATSAPP_AUTOMATION_ENABLED=false`.
+4. No Admin → Comunicação · Automações, ativar os modelos de `boleto_instructions` e `new_subscriber` (e `monthly_renewal` para parcelas posteriores); salvar. Para PIX, ativar `pix_instructions`.
+5. Criar **nova doação mensal por boleto** com o telefone do apoiador `+55 27 98139-2914`. Marcar o campo opcional de autorização de avisos de pagamento pelo WhatsApp.
+6. Conferir a tela de **cobrança registrada / aguardando pagamento**, o PDF do boleto pelo WhatsApp e o histórico de tentativas.
+7. Na conta Asaas **Sandbox**, localizar o pagamento `pay_...` da primeira parcela e usar **Confirmar pagamento**. Não pagar boleto real; a confirmação é simulada.
+8. Verificar `PAYMENT_CONFIRMED`/`PAYMENT_RECEIVED` no webhook, status atualizado da doação e **segunda mensagem de agradecimento** no mesmo WhatsApp.
+9. Repetir com PIX e depois, quando desejado, com nova mensalidade. Todas as cobranças são checadas novamente no Asaas para evitar falsos positivos.
+
+O piloto automático só opera se `ASAAS_ENV=sandbox` **e** o telefone destinatário for exatamente `5527981392914`. Outros apoiadores não recebem mensagens automáticas com a chave global desligada.
+
+### Migração para produção
+No Superadmin, alterar para `ASAAS_ENV=production` e inserir a chave API **de Produção**. Configurar o webhook na conta Asaas de Produção e validar sua autenticação. A operação de envio continuará usando **o mesmo número institucional UazAPI**. Desabilitar o piloto Sandbox e, **somente após homologação e aprovação**, configurar `IDE_WHATSAPP_AUTOMATION_ENABLED=true` no Supabase. Os modelos permanecem editáveis na interface.
+
+A chave do Sandbox não funciona em Produção. **Trocar o seletor não migra webhooks nem credenciais automaticamente.** O recurso WhatsApp aqui é próprio da UazAPI, não a notificação nativa do Asaas.
