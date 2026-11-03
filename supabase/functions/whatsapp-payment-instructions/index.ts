@@ -147,10 +147,16 @@ Deno.serve(async (req) => {
     const cfg=Object.fromEntries((configQuery.data||[]).map((x:any)=>[x.key,x.value]));
     const token=String(cfg.UAZAPI_TOKEN||"");
     if(token.length<8||!phone(cfg.UAZAPI_PHONE)) return json({error:"Configure a instância e o telefone no Superadmin"},503);
-    const environment=String(cfg.ASAAS_ENV||Deno.env.get("ASAAS_ENV")||"").trim().toLowerCase();
+    const rawEnvironment=String(cfg.ASAAS_ENV||Deno.env.get("ASAAS_ENV")||"").trim().toLowerCase();
+    const environment=rawEnvironment==="prod"?"production":rawEnvironment;
     const apiKey=String(cfg.ASAAS_API_KEY||Deno.env.get("ASAAS_API_KEY")||"");
     if(!apiKey||!["sandbox","production"].includes(environment)) return json({error:"Asaas não configurado"},503);
     if(test && environment!=="sandbox") return json({error:"O teste de cobrança está permitido somente no Asaas Sandbox. Não serão enviados códigos reais de produção."},409);
+    if ((environment==="sandbox" && apiKey.startsWith("$aact_prod_")) ||
+        (environment==="production" && apiKey.startsWith("$aact_hmlg_")))
+      return json({error:"Credencial incompatível com o ambiente Asaas"},503);
+    if(environment==="production" && Deno.env.get("IDE_WHATSAPP_AUTOMATION_ENABLED")!=="true")
+      return json({ok:true,skipped:"Automação de produção desativada"});
     const base=environment==="sandbox"?"https://api-sandbox.asaas.com/v3":"https://api.asaas.com/v3";
     const headers={access_token:apiKey,"User-Agent":"IDE-Missoes/1.0"};
     const payResponse=await fetch(base+"/payments/"+encodeURIComponent(paymentId),{
@@ -174,7 +180,12 @@ Deno.serve(async (req) => {
 
     const dest=test?TEST_PHONE:phone(donation.donor_phone);
     if(!dest) return json({ok:true,skipped:"Telefone do apoiador inválido"});
-    // Sandbox pilot: each opted-in donor receives messages on their own registration phone.
+    // Sandbox is always restricted, even if the global flag is accidentally enabled.
+    const allowedPhones=(Deno.env.get("IDE_WHATSAPP_SANDBOX_ALLOWED_PHONES")||"")
+      .split(",").map(phone).filter(Boolean);
+    if(environment==="sandbox" && !allowedPhones.includes(dest))
+      return json({error:"Destinatário não autorizado para homologação Sandbox"},403);
+    // Sandbox pilot: only explicitly authorized opted-in donors.
     // Manual admin test actions still use the fixed admin-only test number.
     const pilot = environment==="sandbox" && !test && Boolean(dest) &&
       Deno.env.get("IDE_WHATSAPP_SANDBOX_TEST_ENABLED")==="true";
@@ -237,7 +248,7 @@ Deno.serve(async (req) => {
     async function sendOnce(suffix:string,kind:"text"|"document",text:string):Promise<string>{
       // Key includes payment identity; duplicate webhooks cannot resend.
       const eventKey=test
-        ?"test-payment:"+crypto.randomUUID()+":"+suffix
+        ?"test-payment:"+paymentId+":"+new Date().toISOString().slice(0,10)+":"+suffix
         :resend
           ?"second-copy:"+paymentId+":"+new Date().toISOString().slice(0,10)+":"+suffix
           :"payment-instructions:"+paymentId+":"+suffix;
@@ -246,7 +257,12 @@ Deno.serve(async (req) => {
         phone_e164:dest,status:"RESERVED"
       }).select("id").single();
       if(claim.error){
-        if(claim.error.code==="23505") return "ALREADY_ATTEMPTED";
+        if(claim.error.code==="23505") {
+          const previous=await db.from("whatsapp_automation_deliveries")
+            .select("status").eq("event_key",eventKey).maybeSingle();
+          if(previous.error) return "UNKNOWN";
+          return previous.data?.status==="ACCEPTED" ? "ALREADY_ACCEPTED" : "BLOCKED_PREVIOUS_ATTEMPT";
+        }
         throw new Error("Reserva de envio indisponível");
       }
       let status="UNKNOWN", id:string|null=null;
@@ -260,31 +276,35 @@ Deno.serve(async (req) => {
           body:JSON.stringify(data),signal:AbortSignal.timeout(15000),redirect:"error"
         });
         const response=await res.json().catch(()=>({}));
-        if(res.ok&&!response.error){status="ACCEPTED";id=progressStatus(response);}
+        if(res.ok&&!response.error&&progressStatus(response)){status="ACCEPTED";id=progressStatus(response);}
+        else if(res.ok&&!response.error) status="UNKNOWN";
         else status="REJECTED";
       }catch{status="UNKNOWN";}
       const logged=await db.from("whatsapp_automation_deliveries")
         .update({status,provider_message_id:id,completed_at:new Date().toISOString()})
         .eq("id",claim.data.id);
-      if(logged.error) console.error("Falha de log de cobrança WhatsApp",logged.error.code);
+      if(logged.error) {
+        console.error("Falha de log de cobrança WhatsApp",logged.error.code);
+        return "UNKNOWN";
+      }
       return status;
     }
 
     let results:string[];
     if(method==="PIX"){
       const first=await sendOnce("explanation","text",message);
-      if(first!=="ACCEPTED"&&first!=="ALREADY_ATTEMPTED")
+      if(first!=="ACCEPTED"&&first!=="ALREADY_ACCEPTED")
         return json({ok:false,method,results:[first],message:"Não foi possível enviar as instruções; código PIX não enviado."});
       const second=await sendOnce("copy-code","text",payload);
       results=[first,second];
     }else {
       const first=await sendOnce("pdf","document",message+"\n\nO PIX copia e cola desta mesma cobrança será enviado na próxima mensagem.");
-      if(first!=="ACCEPTED"&&first!=="ALREADY_ATTEMPTED")
+      if(first!=="ACCEPTED"&&first!=="ALREADY_ACCEPTED")
         return json({ok:false,method,results:[first],message:"Não foi possível enviar o boleto; código PIX não enviado."});
       const second=await sendOnce("copy-code","text",payload);
       results=[first,second];
     }
-    return json({ok:results.every(x=>x==="ACCEPTED"||x==="ALREADY_ATTEMPTED"),
+    return json({ok:results.every(x=>x==="ACCEPTED"||x==="ALREADY_ACCEPTED"),
       method,results,phone:test?TEST_PHONE:undefined,
       message:"As tentativas foram registradas. ACCEPTED indica aceite da UazAPI, não entrega ao destinatário."});
   }catch(err){

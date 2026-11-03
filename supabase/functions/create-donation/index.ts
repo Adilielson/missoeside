@@ -8,6 +8,7 @@ const corsHeaders = {
 };
 
 interface DonationPayload {
+  request_id: string;
   donor_name: string;
   donor_email: string;
   donor_phone?: string;
@@ -31,6 +32,7 @@ interface DonationPayload {
 
 Deno.serve(async (req) => {
   if (req.method === "OPTIONS") return new Response(null, { headers: corsHeaders });
+  if (req.method !== "POST") return new Response(null, {status:405, headers:corsHeaders});
 
   try {
     const supabase = createClient(
@@ -79,6 +81,14 @@ Deno.serve(async (req) => {
 
     const payload: DonationPayload = await req.json();
 
+    if (!/^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(payload.request_id || "") ||
+        !["PIX","BOLETO","CREDIT_CARD"].includes(payload.payment_method) ||
+        !["ONE_TIME","MONTHLY"].includes(payload.type) ||
+        typeof payload.amount !== "number" || !Number.isFinite(payload.amount) || payload.amount <= 0) {
+      return new Response(JSON.stringify({error:"Solicitação inválida. Atualize a página antes de iniciar uma nova doação."}),
+        {status:400,headers:{...corsHeaders,"Content-Type":"application/json"}});
+    }
+
     // 0. Get Project ID and Name
     // O projeto vem do banco, nunca do nome enviado pelo navegador.
     // Impede que uma doacao de projeto inexistente seja registrada como geral.
@@ -118,6 +128,21 @@ Deno.serve(async (req) => {
         error: "O cadastro de doações ainda não foi atualizado no Supabase. Nenhuma nova cobrança foi criada.",
         code: "DONATION_SCHEMA_NOT_READY"
       }), { status: 503, headers: { ...corsHeaders, "Content-Type": "application/json" } });
+    }
+
+    // Reserve BEFORE any external side effect. Never release on timeout: Asaas
+    // may have created the charge even when its response was lost. Reconcile manually.
+    const requestEnvironment = production ? "production" : "sandbox";
+    const reservation = await supabase.from("donation_creation_requests").insert({
+      request_id: payload.request_id, environment: requestEnvironment, status: "RESERVED",
+    });
+    if (reservation.error) {
+      const duplicate = reservation.error.code === "23505";
+      return new Response(JSON.stringify({
+        error: duplicate ? "Esta solicitação já foi processada ou está em análise. Consulte a cobrança existente; não inicie outra." :
+          "Proteção de cobrança indisponível. Nenhuma nova cobrança foi criada.",
+        code: duplicate ? "DONATION_REQUEST_ALREADY_RESERVED" : "DONATION_RESERVATION_UNAVAILABLE",
+      }), {status:duplicate?409:503,headers:{...corsHeaders,"Content-Type":"application/json"}});
     }
 
     // 1. Create or fetch customer
@@ -239,6 +264,11 @@ Deno.serve(async (req) => {
       });
     }
 
+    const recorded = await supabase.from("donation_creation_requests").update({
+      status: "CREATED", asaas_id: payment.id,
+    }).eq("request_id", payload.request_id).eq("environment", requestEnvironment);
+    if (recorded.error) console.error("Charge reservation update failed", recorded.error.code);
+
     // A assinatura pode ser criada antes de o Asaas disponibilizar sua primeira cobrança.
     // Nunca enviar sub_... para o endpoint /payments/{id}/pixQrCode.
     let actualPaymentId: string | null = payload.type === "MONTHLY" ? null : payment.id;
@@ -298,7 +328,7 @@ Deno.serve(async (req) => {
     }
 
     if (billingType === "BOLETO") {
-      boletoUrl = String(firstPayment?.bankSlipUrl ?? firstPayment?.invoiceUrl ?? payment.bankSlipUrl ?? payment.invoiceUrl ?? "") || null;
+      boletoUrl = String(firstPayment?.bankSlipUrl ?? payment.bankSlipUrl ?? "") || null;
     }
 
     // 4. Project Name already fetched at step 0

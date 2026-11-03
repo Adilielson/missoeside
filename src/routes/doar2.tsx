@@ -1,5 +1,5 @@
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef } from "react";
 import { Heart, Loader2, Lock, QrCode, CreditCard, FileText, Copy, Check } from "lucide-react";
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
@@ -43,6 +43,7 @@ function brl(v: number) {
 
 export function DoarCheckout({ projectSlug }: { projectSlug?: string }) {
   const navigate = useNavigate();
+  const requestId = useRef<string | null>(null);
 
   const [raised, setRaised] = useState(0);
   const [type, setType] = useState<DonationType>("ONE_TIME");
@@ -145,8 +146,15 @@ export function DoarCheckout({ projectSlug }: { projectSlug?: string }) {
         setLoading(false);
         return toast.error("Validade do cartão inválida. Use MM/AA");
       }
+      // Keep the same attempt across network retries and page reloads. Only
+      // retire it after confirmed success; ambiguous failures require reconciliation.
+      if (!requestId.current) {
+        requestId.current = sessionStorage.getItem("ide-donation-request") || crypto.randomUUID();
+        sessionStorage.setItem("ide-donation-request", requestId.current);
+      }
       const { data, error } = await supabase.functions.invoke("create-donation", {
         body: {
+          request_id: requestId.current,
           donor_name: name, // Envia o nome real para o processamento interno/Asaas
           donor_email: email,
           donor_phone: phone,
@@ -195,6 +203,7 @@ export function DoarCheckout({ projectSlug }: { projectSlug?: string }) {
       }
 
       setPaymentCreated(true);
+      sessionStorage.removeItem("ide-donation-request");
       toast.success("Cobrança registrada no Asaas. A doação será confirmada após o pagamento.");
 
       if (method === "PIX") {

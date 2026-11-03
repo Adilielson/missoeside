@@ -87,6 +87,7 @@ function AutomationsPage() {
       });
       if(error){let message=error.message;try{const r=await (error as any).context?.clone?.().json();message=r?.error||message}catch{}throw new Error(message)}
       if(data?.error)throw new Error(data.error);
+      if(data?.skipped){toast.info(data.skipped);return;}
       if(!data?.ok)throw new Error(data?.message||"Segunda via não aceita pela UazAPI");
       toast.success("Boleto e PIX aceitos pela UazAPI. Confirme a entrega no WhatsApp.");
       await load();
