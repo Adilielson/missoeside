@@ -80,7 +80,7 @@ function AutomationsPage() {
     <div className="rounded-xl border border-amber-400/30 bg-amber-400/5 p-4 text-sm">
       <div className="flex items-center gap-2 font-bold"><ShieldCheck className="w-4 h-4"/>Segurança de envio</div>
       <p className="mt-2">O backend só envia eventos ativos quando o doador autorizou, não solicitou descadastro e o evento ainda não foi processado. O aceite do provedor não comprova entrega.</p>
-      <p className="mt-2">Estado do servidor: <b>{serverEnabled?"Envios gerais habilitados":"Envios gerais desativados"}</b>. Modo de teste restrito ao número autorizado: <b>{sandboxTestEnabled?"Habilitado":"Desativado"}</b>. Para testar do início ao fim no Sandbox, ative o modelo de boleto/PIX e o modelo de confirmação, salve e configure IDE_WHATSAPP_SANDBOX_TEST_ENABLED=true no Supabase. Para produção, a ativação independente é IDE_WHATSAPP_AUTOMATION_ENABLED=true.</p>
+      <p className="mt-2">Estado do servidor: <b>{serverEnabled?"Envios gerais habilitados":"Envios gerais desativados"}</b>. Piloto Sandbox com envio ao WhatsApp informado pelo próprio doador (mediante autorização): <b>{sandboxTestEnabled?"Habilitado":"Desativado"}</b>. Os botões de teste manual continuam restritos ao número técnico cadastrado. Para testar do início ao fim no Sandbox, ative o modelo de boleto/PIX e o modelo de confirmação, salve e configure IDE_WHATSAPP_SANDBOX_TEST_ENABLED=true no Supabase. Para produção, a ativação independente é IDE_WHATSAPP_AUTOMATION_ENABLED=true.</p>
     </div>
     <div className="rounded-2xl border border-white/10 bg-white/[0.03] p-5 space-y-3">
       <h2 className="text-xl font-bold">Teste do WhatsApp institucional</h2>
