@@ -56,7 +56,8 @@ Deno.serve(async (req) => {
         const row = data?.find((r) => r.key === k);
         map[k] = {
           configured: !!row?.value,
-          preview: mask(row?.value),
+          preview: k === "ASAAS_ENV" ? "" : mask(row?.value),
+          display_value: k === "ASAAS_ENV" && ["sandbox", "production"].includes(String(row?.value || "").trim().toLowerCase()) ? String(row?.value).trim().toLowerCase() : null,
           updated_at: row?.updated_at ?? null,
         };
       }
@@ -66,9 +67,11 @@ Deno.serve(async (req) => {
     if (action === "save") {
       const { key, value } = body;
       if (!KEYS.includes(key)) return json({ error: "Invalid key" }, 400);
+      if (typeof value !== "string" || !value.trim()) return json({ error: "Valor obrigatório" }, 400);
+      if (key === "ASAAS_ENV" && !["sandbox", "production"].includes(value.trim().toLowerCase())) return json({ error: "Ambiente deve ser sandbox ou production" }, 400);
       const { error } = await supabase
         .from("system_settings")
-        .upsert({ key, value, updated_at: new Date().toISOString() }, { onConflict: "key" });
+        .upsert({ key, value: key === "ASAAS_ENV" ? value.trim().toLowerCase() : value.trim(), updated_at: new Date().toISOString() }, { onConflict: "key" });
       if (error) throw error;
       return json({ success: true });
     }
@@ -83,7 +86,8 @@ Deno.serve(async (req) => {
 
       try {
         if (service === "asaas") {
-          const env = (cfg.ASAAS_ENV || "sandbox").toLowerCase();
+          const env = String(cfg.ASAAS_ENV || "").trim().toLowerCase();
+          if (!["sandbox", "production"].includes(env)) return json({ ok: false, message: "Selecione e salve Sandbox ou Produção antes de testar." });
           const baseUrl = env === "production" || env === "prod" 
             ? "https://api.asaas.com/v3" 
             : "https://api-sandbox.asaas.com/v3";
@@ -91,8 +95,13 @@ Deno.serve(async (req) => {
           const r = await fetch(`${baseUrl}/customers?limit=1`, {
             headers: { access_token: cfg.ASAAS_API_KEY ?? "" },
           });
-          if (!r.ok) throw new Error(`HTTP ${r.status}: ${await r.text()}`);
-          return json({ ok: true, message: `Conectado ao Asaas (${env}) com sucesso` });
+          if (!r.ok) {
+            const response = await r.json().catch(() => ({}));
+            const code = response?.errors?.[0]?.code;
+            if (code === "invalid_environment") throw new Error("A chave API não pertence ao ambiente selecionado. Use uma chave do mesmo ambiente (Sandbox ou Produção).");
+            throw new Error(`Asaas HTTP ${r.status}: ${typeof code === "string" ? code : "falha de autenticação ou conexão"}`);
+          }
+          return json({ ok: true, message: `Conectado ao Asaas (${env === "sandbox" ? "Sandbox" : "Produção"}) com sucesso` });
         }
         if (service === "resend") {
           const r = await fetch("https://api.resend.com/domains", {

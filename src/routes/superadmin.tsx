@@ -86,7 +86,7 @@ const GROUPS: GroupDef[] = [
   },
 ];
 
-type SettingState = { configured: boolean; preview: string; updated_at: string | null };
+type SettingState = { configured: boolean; preview: string; updated_at: string | null; display_value?: string | null };
 
 function SuperadminPage() {
   const [authed, setAuthed] = useState(false);
@@ -99,6 +99,7 @@ function SuperadminPage() {
   const [show, setShow] = useState<Record<string, boolean>>({});
   const [savingKey, setSavingKey] = useState<string | null>(null);
   const [testingSvc, setTestingSvc] = useState<string | null>(null);
+  const [testResults, setTestResults] = useState<Record<string, { ok: boolean; message: string }>>({});
   const [logs, setLogs] = useState<any[]>([]);
   const [logsLoading, setLogsLoading] = useState(false);
 
@@ -154,10 +155,12 @@ function SuperadminPage() {
   }, [activeGroup]);
 
   async function save(key: string) {
-    if (!values[key]) return toast.error("Digite um valor antes de salvar.");
+    if (!values[key]?.trim()) return toast.error("Digite um valor antes de salvar.");
+    if (key === "ASAAS_ENV" && !["sandbox", "production"].includes(values[key].trim().toLowerCase())) return toast.error("Selecione Sandbox ou Produção.");
     setSavingKey(key);
     try {
-      await call("save", { key, value: values[key] });
+      await call("save", { key, value: key === "ASAAS_ENV" ? values[key].trim().toLowerCase() : values[key].trim() });
+      if (key.startsWith("ASAAS_")) setTestResults(v => ({ ...v, asaas: { ok: false, message: "Configuração alterada. Teste a conexão novamente." } }));
       toast.success(`${key} salvo`);
       setValues((v) => ({ ...v, [key]: "" }));
       await refresh();
@@ -172,6 +175,7 @@ function SuperadminPage() {
     setTestingSvc(service);
     try {
       const r = await call("test", { service });
+      setTestResults(v => ({ ...v, [service]: { ok: !!r.ok, message: String(r.message || (r.ok ? "Conectado" : "Falha na conexão")) } }));
       if (r.ok) toast.success(r.message);
       else toast.error(r.message || "Falha no teste");
     } catch (e: any) {
@@ -487,6 +491,40 @@ function SuperadminPage() {
               )}
             </div>
           </div>
+          )}
+
+          {group?.id === "asaas" && (
+            <div className="mb-5 rounded-2xl border border-white/10 bg-white/[0.03] p-5 space-y-3">
+              <h3 className="font-bold text-lg">1. Selecione o ambiente de pagamentos</h3>
+              <p className="text-sm text-white/60">Sandbox é para testes sem dinheiro real. Produção é para cobranças reais. A chave API precisa ser do mesmo ambiente.</p>
+              <div className="grid grid-cols-2 gap-2">
+                {(["sandbox", "production"] as const).map(env => (
+                  <button key={env} type="button" onClick={() => setValues(v => ({ ...v, ASAAS_ENV: env }))}
+                    className={cn("rounded-xl border px-4 py-3 text-left transition-colors",
+                      values.ASAAS_ENV === env ? "border-[#e8440c] bg-[#e8440c]/15" : "border-white/15 bg-black/20 hover:border-white/30")}>
+                    <span className="block font-bold">{env === "sandbox" ? "Sandbox · Testes" : "Produção · Real"}</span>
+                    <span className="text-xs text-white/50">{env === "sandbox" ? "Não movimenta dinheiro real" : "Cobra de verdade"}</span>
+                  </button>
+                ))}
+              </div>
+              <div className="flex flex-wrap items-center gap-3">
+                <Button disabled={savingKey === "ASAAS_ENV" || !values.ASAAS_ENV}
+                  onClick={() => save("ASAAS_ENV")}
+                  className="bg-[#e8440c] hover:bg-[#c93a09]">
+                  {savingKey === "ASAAS_ENV" ? <Loader2 className="h-4 w-4 animate-spin" /> : <Save className="h-4 w-4" />}
+                  Salvar ambiente
+                </Button>
+                <span className="text-sm text-white/60">Ambiente salvo: <strong className="text-white">{settings.ASAAS_ENV?.display_value === "production" ? "Produção" : settings.ASAAS_ENV?.display_value === "sandbox" ? "Sandbox" : "Não identificado — selecione e salve"}</strong></span>
+              </div>
+              <p className="text-xs text-white/40">Selecionar não altera o sistema até clicar em Salvar ambiente.</p>
+            </div>
+          )}
+          {group?.id === "asaas" && testResults.asaas && (
+            <div role="status" className={cn("mb-5 rounded-xl border p-4 text-sm",
+              testResults.asaas.ok ? "border-emerald-500/30 bg-emerald-500/10 text-emerald-200" : "border-amber-500/30 bg-amber-500/10 text-amber-100")}>
+              <strong>{testResults.asaas.ok ? "Conexão verificada" : "Conexão ainda não validada"}</strong>
+              <p className="mt-1 break-words">{testResults.asaas.message}</p>
+            </div>
           )}
 
           {/* Fields */}
