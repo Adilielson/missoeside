@@ -146,6 +146,7 @@ Deno.serve(async (req) => {
     const environment=String(cfg.ASAAS_ENV||Deno.env.get("ASAAS_ENV")||"").trim().toLowerCase();
     const apiKey=String(cfg.ASAAS_API_KEY||Deno.env.get("ASAAS_API_KEY")||"");
     if(!apiKey||!["sandbox","production"].includes(environment)) return json({error:"Asaas não configurado"},503);
+    if(test && environment!=="sandbox") return json({error:"O teste de cobrança está permitido somente no Asaas Sandbox. Não serão enviados códigos reais de produção."},409);
     const base=environment==="sandbox"?"https://api-sandbox.asaas.com/v3":"https://api.asaas.com/v3";
     const headers={access_token:apiKey,"User-Agent":"IDE-Missoes/1.0"};
     const payResponse=await fetch(base+"/payments/"+encodeURIComponent(paymentId),{
