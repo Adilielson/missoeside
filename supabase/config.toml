@@ -21,3 +21,7 @@ verify_jwt = false
 # JWT/admin role validated inside the function; internal events require service-role key.
 [functions.whatsapp-automation]
 verify_jwt = false
+
+# Admin tests require user JWT; webhooks/checkout use service-role authentication.
+[functions.whatsapp-payment-instructions]
+verify_jwt = false
