@@ -67,7 +67,8 @@ export function DoarCheckout({ projectSlug }: { projectSlug?: string }) {
   const [postalCode, setPostalCode] = useState("");
   const [isAnonymous, setIsAnonymous] = useState(false);
   const [marketingConsent, setMarketingConsent] = useState(false);
-  // O aceite opcional é persistido pelo backend após aplicar a migração de automações.
+  // O aceite opcional é persistido pelo backend após aplicar a migração de automações (já aplicada).
+  const marketingEnabled = true;
 
   // card
   const [cardNumber, setCardNumber] = useState("");

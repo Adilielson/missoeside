@@ -14,6 +14,153 @@ export type Database = {
   }
   public: {
     Tables: {
+      asaas_payment_cycles: {
+        Row: {
+          amount: number
+          donation_id: string
+          due_date: string | null
+          last_verified_at: string
+          paid_at: string | null
+          payment_id: string
+          status: string
+          subscription_id: string | null
+        }
+        Insert: {
+          amount: number
+          donation_id: string
+          due_date?: string | null
+          last_verified_at?: string
+          paid_at?: string | null
+          payment_id: string
+          status: string
+          subscription_id?: string | null
+        }
+        Update: {
+          amount?: number
+          donation_id?: string
+          due_date?: string | null
+          last_verified_at?: string
+          paid_at?: string | null
+          payment_id?: string
+          status?: string
+          subscription_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "asaas_payment_cycles_donation_id_fkey"
+            columns: ["donation_id"]
+            isOneToOne: false
+            referencedRelation: "donations"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      communication_campaigns: {
+        Row: {
+          audience: string
+          channel: string
+          content: string
+          created_at: string
+          created_by: string | null
+          id: string
+          name: string
+          objective: string
+          project_id: string | null
+          status: string
+          subject: string
+          updated_at: string
+        }
+        Insert: {
+          audience: string
+          channel: string
+          content?: string
+          created_at?: string
+          created_by?: string | null
+          id?: string
+          name: string
+          objective: string
+          project_id?: string | null
+          status?: string
+          subject?: string
+          updated_at?: string
+        }
+        Update: {
+          audience?: string
+          channel?: string
+          content?: string
+          created_at?: string
+          created_by?: string | null
+          id?: string
+          name?: string
+          objective?: string
+          project_id?: string | null
+          status?: string
+          subject?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "communication_campaigns_project_id_fkey"
+            columns: ["project_id"]
+            isOneToOne: false
+            referencedRelation: "projects"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      communication_opt_outs: {
+        Row: {
+          created_at: string
+          phone_e164: string
+          reason: string
+        }
+        Insert: {
+          created_at?: string
+          phone_e164: string
+          reason?: string
+        }
+        Update: {
+          created_at?: string
+          phone_e164?: string
+          reason?: string
+        }
+        Relationships: []
+      }
+      communication_whatsapp_deliveries: {
+        Row: {
+          attempted_at: string
+          campaign_id: string
+          completed_at: string | null
+          phone_e164: string
+          provider_message_id: string | null
+          status: string
+        }
+        Insert: {
+          attempted_at?: string
+          campaign_id: string
+          completed_at?: string | null
+          phone_e164: string
+          provider_message_id?: string | null
+          status: string
+        }
+        Update: {
+          attempted_at?: string
+          campaign_id?: string
+          completed_at?: string | null
+          phone_e164?: string
+          provider_message_id?: string | null
+          status?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "communication_whatsapp_deliveries_campaign_id_fkey"
+            columns: ["campaign_id"]
+            isOneToOne: false
+            referencedRelation: "communication_campaigns"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       donations: {
         Row: {
           amount: number
@@ -25,8 +172,11 @@ export type Database = {
           created_at: string
           donor_cpf: string | null
           donor_email: string
+          donor_marketing_consent: boolean
+          donor_marketing_consent_at: string | null
           donor_name: string
           donor_phone: string | null
+          due_date: string | null
           email_sent: boolean | null
           id: string
           is_anonymous: boolean | null
@@ -51,8 +201,11 @@ export type Database = {
           created_at?: string
           donor_cpf?: string | null
           donor_email: string
+          donor_marketing_consent?: boolean
+          donor_marketing_consent_at?: string | null
           donor_name: string
           donor_phone?: string | null
+          due_date?: string | null
           email_sent?: boolean | null
           id?: string
           is_anonymous?: boolean | null
@@ -77,8 +230,11 @@ export type Database = {
           created_at?: string
           donor_cpf?: string | null
           donor_email?: string
+          donor_marketing_consent?: boolean
+          donor_marketing_consent_at?: string | null
           donor_name?: string
           donor_phone?: string | null
+          due_date?: string | null
           email_sent?: boolean | null
           id?: string
           is_anonymous?: boolean | null
@@ -551,6 +707,74 @@ export type Database = {
           slug?: string
           specialties?: string[]
           status?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      whatsapp_automation_deliveries: {
+        Row: {
+          attempted_at: string
+          completed_at: string | null
+          donation_id: string | null
+          event_key: string
+          event_type: string
+          id: string
+          phone_e164: string
+          provider_message_id: string | null
+          status: string
+        }
+        Insert: {
+          attempted_at?: string
+          completed_at?: string | null
+          donation_id?: string | null
+          event_key: string
+          event_type: string
+          id?: string
+          phone_e164: string
+          provider_message_id?: string | null
+          status?: string
+        }
+        Update: {
+          attempted_at?: string
+          completed_at?: string | null
+          donation_id?: string | null
+          event_key?: string
+          event_type?: string
+          id?: string
+          phone_e164?: string
+          provider_message_id?: string | null
+          status?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "whatsapp_automation_deliveries_donation_id_fkey"
+            columns: ["donation_id"]
+            isOneToOne: false
+            referencedRelation: "donations"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      whatsapp_automation_templates: {
+        Row: {
+          content: string
+          enabled: boolean
+          event_type: string
+          label: string
+          updated_at: string
+        }
+        Insert: {
+          content: string
+          enabled?: boolean
+          event_type: string
+          label: string
+          updated_at?: string
+        }
+        Update: {
+          content?: string
+          enabled?: boolean
+          event_type?: string
+          label?: string
           updated_at?: string
         }
         Relationships: []
