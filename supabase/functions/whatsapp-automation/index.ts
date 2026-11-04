@@ -2,7 +2,7 @@ import { createClient } from "https://esm.sh/@supabase/supabase-js@2.45.0";
 
 const cors = { "Access-Control-Allow-Origin": "*", "Access-Control-Allow-Headers": "authorization,apikey,content-type,x-client-info", "Access-Control-Allow-Methods": "POST,OPTIONS" };
 const json = (body: unknown, status=200) => new Response(JSON.stringify(body), { status, headers: { ...cors, "Content-Type": "application/json", "Cache-Control": "no-store" } });
-const allowed = new Set(["welcome","payment_confirmed","new_subscriber","monthly_renewal","upcoming_due","payment_overdue","anniversary","project_updates"]);
+const allowed = new Set(["welcome","payment_confirmed","new_subscriber","monthly_renewal","upcoming_due","payment_overdue","anniversary","project_updates","subscription_created"]);
 // PIX/boleto templates are sent by whatsapp-payment-instructions, but are edited on the same admin page.
 const editable = new Set([...allowed, "pix_instructions", "boleto_instructions"]);
 const fixedTestPhone = "5527981392914";
@@ -69,9 +69,18 @@ Deno.serve(async(req) => {
     if(!test && type==="project_updates") return json({ok:true,skipped:"Novidades requerem aprovação editorial separada"});
     const eventKey=test?"test:"+crypto.randomUUID():String(body.eventKey||"");
     if(!test && !/^[a-z0-9:_-]{8,200}$/i.test(eventKey)) return json({error:"Chave do evento inválida"},400);
+    // Registrar o motivo de eventos ignorados para diagnóstico em Automações.
+    const skip=async(reason:string)=>{
+      if(!test && safeId(body.donationId)) {
+        const r=await db.from("whatsapp_automation_deliveries").insert({event_key:"skip:"+eventKey,event_type:type,
+          donation_id:body.donationId,phone_e164:"-",status:"SKIPPED",skip_reason:reason,completed_at:new Date().toISOString()});
+        if(r.error && r.error.code!=="23505") console.warn("skip log failed",r.error.code);
+      }
+      return json({ok:true,skipped:reason});
+    };
     const {data:model,error:modelErr}=await db.from("whatsapp_automation_templates").select("enabled,content").eq("event_type",type).single();
     if(modelErr || !model) return json({error:"Modelo não encontrado"},503);
-    if(!test && !model.enabled) return json({ok:true,skipped:"Modelo desativado"});
+    if(!test && !model.enabled) return await skip("Modelo desativado");
 
     let dest=fixedTestPhone;
     let donationId: string|null=null;
@@ -85,16 +94,16 @@ Deno.serve(async(req) => {
       if(dErr||!d) return json({error:"Doação não encontrada"},404);
       // Avisos financeiros precisam de consentimento transacional explícito;
       // mensagens de relacionamento exigem o aceite de marketing distinto.
-      const financial = ["payment_confirmed","new_subscriber","monthly_renewal","payment_overdue"].includes(type);
+      const financial = ["payment_confirmed","new_subscriber","monthly_renewal","payment_overdue","subscription_created"].includes(type);
       const consent = financial
         ? d.donor_payment_notification_consent===true && !!d.donor_payment_notification_consent_at
         : d.donor_marketing_consent===true && !!d.donor_marketing_consent_at;
-      if(!consent) return json({ok:true,skipped:"Doador sem autorização para este tipo de mensagem"});
+      if(!consent) return await skip("Doador sem autorização para este tipo de mensagem");
       dest=phone(d.donor_phone)||"";
-      if(!dest) return json({ok:true,skipped:"Telefone inválido"});
+      if(!dest) return await skip("Telefone inválido");
       const blocked=await db.from("communication_opt_outs").select("phone_e164").eq("phone_e164",dest).maybeSingle();
       if(blocked.error) return json({error:"Não foi possível validar descadastro"},503);
-      if(blocked.data) return json({ok:true,skipped:"Descadastro registrado"});
+      if(blocked.data) return await skip("Descadastro registrado");
       let project=d.campaign||"Missões IDE";
       if(d.project_id) {
         const p=await db.from("projects").select("name").eq("id",d.project_id).maybeSingle();
@@ -113,7 +122,7 @@ Deno.serve(async(req) => {
     const environment=String(config.ASAAS_ENV||Deno.env.get("ASAAS_ENV")||"").trim().toLowerCase();
     const pilot=environment==="sandbox" && !test && Boolean(dest) &&
       Deno.env.get("IDE_WHATSAPP_SANDBOX_TEST_ENABLED")==="true";
-    if(!test && !gate && !pilot) return json({ok:true,skipped:"Envio desativado para este destinatário"});
+    if(!test && !gate && !pilot) return await skip("Envio desativado para este destinatário");
     if(!test && ["payment_confirmed","new_subscriber","monthly_renewal"].includes(type)) {
       // Revalidar o estado do boleto no Asaas: 'autorizado' não é pagamento.
       const paymentId=eventKey.startsWith("paid:")?eventKey.slice(5):"";
@@ -137,7 +146,23 @@ Deno.serve(async(req) => {
         (verified.id===donation.data.asaas_id ||
           (donation.data.type==="MONTHLY" && verified.subscription===donation.data.asaas_id));
       if(!matches || !["CONFIRMED","RECEIVED","RECEIVED_IN_CASH"].includes(String(verified.status||"").toUpperCase()))
-        return json({ok:true,skipped:"Pagamento não confirmado pelo Asaas"});
+        return await skip("Pagamento não confirmado pelo Asaas");
+    }
+    if(!test && type==="subscription_created") {
+      // Assinatura registrada: confirmar que a assinatura existe no Asaas e pertence à doação.
+      const subId=eventKey.startsWith("sub:")?eventKey.slice(4):"";
+      if(!/^sub_[A-Za-z0-9_-]{4,128}$/.test(subId)) return json({error:"Identificador de assinatura inválido"},400);
+      const key=String(config.ASAAS_API_KEY||Deno.env.get("ASAAS_API_KEY")||"");
+      if(!key || !["sandbox","production"].includes(environment)) return json({error:"Asaas não configurado"},503);
+      const base=environment==="sandbox"?"https://api-sandbox.asaas.com/v3":"https://api.asaas.com/v3";
+      const proof=await fetch(base+"/subscriptions/"+encodeURIComponent(subId),{headers:{access_token:key},signal:AbortSignal.timeout(10000),redirect:"error"});
+      if(!proof.ok) return json({error:"Assinatura não pôde ser verificada no Asaas"},503);
+      const sub=await proof.json();
+      const don=await db.from("donations").select("asaas_id,asaas_customer,type").eq("id",donationId).single();
+      if(!don.data || don.data.type!=="MONTHLY" || don.data.asaas_id!==subId || sub.customer!==don.data.asaas_customer || sub.deleted===true)
+        return await skip("Assinatura não confere com o Asaas");
+      if(vars.vencimento==="—" && /^\d{4}-\d{2}-\d{2}$/.test(String(sub.nextDueDate||"")))
+        vars.vencimento=String(sub.nextDueDate).split("-").reverse().join("/");
     }
     // Verificar a conexão real, não apenas a existência de token no banco.
     try {
