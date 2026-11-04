@@ -396,11 +396,20 @@ Deno.serve(async (req) => {
             body: JSON.stringify({ action: "event", donationId: donation.id, paymentId: actualPaymentId }),
             signal: AbortSignal.timeout(25000),
           });
-          if (!dispatched.ok) console.warn("WhatsApp: instrução de cobrança não entregue ao worker", dispatched.status);
+          const result = await dispatched.json().catch(() => null);
+          // Audit the worker outcome, not the raw body (which can include phone/PII).
+          const safeCode = (v: unknown) => typeof v === "string" && /^[a-zA-Z0-9_-]{1,80}$/.test(v) ? v : null;
+          const safeResults = new Set(["ACCEPTED","ALREADY_ACCEPTED","REJECTED","UNKNOWN","BLOCKED_PREVIOUS_ATTEMPT","AUDIT_FAILED"]);
+          console.info(JSON.stringify({event:"payment_worker_response",donationId:donation.id,
+            httpStatus:dispatched.status,ok:result?.ok===true,skipped:Boolean(result?.skipped),
+            error:Boolean(result?.error)||!result,code:safeCode(result?.code),stage:safeCode(result?.stage),
+            traceId:safeCode(result?.traceId),auditSaved:typeof result?.auditSaved==="boolean"?result.auditSaved:null,
+            results:Array.isArray(result?.results)?result.results.filter((x:unknown)=>safeResults.has(x as string)):[],
+          }));
         }
       } catch {
         // Cobrança existente nunca deve ser recriada por falha no WhatsApp.
-        console.warn("WhatsApp: worker de cobrança temporariamente indisponível");
+        console.warn(JSON.stringify({event:"payment_worker_response",donationId:donation.id,code:"WORKER_UNREACHABLE",ok:false}));
       }
     }
 

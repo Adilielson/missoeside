@@ -1,0 +1,50 @@
+name: Validar e publicar diagnóstico de pagamentos
+on:
+  push:
+    branches: [fix/payment-worker-diagnostics]
+    paths:
+      - 'supabase/functions/create-donation/**'
+      - 'supabase/functions/whatsapp-payment-instructions/**'
+      - 'supabase/functions/whatsapp-automation/**'
+      - 'scripts/test-payment-diagnostics.mjs'
+      - '.github/workflows/payment-diagnostics-deploy.yml'
+permissions:
+  contents: read
+concurrency:
+  group: payment-diagnostics-deploy
+  cancel-in-progress: false
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '24'
+      - run: node --test scripts/test-payment-diagnostics.mjs
+      - run: node scripts/check-donation-flow.mjs
+  deploy:
+    needs: validate
+    runs-on: ubuntu-latest
+    env:
+      SUPABASE_ACCESS_TOKEN: ${{ secrets.SUPABASE_ACCESS_TOKEN }}
+      SUPABASE_PROJECT_REF: ${{ vars.SUPABASE_PROJECT_REF }}
+    steps:
+      - uses: actions/checkout@v4
+      - name: Verificar configuração existente
+        run: |
+          test -n "$SUPABASE_ACCESS_TOKEN" || { echo "::error::SUPABASE_ACCESS_TOKEN ausente"; exit 1; }
+          test -n "$SUPABASE_PROJECT_REF" || { echo "::error::SUPABASE_PROJECT_REF ausente"; exit 1; }
+      - name: Impedir sobrescrita de mudanças concorrentes do Lovable
+        run: |
+          diagnostics_main_sha=$(git ls-remote origin refs/heads/main | cut -f1)
+          test "$diagnostics_main_sha" = "fdc344c012a99d2eb8e9003b155daddb6efe8705" || { echo "::error::main mudou; revisar a branch antes de publicar"; exit 1; }
+      - uses: supabase/setup-cli@v1
+        with:
+          version: latest
+      - name: Publicar somente funções de diagnóstico
+        run: |
+          supabase functions deploy whatsapp-payment-instructions --remote="$SUPABASE_PROJECT_REF" --yes
+          supabase functions deploy create-donation --remote="$SUPABASE_PROJECT_REF" --yes
+          supabase functions deploy whatsapp-automation --remote="$SUPABASE_PROJECT_REF" --yes
+# No database migration, secrets mutation, charge creation or WhatsApp test is run by CI.

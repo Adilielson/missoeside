@@ -47,7 +47,7 @@ Deno.serve(async(req) => {
         db.from("whatsapp_automation_deliveries").select("event_type,status,phone_e164,attempted_at,skip_reason").order("attempted_at",{ascending:false}).limit(30)
       ]);
       if(t.error || d.error) return json({error:"Migração de automações não aplicada no Supabase"},503);
-      return json({templates:t.data,deliveries:d.data,enabled:Deno.env.get("IDE_WHATSAPP_AUTOMATION_ENABLED")==="true",sandboxTestEnabled:Deno.env.get("IDE_WHATSAPP_SANDBOX_TEST_ENABLED")==="true"});
+      return json({templates:t.data,deliveries:d.data,enabled:(Deno.env.get("IDE_WHATSAPP_AUTOMATION_ENABLED")||"").trim().toLowerCase()==="true",sandboxTestEnabled:(Deno.env.get("IDE_WHATSAPP_SANDBOX_TEST_ENABLED")||"").trim().toLowerCase()==="true"});
     }
     if(action==="save") {
       const type=String(body.eventType||"");
@@ -62,7 +62,7 @@ Deno.serve(async(req) => {
     const test=action==="test";
     if(action!=="event" && !test) return json({error:"Ação não permitida"},400);
     if(test && body.confirmation!=="CONFIRMO_TESTE_WHATSAPP") return json({error:"Confirmação explícita obrigatória"},400);
-    if(!test && Deno.env.get("IDE_WHATSAPP_AUTOMATION_ENABLED")!=="true" && Deno.env.get("IDE_WHATSAPP_SANDBOX_TEST_ENABLED")!=="true") return json({ok:true,skipped:"Automação desativada no servidor"});
+    if(!test && (Deno.env.get("IDE_WHATSAPP_AUTOMATION_ENABLED")||"").trim().toLowerCase()!=="true" && (Deno.env.get("IDE_WHATSAPP_SANDBOX_TEST_ENABLED")||"").trim().toLowerCase()!=="true") return json({ok:true,skipped:"Automação desativada no servidor"});
 
     const type=test?"payment_confirmed":String(body.eventType||"");
     if(!allowed.has(type)) return json({error:"Evento inválido"},400);
@@ -118,10 +118,10 @@ Deno.serve(async(req) => {
     const config=Object.fromEntries((configResult.data||[]).map(x=>[x.key,x.value]));
     const token=String(config.UAZAPI_TOKEN||"");
     if(token.length<8 || !phone(config.UAZAPI_PHONE)) return json({error:"Configure token e telefone institucional no Superadmin"},503);
-    const gate=Deno.env.get("IDE_WHATSAPP_AUTOMATION_ENABLED")==="true";
+    const gate=(Deno.env.get("IDE_WHATSAPP_AUTOMATION_ENABLED")||"").trim().toLowerCase()==="true";
     const environment=String(config.ASAAS_ENV||Deno.env.get("ASAAS_ENV")||"").trim().toLowerCase();
     const pilot=environment==="sandbox" && !test && Boolean(dest) &&
-      Deno.env.get("IDE_WHATSAPP_SANDBOX_TEST_ENABLED")==="true";
+      (Deno.env.get("IDE_WHATSAPP_SANDBOX_TEST_ENABLED")||"").trim().toLowerCase()==="true";
     if(!test && !gate && !pilot) return await skip("Envio desativado para este destinatário");
     if(!test && ["payment_confirmed","new_subscriber","monthly_renewal"].includes(type)) {
       // Revalidar o estado do boleto no Asaas: 'autorizado' não é pagamento.
@@ -177,7 +177,7 @@ Deno.serve(async(req) => {
     } catch { return json({error:"Não foi possível confirmar conexão com WhatsApp"},503); }
     // Limite global e reserva atômica antes da chamada: nunca repetir um envio incerto.
     const since=new Date(Date.now()-86400000).toISOString();
-    const used=await db.from("whatsapp_automation_deliveries").select("id",{count:"exact",head:true}).gte("attempted_at",since);
+    const used=await db.from("whatsapp_automation_deliveries").select("id",{count:"exact",head:true}).neq("event_type","payment_diagnostic").gte("attempted_at",since);
     if(used.error) return json({error:"Não foi possível validar cota"},503);
     if((used.count||0)>=40) return json({error:"Limite diário de 40 tentativas atingido"},429);
     const reservation=await db.from("whatsapp_automation_deliveries").insert({
