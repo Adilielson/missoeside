@@ -417,6 +417,9 @@ export function DoarCheckout({ projectSlug }: { projectSlug?: string }) {
               className="mt-1 accent-brand-orange"/>
             <span>Quero receber avisos de cobrança e confirmação de pagamento pelo WhatsApp informado, incluindo boleto PDF ou código PIX. Aceite opcional; posso interromper as mensagens quando desejar.</span>
           </label>
+          {!paymentWhatsAppConsent && (
+            <p className="mt-2 text-xs text-brand-orange">Sem marcar esta opção, nenhuma mensagem de WhatsApp será enviada sobre sua doação.</p>
+          )}
           {marketingEnabled && <label className="flex items-start gap-2 mt-5 text-xs text-white/60 cursor-pointer">
             <input type="checkbox" checked={marketingConsent} onChange={e=>setMarketingConsent(e.target.checked)}
               className="mt-0.5 accent-brand-orange"/>
