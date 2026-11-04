@@ -6,7 +6,7 @@ import { Button } from "@/components/ui/button";
 import { toast } from "sonner";
 
 type Template = {event_type:string;label:string;enabled:boolean;content:string};
-type Delivery = {event_type:string;status:string;phone_e164:string;attempted_at:string};
+type Delivery = {event_type:string;status:string;phone_e164:string;attempted_at:string;skip_reason?:string|null};
 
 export const Route=createFileRoute("/admin/automations")({component:AutomationsPage});
 function AutomationsPage() {
