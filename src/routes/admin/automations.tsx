@@ -125,7 +125,7 @@ function AutomationsPage() {
       {deliveries.length===0?<p className="text-white/50 text-sm">Nenhum envio registrado.</p>:
         <div className="space-y-2">{deliveries.map((d,i)=><div key={i} className="flex flex-wrap justify-between gap-2 border-b border-white/10 pb-2 text-sm">
           <span>{d.event_type} · {d.phone_e164.slice(0,4)+"••••"+d.phone_e164.slice(-4)}</span>
-          <span>{d.status} · {new Date(d.attempted_at).toLocaleString("pt-BR")}</span></div>)}</div>}
+          <span>{d.status}{d.skip_reason ? ` (${d.skip_reason})` : ""} · {new Date(d.attempted_at).toLocaleString("pt-BR")}</span></div>)}</div>}
     </section>
   </div>;
 }
