@@ -44,7 +44,7 @@ Deno.serve(async(req) => {
     if(action==="list") {
       const [t,d]=await Promise.all([
         db.from("whatsapp_automation_templates").select("event_type,label,enabled,content").order("label"),
-        db.from("whatsapp_automation_deliveries").select("event_type,status,phone_e164,attempted_at").order("attempted_at",{ascending:false}).limit(30)
+        db.from("whatsapp_automation_deliveries").select("event_type,status,phone_e164,attempted_at,skip_reason").order("attempted_at",{ascending:false}).limit(30)
       ]);
       if(t.error || d.error) return json({error:"Migração de automações não aplicada no Supabase"},503);
       return json({templates:t.data,deliveries:d.data,enabled:Deno.env.get("IDE_WHATSAPP_AUTOMATION_ENABLED")==="true",sandboxTestEnabled:Deno.env.get("IDE_WHATSAPP_SANDBOX_TEST_ENABLED")==="true"});
