@@ -16,6 +16,10 @@ function AutomationsPage() {
   const [saving,setSaving]=useState<string|null>(null);
   const [testing,setTesting]=useState(false);
   const [paymentTesting,setPaymentTesting]=useState<"PIX"|"BOLETO"|null>(null);
+  const [testDonationId,setTestDonationId]=useState("");
+  const [testPaymentId,setTestPaymentId]=useState("");
+  const [testPhone,setTestPhone]=useState("");
+  const [donationTesting,setDonationTesting]=useState(false);
   const [serverEnabled,setServerEnabled]=useState(false);
   const [sandboxTestEnabled,setSandboxTestEnabled]=useState(false);
   const [error,setError]=useState("");
@@ -71,6 +75,24 @@ function AutomationsPage() {
     }catch(e:any){toast.error(e.message||"Falha no teste de cobrança")}
     finally{setPaymentTesting(null)}
   }
+  async function testExistingDonation() {
+    if(!/^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(testDonationId.trim()))
+      return toast.error("Informe o UUID da doação existente.");
+    if(!window.confirm("Enviar instruções da cobrança existente no Sandbox ao telefone informado, que deve coincidir com o cadastro e ter consentimento? Não cria cobrança nem realiza pagamento."))return;
+    setDonationTesting(true);
+    try {
+      const {data,error}=await supabase.functions.invoke("whatsapp-payment-instructions",{body:{
+        action:"test_donation",donationId:testDonationId.trim(),paymentId:testPaymentId.trim()||undefined,
+        expectedPhone:testPhone,confirmation:"CONFIRMO_TESTE_DOACAO_SANDBOX",
+      }});
+      if(error){let detail;try{detail=await (error as any).context?.clone?.().json()}catch{}throw new Error(detail?.error||error.message)}
+      if(data?.error)throw new Error(data.error);
+      if(data?.skipped)toast.info(data.skipped);
+      else if(!data?.ok)toast.error(data?.message||"Envio não confirmado; consulte o diagnóstico.");
+      else toast.success("Aceito pela UazAPI. Confirme o recebimento no telefone de teste.");
+      await load();
+    }catch(e:any){toast.error(e.message||"Falha no teste");await load()}finally{setDonationTesting(false)}
+  }
   return <div className="max-w-5xl mx-auto text-white space-y-6">
     <header className="flex flex-wrap justify-between items-center gap-4">
       <div><h1 className="text-3xl font-bold">Comunicação · Automações</h1>
@@ -108,6 +130,16 @@ function AutomationsPage() {
       </div>
       <p className="text-xs text-amber-200/80">O botão de teste não gera cobranças nem altera pagamentos. Se não existir uma cobrança avulsa pendente desse tipo no Sandbox, crie uma no formulário de doação antes do teste. O PDF será enviado como arquivo, não como link.</p>
     </div>
+    <section className="rounded-2xl border border-white/10 p-5 space-y-3">
+      <h2 className="text-xl font-bold">Testar uma doação existente — Sandbox</h2>
+      <p className="text-sm text-white/60">Reutiliza a cobrança, exige consentimento e confere o telefone autorizado com o cadastro. Para mensalidade, informe o pay_ da parcela. Tentativas incertas não são reenviadas.</p>
+      <input aria-label="ID da doação de teste" className="w-full bg-black/30 p-3 rounded-lg" placeholder="UUID da doação" value={testDonationId} onChange={e=>setTestDonationId(e.target.value)} />
+      <input aria-label="ID da cobrança de teste" className="w-full bg-black/30 p-3 rounded-lg" placeholder="pay_ da parcela (obrigatório para mensalidade)" value={testPaymentId} onChange={e=>setTestPaymentId(e.target.value)} />
+      <input aria-label="Telefone autorizado para teste" className="w-full bg-black/30 p-3 rounded-lg" placeholder="Telefone de teste autorizado" value={testPhone} onChange={e=>setTestPhone(e.target.value)} />
+      <Button disabled={donationTesting||!testDonationId.trim()||!testPhone.trim()} onClick={testExistingDonation}>
+        {donationTesting?"Testando…":"Enviar instruções da doação de teste"}
+      </Button>
+    </section>
     {error&&<div role="alert" className="rounded-lg border border-red-500/40 p-4 text-red-300">{error}. Confirme a migração e o deploy da função whatsapp-automation no Supabase.</div>}
     {loading?<div className="flex gap-2 items-center"><Loader2 className="w-5 h-5 animate-spin"/>Carregando modelos...</div>:null}
     <section className="grid gap-4">
