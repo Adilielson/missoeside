@@ -404,6 +404,27 @@ Deno.serve(async (req) => {
       }
     }
 
+    // Assinatura mensal: mensagem imediata de "assinatura registrada" (não afirma pagamento).
+    if (payload.type === "MONTHLY" && typeof payment.id === "string" && payment.id.startsWith("sub_") &&
+        payload.donor_payment_notification_consent === true) {
+      try {
+        const role = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY") || "";
+        const base = Deno.env.get("SUPABASE_URL") || "";
+        if (role && base) {
+          const sent = await fetch(base + "/functions/v1/whatsapp-automation", {
+            method: "POST",
+            headers: { "Content-Type": "application/json", authorization: "Bearer " + role, apikey: role },
+            body: JSON.stringify({ action: "event", eventType: "subscription_created", eventKey: "sub:" + payment.id,
+              donationId: donation.id, dueDate: typeof firstPayment?.dueDate === "string" ? firstPayment.dueDate : undefined }),
+            signal: AbortSignal.timeout(20000),
+          });
+          if (!sent.ok) console.warn("WhatsApp: assinatura registrada não enviada", sent.status, await sent.text());
+        }
+      } catch {
+        console.warn("WhatsApp: automação de assinatura indisponível");
+      }
+    }
+
     // 6. E-mail de agradecimento somente quando houve pagamento confirmado.
     if (initialStatus === "CONFIRMED") try {
       const message = `Olá ${payload.donor_name}, obrigado pela sua doação de R$ ${payload.amount.toFixed(2).replace('.', ',')} para o projeto ${projectName}. Sua ajuda transforma vidas! 💛`;
